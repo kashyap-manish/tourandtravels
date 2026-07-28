@@ -51,11 +51,11 @@ export default function Home() {
         style={{ backgroundImage: "url('/images/bg_5.jpg')", minHeight: '100vh' }}
       >
         <div className="overlay" />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 w-full">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
           <div className="max-w-xl text-white">
             <span className="text-orange-400 font-semibold tracking-widest uppercase text-sm">Welcome to Pacific</span>
-            <h1 className="text-4xl md:text-6xl font-bold mt-3 mb-5 leading-tight">Discover Your Favorite Place with Us</h1>
-            <p className="text-gray-200 text-lg">Travel to any corner of the world, without going around in circles</p>
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mt-3 mb-5 leading-tight">Discover Your Favorite Place with Us</h1>
+            <p className="text-gray-200 text-base md:text-lg">Travel to any corner of the world, without going around in circles</p>
           </div>
           <a href="https://vimeo.com/45830194" target="_blank" rel="noreferrer"
             className="mt-8 w-16 h-16 rounded-full border-2 border-white flex items-center justify-center hover:bg-orange-500 hover:border-orange-500 transition-colors">
@@ -65,14 +65,14 @@ export default function Home() {
       </section>
 
       {/* Search */}
-      <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-20">
+      <section className="max-w-7xl mx-auto px-4 -mt-6 md:-mt-8 relative z-20">
         <SearchForm />
       </section>
 
       {/* Services */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+      <section className="py-14 md:py-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-10 md:gap-12 items-center">
             <div className="order-2 md:order-1 grid grid-cols-2 gap-4">
               {services.map(s => (
                 <div key={s.title} className="service-card rounded-lg" style={{ backgroundImage: `url('${s.img}')` }}>
@@ -86,7 +86,7 @@ export default function Home() {
             </div>
             <div className="order-1 md:order-2">
               <span className="text-orange-500 font-semibold tracking-widest uppercase text-sm">Welcome to Pacific</span>
-              <h2 className="text-3xl font-bold mt-2 mb-4">It's time to start your adventure</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mt-2 mb-4">It's time to start your adventure</h2>
               <p className="text-gray-600 mb-3">A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.</p>
               <p className="text-gray-600 mb-6">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
               <a href="#" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded font-semibold transition-colors">Search Destination</a>
@@ -96,16 +96,18 @@ export default function Home() {
       </section>
 
       {/* Select Destination */}
-      <section className="py-20 bg-cover bg-center relative" style={{ backgroundImage: "url('/images/bg_3.jpg')" }}>
+      <section className="py-14 md:py-20 bg-cover bg-center relative" style={{ backgroundImage: "url('/images/bg_3.jpg')" }}>
         <div className="absolute inset-0 bg-black/50" />
-        <div className="relative z-10 max-w-7xl mx-auto px-4">
-          <div className="text-center text-white mb-10">
+        <div className="relative z-10 max-w-7xl mx-auto px-0 md:px-6">
+          <div className="text-center text-white mb-10 px-6">
             <span className="text-orange-400 font-semibold tracking-widest uppercase text-sm">Pacific Provide Places</span>
-            <h2 className="text-3xl font-bold mt-2">Select Your Destination</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mt-2">Select Your Destination</h2>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {places.map(p => (
-              <a key={p.name} href="#" className="dest-card" style={{ backgroundImage: `url('${p.img}')` }}>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
+            {places.map((p, i) => (
+              <a key={p.name} href="#"
+                className={`dest-card${i === places.length - 1 && places.length % 2 !== 0 ? ' col-span-2 md:col-span-1' : ''}`}
+                style={{ backgroundImage: `url('${p.img}')` }}>
                 <div className="dest-text">
                   <h3 className="font-bold text-lg">{p.name}</h3>
                   <span className="text-sm text-gray-200">{p.tours}</span>
@@ -117,13 +119,13 @@ export default function Home() {
       </section>
 
       {/* Tour Destinations */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4">
+      <section className="py-14 md:py-20">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-10">
             <span className="text-orange-500 font-semibold tracking-widest uppercase text-sm">Destination</span>
-            <h2 className="text-3xl font-bold mt-2">Tour Destination</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mt-2">Tour Destination</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {tours.map((t, i) => <TourCard key={i} {...t} />)}
           </div>
         </div>
@@ -142,13 +144,13 @@ export default function Home() {
       </section>
 
       {/* About */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-0 rounded-lg overflow-hidden shadow-lg">
-            <div className="h-72 md:h-auto bg-cover bg-center" style={{ backgroundImage: "url('/images/about-1.jpg')" }} />
-            <div className="bg-white p-10 flex flex-col justify-center">
+      <section className="py-14 md:py-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-0 rounded-2xl overflow-hidden shadow-lg">
+            <div className="h-64 md:h-auto bg-cover bg-center" style={{ backgroundImage: "url('/images/about-1.jpg')" }} />
+            <div className="bg-white p-7 md:p-10 flex flex-col justify-center">
               <span className="text-orange-500 font-semibold tracking-widest uppercase text-sm">About Us</span>
-              <h2 className="text-3xl font-bold mt-2 mb-4">Make Your Tour Memorable and Safe With Us</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mt-2 mb-4">Make Your Tour Memorable and Safe With Us</h2>
               <p className="text-gray-600 mb-6">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
               <a href="#" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded font-semibold transition-colors w-fit">Book Your Destination</a>
             </div>
@@ -157,14 +159,14 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-cover bg-center relative" style={{ backgroundImage: "url('/images/bg_1.jpg')" }}>
+      <section className="py-14 md:py-20 bg-cover bg-center relative" style={{ backgroundImage: "url('/images/bg_1.jpg')" }}>
         <div className="absolute inset-0 bg-black/60" />
-        <div className="relative z-10 max-w-7xl mx-auto px-4">
+        <div className="relative z-10 max-w-7xl mx-auto px-6">
           <div className="text-center text-white mb-10">
             <span className="text-orange-400 font-semibold tracking-widest uppercase text-sm">Testimonial</span>
-            <h2 className="text-3xl font-bold mt-2">Tourist Feedback</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mt-2">Tourist Feedback</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
               <div key={i} className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-white">
                 <div className="flex text-yellow-400 text-sm mb-3">
@@ -185,13 +187,13 @@ export default function Home() {
       </section>
 
       {/* Blog */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4">
+      <section className="py-14 md:py-20">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-10">
             <span className="text-orange-500 font-semibold tracking-widest uppercase text-sm">Our Blog</span>
-            <h2 className="text-3xl font-bold mt-2">Recent Post</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mt-2">Recent Post</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {blogs.map((b, i) => <BlogCard key={i} {...b} />)}
           </div>
         </div>

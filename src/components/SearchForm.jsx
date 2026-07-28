@@ -44,7 +44,7 @@ export default function SearchForm() {
       </div>
 
       {/* Form */}
-      <form className="grid grid-cols-1 md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+      <form className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 divide-y sm:divide-x sm:divide-y-0 md:divide-x divide-gray-100">
         <Field label="Destination" icon="fa-map-marker">
           <input
             type="text"

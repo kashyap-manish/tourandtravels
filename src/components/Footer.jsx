@@ -86,15 +86,15 @@ export default function Footer() {
             <p className="text-orange-400 text-xs font-semibold tracking-widest uppercase mb-1">Stay Updated</p>
             <h3 className="text-xl font-bold text-white">Subscribe to our newsletter</h3>
           </div>
-          <form className="flex w-full md:w-auto gap-0 max-w-md" onSubmit={e => e.preventDefault()}>
+          <form className="flex w-full md:w-auto gap-0 max-w-md flex-col sm:flex-row" onSubmit={e => e.preventDefault()}>
             <input
               type="email"
               placeholder="Enter your email address"
-              className="flex-1 bg-white/10 border border-white/10 rounded-l-full px-5 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-orange-500 transition-colors"
+              className="flex-1 bg-white/10 border border-white/10 sm:rounded-l-full rounded-t-full sm:rounded-tr-none px-5 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-orange-500 transition-colors"
             />
             <button
               type="submit"
-              className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-6 py-3 rounded-r-full transition-colors whitespace-nowrap"
+              className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-6 py-3 sm:rounded-r-full rounded-b-full sm:rounded-bl-none transition-colors whitespace-nowrap"
             >
               Subscribe
             </button>
@@ -177,7 +177,7 @@ export default function Footer() {
 
       {/* Bottom Bar */}
       <div className="border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500 text-center">
           <p>© {new Date().getFullYear()} Pacific Travel Agency. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <a href="#" className="hover:text-orange-400 transition-colors">Privacy Policy</a>

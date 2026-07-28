@@ -52,20 +52,20 @@ export default function About() {
       <section className="bg-orange-500">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 divide-x divide-orange-400">
           {stats.map(s => (
-            <div key={s.label} className="py-8 text-center text-white">
-              <p className="text-3xl font-extrabold">{s.value}</p>
-              <p className="text-sm font-medium text-orange-100 mt-1">{s.label}</p>
+            <div key={s.label} className="py-6 md:py-8 text-center text-white">
+              <p className="text-2xl md:text-3xl font-extrabold">{s.value}</p>
+              <p className="text-xs md:text-sm font-medium text-orange-100 mt-1">{s.label}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Our Story */}
-      <section className="py-24">
+      <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
+          <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
             {/* Images collage */}
-            <div className="relative h-[480px]">
+            <div className="relative h-72 sm:h-96 md:h-[480px]">
               <div
                 className="absolute top-0 left-0 w-3/4 h-3/4 rounded-2xl bg-cover bg-center shadow-xl"
                 style={{ backgroundImage: "url('/images/about.jpg')" }}
@@ -88,7 +88,7 @@ export default function About() {
             {/* Text */}
             <div>
               <span className="text-orange-500 font-semibold tracking-widest uppercase text-xs">Our Story</span>
-              <h2 className="text-4xl font-extrabold mt-3 mb-6 leading-tight text-gray-900">
+              <h2 className="text-3xl md:text-4xl font-extrabold mt-3 mb-6 leading-tight text-gray-900">
                 We Turn Your Travel Dreams Into Reality
               </h2>
               <p className="text-gray-500 leading-relaxed mb-4">
@@ -113,13 +113,13 @@ export default function About() {
       </section>
 
       {/* Services */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-14">
+          <div className="text-center mb-10 md:mb-14">
             <span className="text-orange-500 font-semibold tracking-widest uppercase text-xs">What We Offer</span>
-            <h2 className="text-4xl font-extrabold mt-3 text-gray-900">Our Services</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold mt-3 text-gray-900">Our Services</h2>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {services.map(s => (
               <div
                 key={s.title}
@@ -142,13 +142,13 @@ export default function About() {
 
       {/* Video Banner */}
       <section
-        className="relative py-40 flex items-center justify-center bg-cover bg-center"
+        className="relative py-28 md:py-40 flex items-center justify-center bg-cover bg-center"
         style={{ backgroundImage: "url('/images/bg_4.jpg')" }}
       >
         <div className="absolute inset-0 bg-black/55" />
         <div className="relative z-10 text-center text-white px-4">
           <p className="text-orange-400 font-semibold tracking-widest uppercase text-xs mb-4">Watch Our Story</p>
-          <h2 className="text-4xl font-extrabold mb-8">See The World Through Our Eyes</h2>
+          <h2 className="text-3xl md:text-4xl font-extrabold mb-8">See The World Through Our Eyes</h2>
           <a
             href="https://vimeo.com/45830194"
             target="_blank"
@@ -161,13 +161,13 @@ export default function About() {
       </section>
 
       {/* Team */}
-      <section className="py-24">
+      <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-14">
+          <div className="text-center mb-10 md:mb-14">
             <span className="text-orange-500 font-semibold tracking-widest uppercase text-xs">The People Behind Pacific</span>
-            <h2 className="text-4xl font-extrabold mt-3 text-gray-900">Meet Our Team</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold mt-3 text-gray-900">Meet Our Team</h2>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {team.map((m, i) => (
               <div key={i} className="group text-center">
                 <div className="relative mx-auto w-40 h-40 rounded-2xl overflow-hidden mb-4 shadow-md group-hover:shadow-xl transition-shadow">
@@ -193,15 +193,15 @@ export default function About() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 bg-gray-950 relative overflow-hidden">
+      <section className="py-16 md:py-24 bg-gray-950 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-72 h-72 bg-orange-500/5 rounded-full -translate-x-1/2 -translate-y-1/2" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-orange-500/5 rounded-full translate-x-1/3 translate-y-1/3" />
         <div className="relative z-10 max-w-7xl mx-auto px-6">
-          <div className="text-center mb-14">
+          <div className="text-center mb-10 md:mb-14">
             <span className="text-orange-400 font-semibold tracking-widest uppercase text-xs">Testimonials</span>
-            <h2 className="text-4xl font-extrabold mt-3 text-white">What Our Travelers Say</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold mt-3 text-white">What Our Travelers Say</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
               <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-7 hover:border-orange-500/40 transition-colors">
                 <div className="flex gap-0.5 mb-4">

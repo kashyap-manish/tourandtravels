@@ -1,31 +1,17 @@
-import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setCategory, setSortBy, setPage } from '../store/toursSlice';
 import TourCard from '../components/TourCard';
 import SearchForm from '../components/SearchForm';
 import CallToAction from '../components/CallToAction';
 import { Link } from 'react-router-dom';
-
-const tours = [
-  { img: '/images/destination-1.jpg', price: '₹12,500/person', days: '5 Days Tour', title: 'Golden Triangle', location: 'Delhi, Agra & Jaipur, India', features: ['🚿 2', '🛏 3', '🏛 Heritage'], category: 'Culture' },
-  { img: '/images/destination-2.jpg', price: '₹8,999/person', days: '4 Days Tour', title: 'Goa Beach Getaway', location: 'Goa, India', features: ['🚿 2', '🛏 2', '🏖 Near Beach'], category: 'Beach' },
-  { img: '/images/destination-3.jpg', price: '₹15,000/person', days: '7 Days Tour', title: 'Kerala Backwaters', location: 'Alleppey, Kerala, India', features: ['🚿 2', '🛏 3', '🌿 Nature'], category: 'Nature' },
-  { img: '/images/destination-4.jpg', price: '₹18,500/person', days: '8 Days Tour', title: 'Ladakh Adventure', location: 'Leh-Ladakh, India', features: ['🚿 1', '🛏 2', '⛰ Near Mountain'], category: 'Adventure' },
-  { img: '/images/destination-5.jpg', price: '₹9,500/person', days: '5 Days Tour', title: 'Varanasi Spiritual Tour', location: 'Varanasi, Uttar Pradesh, India', features: ['🚿 2', '🛏 2', '🏛 Heritage'], category: 'Culture' },
-  { img: '/images/destination-6.jpg', price: '₹11,000/person', days: '6 Days Tour', title: 'Manali Snow Escape', location: 'Manali, Himachal Pradesh, India', features: ['🚿 2', '🛏 3', '⛰ Near Mountain'], category: 'Adventure' },
-  { img: '/images/destination-7.jpg', price: '₹7,500/person', days: '4 Days Tour', title: 'Andaman Islands', location: 'Port Blair, Andaman, India', features: ['🚿 2', '🛏 2', '🏖 Near Beach'], category: 'Beach' },
-  { img: '/images/destination-8.jpg', price: '₹13,000/person', days: '6 Days Tour', title: 'Rajasthan Desert Safari', location: 'Jaisalmer, Rajasthan, India', features: ['🚿 1', '🛏 2', '🌅 Desert'], category: 'Adventure' },
-  { img: '/images/destination-9.jpg', price: '₹10,500/person', days: '5 Days Tour', title: 'Coorg Coffee Trails', location: 'Coorg, Karnataka, India', features: ['🚿 2', '🛏 3', '🌿 Nature'], category: 'Nature' },
-  { img: '/images/destination-10.jpg', price: '₹14,000/person', days: '7 Days Tour', title: 'Darjeeling & Sikkim', location: 'Darjeeling, West Bengal, India', features: ['🚿 2', '🛏 2', '⛰ Near Mountain'], category: 'Nature' },
-  { img: '/images/destination-11.jpg', price: '₹16,500/person', days: '8 Days Tour', title: 'Spiti Valley Expedition', location: 'Spiti, Himachal Pradesh, India', features: ['🚿 1', '🛏 2', '⛰ Near Mountain'], category: 'Adventure' },
-  { img: '/images/destination-12.jpg', price: '₹8,000/person', days: '4 Days Tour', title: 'Pondicherry Coastal Tour', location: 'Pondicherry, India', features: ['🚿 2', '🛏 2', '🏖 Near Beach'], category: 'Beach' },
-];
+import { tours } from '../data/tours';
 
 const categories = ['All', 'Beach', 'Adventure', 'Nature', 'Culture'];
 const ITEMS_PER_PAGE = 9;
 
 export default function Destination() {
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [sortBy, setSortBy] = useState('default');
-  const [currentPage, setCurrentPage] = useState(1);
+  const dispatch = useDispatch();
+  const { activeCategory, sortBy, currentPage } = useSelector(s => s.tours);
 
   const filtered = tours.filter(t => activeCategory === 'All' || t.category === activeCategory);
 
@@ -40,7 +26,7 @@ export default function Destination() {
   const totalPages = Math.ceil(sorted.length / ITEMS_PER_PAGE);
   const paginated = sorted.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-  const handleCategory = (cat) => { setActiveCategory(cat); setCurrentPage(1); };
+  const handleCategory = (cat) => dispatch(setCategory(cat));
 
   return (
     <>
@@ -56,13 +42,13 @@ export default function Destination() {
             <i className="fa fa-chevron-right text-xs text-orange-500" />
             <span className="text-white">Destinations</span>
           </p>
-          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">Tour Destinations</h1>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">Tour Destinations</h1>
           <p className="mt-3 text-gray-300 text-lg max-w-xl mx-auto">Explore our handpicked tours across the world's most breathtaking destinations</p>
         </div>
       </section>
 
       {/* Search */}
-      <section className="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
+      <section className="max-w-7xl mx-auto px-6 -mt-6 md:-mt-8 relative z-20">
         <SearchForm />
       </section>
 
@@ -92,7 +78,7 @@ export default function Destination() {
               <span className="text-sm text-gray-400">{sorted.length} tours found</span>
               <select
                 value={sortBy}
-                onChange={e => setSortBy(e.target.value)}
+                onChange={e => dispatch(setSortBy(e.target.value))}
                 className="border border-gray-200 rounded-xl px-4 py-2 text-sm text-gray-600 outline-none focus:border-orange-400 transition-colors bg-white"
               >
                 <option value="default">Sort: Default</option>
@@ -111,7 +97,7 @@ export default function Destination() {
           {totalPages > 1 && (
             <div className="flex justify-center items-center gap-2 mt-12">
               <button
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                onClick={() => dispatch(setPage(Math.max(1, currentPage - 1)))}
                 disabled={currentPage === 1}
                 className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 text-gray-500 hover:bg-orange-500 hover:text-white hover:border-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               >
@@ -121,7 +107,7 @@ export default function Destination() {
               {[...Array(totalPages)].map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => setCurrentPage(i + 1)}
+                  onClick={() => dispatch(setPage(i + 1))}
                   className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-semibold border transition-all
                     ${currentPage === i + 1
                       ? 'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-500/20'
@@ -133,7 +119,7 @@ export default function Destination() {
               ))}
 
               <button
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                onClick={() => dispatch(setPage(Math.min(totalPages, currentPage + 1)))}
                 disabled={currentPage === totalPages}
                 className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 text-gray-500 hover:bg-orange-500 hover:text-white hover:border-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               >

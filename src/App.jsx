@@ -13,6 +13,7 @@ import BookingConditions from './pages/BookingConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import RefundPolicy from './pages/RefundPolicy';
 import CallUs from './pages/CallUs';
+import TourDetail from './pages/TourDetail';
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/destination" element={<Destination />} />
+          <Route path="/destination/:id" element={<TourDetail />} />
           <Route path="/hotel" element={<Hotel />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/contact" element={<Contact />} />

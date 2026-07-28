@@ -1,4 +1,11 @@
-export default function TourCard({ img, price, days, title, location, features }) {
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleWishlist } from '../store/wishlistSlice';
+
+export default function TourCard({ id, img, price, days, title, location, features }) {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isWishlisted = useSelector(s => s.wishlist.ids.includes(id));
   return (
     <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
 
@@ -13,8 +20,10 @@ export default function TourCard({ img, price, days, title, location, features }
           {price}
         </div>
         {/* Wishlist */}
-        <button className="absolute top-4 right-4 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-md transition-colors group/btn">
-          <i className="fa fa-heart-o text-gray-400 group-hover/btn:text-red-500 transition-colors text-sm" />
+        <button
+          onClick={() => dispatch(toggleWishlist(id))}
+          className="absolute top-4 right-4 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-md transition-colors group/btn">
+          <i className={`fa ${isWishlisted ? 'fa-heart text-red-500' : 'fa-heart-o text-gray-400 group-hover/btn:text-red-500'} transition-colors text-sm`} />
         </button>
         {/* Days badge */}
         <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5">
@@ -56,7 +65,10 @@ export default function TourCard({ img, price, days, title, location, features }
 
       {/* Footer */}
       <div className="px-5 pb-5">
-        <button className="w-full bg-gray-950 hover:bg-orange-500 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors duration-200">
+        <button
+          onClick={() => navigate(`/destination/${id}`)}
+          className="w-full bg-gray-950 hover:bg-orange-500 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors duration-200"
+        >
           View Details
         </button>
       </div>
