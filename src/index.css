@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900');
+@import url('https://fonts.googleapis.com/css2?family=Arizonia&display=swap');
+@import url('https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+
+:root {
+  --primary: #f97316;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+.hero-bg {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+}
+
+.brand-name span {
+  display: block;
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  color: #f97316;
+  text-transform: uppercase;
+}
+
+.card-img {
+  background-size: cover;
+  background-position: center;
+  height: 220px;
+  display: block;
+  position: relative;
+}
+
+.card-img .price {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: #f97316;
+  color: #fff;
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.service-card {
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  min-height: 200px;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+}
+
+.service-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.dest-card {
+  background-size: cover;
+  background-position: center;
+  height: 260px;
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.dest-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+}
+
+.dest-card .dest-text {
+  position: relative;
+  z-index: 1;
+  padding: 1rem;
+  color: #fff;
+}
+
+.blog-img {
+  background-size: cover;
+  background-position: center;
+  height: 200px;
+  display: block;
+}
+
+.intro-bg {
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  padding: 5rem 2rem;
+}
