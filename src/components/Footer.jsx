@@ -8,7 +8,14 @@ const information = [
   { label: 'Refund Policy', to: '/refund-policy' },
   { label: 'Call Us', to: '/call-us' },
 ];
-const experiences = ['Adventure', 'Hotel and Restaurant', 'Beach', 'Nature', 'Camping', 'Party'];
+const experiences = [
+  { label: 'Adventure', to: '/experience/adventure' },
+  { label: 'Hotel and Restaurant', to: '/experience/hotel-restaurant' },
+  { label: 'Beach', to: '/experience/beach' },
+  { label: 'Nature', to: '/experience/nature' },
+  { label: 'Camping', to: '/experience/camping' },
+  { label: 'Party', to: '/experience/party' },
+];
 
 const socials = [
   {
@@ -139,11 +146,11 @@ export default function Footer() {
           <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-5">Experience</h4>
           <ul className="space-y-2.5">
             {experiences.map(item => (
-              <li key={item}>
-                <a href="#" className="group flex items-center gap-2 text-sm text-gray-400 hover:text-orange-400 transition-colors">
+              <li key={item.label}>
+                <Link to={item.to} className="group flex items-center gap-2 text-sm text-gray-400 hover:text-orange-400 transition-colors">
                   <i className="fa fa-chevron-right text-[10px] text-orange-500/50 group-hover:text-orange-500 transition-colors" />
-                  {item}
-                </a>
+                  {item.label}
+                </Link>
               </li>
             ))}
           </ul>

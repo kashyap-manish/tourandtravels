@@ -14,6 +14,13 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import RefundPolicy from './pages/RefundPolicy';
 import CallUs from './pages/CallUs';
 import TourDetail from './pages/TourDetail';
+import Adventure from './pages/Adventure';
+import Beach from './pages/Beach';
+import Nature from './pages/Nature';
+import Camping from './pages/Camping';
+import Party from './pages/Party';
+import HotelRestaurant from './pages/HotelRestaurant';
+import ChatBox from './components/ChatBox';
 
 export default function App() {
   return (
@@ -34,9 +41,16 @@ export default function App() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/call-us" element={<CallUs />} />
+          <Route path="/experience/adventure" element={<Adventure />} />
+          <Route path="/experience/hotel-restaurant" element={<HotelRestaurant />} />
+          <Route path="/experience/beach" element={<Beach />} />
+          <Route path="/experience/nature" element={<Nature />} />
+          <Route path="/experience/camping" element={<Camping />} />
+          <Route path="/experience/party" element={<Party />} />
         </Routes>
       </main>
       <Footer />
+      <ChatBox />
     </BrowserRouter>
   );
 }
