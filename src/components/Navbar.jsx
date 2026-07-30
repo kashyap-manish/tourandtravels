@@ -7,6 +7,7 @@ const links = [
   { to: '/destination', label: 'Destination' },
   { to: '/hotel', label: 'Hotel' },
   { to: '/blog', label: 'Blog' },
+  { to: '/flight', label: 'Flight' },
   { to: '/contact', label: 'Contact' },
 ];
 
@@ -59,7 +60,7 @@ export default function Navbar() {
         {/* CTA + Hamburger */}
         <div className="flex items-center gap-3">
           <Link
-            to="http://localhost:5173/login"
+            to="/login"
             className="hidden md:inline-flex items-center gap-2 border border-white/20 hover:border-orange-500 text-gray-300 hover:text-orange-400 text-sm font-semibold px-5 py-2 rounded-full transition-colors duration-200"
           >
             <i className="fa fa-user text-xs" />
@@ -105,7 +106,7 @@ export default function Navbar() {
           ))}
           <li className="pt-2 flex flex-col gap-2">
             <Link
-              to="http://localhost:5173/login"
+              to="/login"
               onClick={() => setOpen(false)}
               className="flex items-center justify-center gap-2 border border-white/20 hover:border-orange-500 text-gray-300 hover:text-orange-400 text-sm font-semibold px-5 py-2.5 rounded-full transition-colors"
             >

@@ -4,4 +4,17 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5001',
+        changeOrigin: true,
+      },
+      '/aviationstack': {
+        target: 'http://api.aviationstack.com/v1',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/aviationstack/, ''),
+      },
+    },
+  },
 })

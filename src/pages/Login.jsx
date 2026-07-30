@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { login, clearError } from '../store/authSlice';
 
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
   const { loading, error, token } = useSelector(s => s.auth);
   const [form, setForm] = useState({ email: '', password: '' });
 
   useEffect(() => {
-    if (token) navigate('/');
+    if (token) navigate(from, { replace: true });
     return () => dispatch(clearError());
   }, [token]);
 
@@ -21,8 +23,8 @@ export default function Login() {
 
   return (
     <section
-      className="min-h-screen flex items-center justify-center bg-cover bg-center px-4 py-16"
-      style={{ backgroundImage: "url('/images/bg_1.jpg')" }}
+      className="min-h-screen flex items-center justify-center bg-cover bg-center px-4 py-16 relative"
+      style={{ backgroundImage: "url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1600&auto=format&fit=crop')" }}
     >
       <div className="absolute inset-0 bg-black/50" />
       <div className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">

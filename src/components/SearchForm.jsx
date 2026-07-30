@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const prices = ['Any Budget', '$100', '$10,000', '$50,000', '$100,000', '$200,000', '$300,000', '$500,000', '$1,000,000'];
+const prices = ['Any Budget', '₹1,000', '₹5,000', '₹10,000', '₹25,000', '₹50,000', '₹1,00,000', '₹2,00,000', '₹5,00,000'];
 
 const tabs = [
   { key: 'tour', label: 'Search Tour', icon: 'fa-paper-plane' },
@@ -19,36 +19,45 @@ function Field({ label, icon, children }) {
   );
 }
 
-export default function SearchForm() {
-  const [tab, setTab] = useState('tour');
+export default function SearchForm({ onHotelSearch, hotelOnly, tourOnly }) {
+  const [tab, setTab] = useState(hotelOnly ? 'hotel' : 'tour');
+  const filteredTabs = hotelOnly ? tabs.filter(t => t.key === 'hotel') : tourOnly ? tabs.filter(t => t.key === 'tour') : tabs;
+  const [destination, setDestination] = useState('');
 
   return (
     <div className="bg-white rounded-2xl shadow-2xl shadow-black/15 overflow-hidden">
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-100">
-        {tabs.map(t => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={`flex items-center gap-2 px-6 py-3.5 text-sm font-semibold transition-all duration-200 border-b-2 -mb-px
-              ${tab === t.key
-                ? 'border-orange-500 text-orange-500'
-                : 'border-transparent text-gray-400 hover:text-gray-600'
-              }`}
-          >
-            <i className={`fa ${t.icon} text-xs`} />
-            {t.label}
-          </button>
-        ))}
-      </div>
+      {!hotelOnly && !tourOnly && (
+        <div className="flex border-b border-gray-100">
+          {filteredTabs.map(t => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={`flex items-center gap-2 px-6 py-3.5 text-sm font-semibold transition-all duration-200 border-b-2 -mb-px
+                ${tab === t.key
+                  ? 'border-orange-500 text-orange-500'
+                  : 'border-transparent text-gray-400 hover:text-gray-600'
+                }`}
+            >
+              <i className={`fa ${t.icon} text-xs`} />
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Form */}
-      <form className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 divide-y sm:divide-x sm:divide-y-0 md:divide-x divide-gray-100">
+      <form
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 divide-y sm:divide-x sm:divide-y-0 md:divide-x divide-gray-100"
+        onSubmit={e => { e.preventDefault(); if (onHotelSearch && destination.trim()) onHotelSearch(destination.trim()); }}
+      >
         <Field label="Destination" icon="fa-map-marker">
           <input
             type="text"
             placeholder="Where to go?"
+            value={destination}
+            onChange={e => setDestination(e.target.value)}
             className="w-full outline-none text-sm text-gray-700 placeholder-gray-300 bg-transparent"
           />
         </Field>
@@ -67,7 +76,7 @@ export default function SearchForm() {
           />
         </Field>
 
-        <Field label="Budget" icon="fa-dollar">
+        <Field label="Budget" icon="fa-rupee">
           <select className="w-full outline-none text-sm text-gray-600 bg-transparent cursor-pointer">
             {prices.map(p => <option key={p}>{p}</option>)}
           </select>

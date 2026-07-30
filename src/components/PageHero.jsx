@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 
-export default function PageHero({ title, breadcrumb }) {
+export default function PageHero({ title, breadcrumb, bgImage }) {
   return (
     <section
       className="relative hero-bg flex items-end justify-center"
-      style={{ backgroundImage: "url('/images/bg_1.jpg')", minHeight: '50vh' }}
+      style={{ backgroundImage: `url('${bgImage || '/images/bg_1.jpg'}')`, minHeight: '50vh' }}
     >
       <div className="overlay" />
       <div className="relative z-10 text-center text-white pb-16 px-4">

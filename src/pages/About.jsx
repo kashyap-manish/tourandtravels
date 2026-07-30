@@ -13,6 +13,8 @@ const services = [
   { img: '/images/services-2.jpg', icon: 'fa-road', title: 'Travel Arrangements', desc: 'Seamless logistics from flights to transfers, all handled for you.' },
   { img: '/images/services-3.jpg', icon: 'fa-user', title: 'Private Guide', desc: 'Expert local guides who bring destinations to life with insider knowledge.' },
   { img: '/images/services-4.jpg', icon: 'fa-map', title: 'Location Manager', desc: 'On-ground support ensuring every detail of your journey runs smoothly.' },
+  { img: '/images/hotel-resto-1.jpg', icon: 'fa-building', title: 'Hotel Booking', desc: 'Handpicked hotels for every budget — from luxury resorts to cozy boutique stays.' },
+  { img: '/images/bg_3.jpg', icon: 'fa-plane', title: 'Flight Booking', desc: 'Best fares on domestic and international flights, booked hassle-free.' },
 ];
 
 const team = [
@@ -119,7 +121,7 @@ export default function About() {
             <span className="text-orange-500 font-semibold tracking-widest uppercase text-xs">What We Offer</span>
             <h2 className="text-3xl md:text-4xl font-extrabold mt-3 text-gray-900">Our Services</h2>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {services.map(s => (
               <div
                 key={s.title}

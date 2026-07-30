@@ -1,4 +1,6 @@
-export default function HotelCard({ img, name, location, stars, price, tag, amenities }) {
+export default function HotelCard({ img, name, location, stars, price, tag, amenities, website }) {
+  const seed = name.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  const photo = img || `https://picsum.photos/seed/${seed}/600/400`;
   return (
     <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col">
 
@@ -6,7 +8,7 @@ export default function HotelCard({ img, name, location, stars, price, tag, amen
       <div className="relative overflow-hidden h-56">
         <div
           className="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-          style={{ backgroundImage: `url('${img}')` }}
+          style={{ backgroundImage: `url('${photo}')` }}
         />
         <div className="absolute top-4 left-4 bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
           {tag}
@@ -47,12 +49,16 @@ export default function HotelCard({ img, name, location, stars, price, tag, amen
         {/* Price + Button */}
         <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
           <div>
-            <span className="text-xl font-extrabold text-orange-500">{price}</span>
-            <span className="text-xs text-gray-400 ml-1">/ night</span>
+            {price && <><span className="text-xl font-extrabold text-orange-500">{price}</span><span className="text-xs text-gray-400 ml-1">/ night</span></>}
           </div>
-          <button className="bg-gray-950 hover:bg-orange-500 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-colors duration-200">
-            Book Now
-          </button>
+          <a
+            href={website || `https://www.google.com/maps/search/${encodeURIComponent(name + ' ' + location)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-gray-950 hover:bg-orange-500 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-colors duration-200"
+          >
+            {website ? 'Visit' : 'Book Now'}
+          </a>
         </div>
       </div>
     </div>

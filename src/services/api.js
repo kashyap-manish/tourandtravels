@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: '/api',
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -16,37 +16,26 @@ export const loginCustomer = (data) => api.post('/auth/login/customer', data);
 export const registerCustomer = (data) => api.post('/auth/register/customer', data);
 export const getMe = () => api.get('/auth/me');
 
-// Buses / Tours
-export const getBuses = () => api.get('/buses');
-export const getBusById = (id) => api.get(`/buses/${id}`);
-export const searchBuses = (params) => api.get('/buses/search', { params });
-export const getBookedSeats = (busId, date) => api.get(`/buses/${busId}/booked-seats`, { params: { date } });
-
-// Cities
-export const getCities = () => api.get('/cities');
+// Tours
+export const getTours = (params) => api.get('/tours', { params });
+export const getTourById = (id) => api.get(`/tours/${id}`);
 
 // Bookings
 export const createBooking = (data) => api.post('/bookings', data);
 export const getMyBookings = () => api.get('/bookings');
 export const getBookingById = (id) => api.get(`/bookings/${id}`);
-
-// Banners
-export const getBanners = () => api.get('/banners');
-
-// FAQs
-export const getFaqs = () => api.get('/faqs');
-
-// Policies
-export const getPolicies = () => api.get('/policies');
-
-// Pages
-export const getPages = () => api.get('/pages');
-
-// Settings
-export const getSettings = () => api.get('/settings');
+export const cancelBooking = (id) => api.put(`/bookings/${id}/cancel`);
 
 // Reviews
-export const getReviews = (busId) => api.get(`/reviews/${busId}`);
+export const getReviews = (tourId) => api.get(`/reviews/${tourId}`);
+export const addReview = (tourId, data) => api.post(`/reviews/${tourId}`, data);
+
+// Wishlist
+export const getWishlist = () => api.get('/wishlist');
+export const toggleWishlist = (tourId) => api.post(`/wishlist/toggle/${tourId}`);
+
+// Contact
+export const sendContact = (data) => api.post('/contact', data);
 
 // Profile
 export const getProfile = () => api.get('/profile');
