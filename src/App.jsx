@@ -22,9 +22,12 @@ import Party from './pages/Party';
 import HotelRestaurant from './pages/HotelRestaurant';
 import ChatBox from './components/ChatBox';
 import Flight from './pages/Flight';
+import Profile from './pages/Profile';
+import Bookings from './pages/Bookings';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import PrivateRoute from './components/PrivateRoute';
+import AdminBookings from './pages/AdminBookings';
 
 export default function App() {
   return (
@@ -61,6 +64,9 @@ export default function App() {
                 <Route path="/experience/camping" element={<Camping />} />
                 <Route path="/experience/party" element={<Party />} />
                 <Route path="/flight" element={<Flight />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/bookings" element={<Bookings />} />
+                <Route path="/admin/bookings" element={<AdminBookings />} />
               </Routes>
             </main>
             <Footer />

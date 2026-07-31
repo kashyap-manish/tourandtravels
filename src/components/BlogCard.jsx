@@ -36,9 +36,9 @@ export default function BlogCard({ img, date, category, title, excerpt, author, 
             </div>
             <span className="text-xs font-semibold text-gray-600">{author}</span>
           </div>
-          <button className="text-xs font-semibold text-orange-500 hover:text-white hover:bg-orange-500 border border-orange-500 px-3 py-1.5 rounded-lg transition-all duration-200 flex items-center gap-1">
+          <a href = "/blog" className="text-xs font-semibold text-orange-500 hover:text-white hover:bg-orange-500 border border-orange-500 px-3 py-1.5 rounded-lg transition-all duration-200 flex items-center gap-1" >
             Read More <i className="fa fa-arrow-right text-xs" />
-          </button>
+          </a>
         </div>
       </div>
     </div>

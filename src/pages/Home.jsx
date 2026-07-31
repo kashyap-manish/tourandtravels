@@ -198,10 +198,10 @@ export default function Home() {
                 <p className="text-gray-500 mb-3">A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.</p>
                 <p className="text-gray-500 mb-6">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
                 <div className="flex gap-4 flex-wrap">
-                  <a href="#" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-full font-semibold transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-400/30">
+                  <a href="/destination" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-full font-semibold transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-400/30">
                     Search Destination
                   </a>
-                  <a href="#" className="border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white px-6 py-3 rounded-full font-semibold transition-all">
+                  <a href="/about" className="border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white px-6 py-3 rounded-full font-semibold transition-all">
                     Learn More
                   </a>
                 </div>
@@ -288,7 +288,7 @@ export default function Home() {
                 ))}
               </ul>
               <div className="flex items-center gap-4">
-                <a href="#" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-full font-semibold transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-400/30">
+                <a href="/destination" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-full font-semibold transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-400/30">
                   Book Your Destination
                 </a>
                 <LottieURL url={LOTTIE_SUCCESS} loop={false} className="w-14 h-14" />

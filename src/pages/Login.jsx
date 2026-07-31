@@ -8,6 +8,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || '/';
+  const verified = location.state?.verified;
   const { loading, error, token } = useSelector(s => s.auth);
   const [form, setForm] = useState({ email: '', password: '' });
 
@@ -37,6 +38,11 @@ export default function Login() {
           <p className="text-gray-400 text-sm mt-1">Sign in to your account</p>
         </div>
 
+        {verified && (
+          <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 mb-5 text-sm">
+            <i className="fa fa-check-circle" /> Email verified! You can now sign in.
+          </div>
+        )}
         {error && (
           <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 mb-5 text-sm">
             <i className="fa fa-exclamation-circle" /> {error}

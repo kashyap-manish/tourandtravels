@@ -1,6 +1,6 @@
 export const tours = [
   {
-    id: 1,
+    id: 1, slug: 'golden-triangle',
     img: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&q=80',
     price: '₹12,500/person', days: '5 Days Tour', title: 'Golden Triangle',
     location: 'Delhi, Agra & Jaipur, India', features: ['🚿 2', '🛏 3', '🏛 Heritage'],
@@ -17,7 +17,7 @@ export const tours = [
     ],
   },
   {
-    id: 2,
+    id: 2, slug: 'goa-beach-getaway',
     img: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=800&q=80',
     price: '₹8,999/person', days: '4 Days Tour', title: 'Goa Beach Getaway',
     location: 'Goa, India', features: ['🚿 2', '🛏 2', '🏖 Near Beach'],
@@ -33,7 +33,7 @@ export const tours = [
     ],
   },
   {
-    id: 3,
+    id: 3, slug: 'kerala-backwaters',
     img: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800&q=80',
     price: '₹15,000/person', days: '7 Days Tour', title: 'Kerala Backwaters',
     location: 'Alleppey, Kerala, India', features: ['🚿 2', '🛏 3', '🌿 Nature'],
@@ -52,7 +52,7 @@ export const tours = [
     ],
   },
   {
-    id: 4,
+    id: 4, slug: 'ladakh-adventure',
     img: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800&q=80',
     price: '₹18,500/person', days: '8 Days Tour', title: 'Ladakh Adventure',
     location: 'Leh-Ladakh, India', features: ['🚿 1', '🛏 2', '⛰ Near Mountain'],
@@ -72,7 +72,7 @@ export const tours = [
     ],
   },
   {
-    id: 5,
+    id: 5, slug: 'varanasi-spiritual-tour',
     img: 'https://images.unsplash.com/photo-1561361058-c24cecae35ca?w=800&q=80',
     price: '₹9,500/person', days: '5 Days Tour', title: 'Varanasi Spiritual Tour',
     location: 'Varanasi, Uttar Pradesh, India', features: ['🚿 2', '🛏 2', '🏛 Heritage'],
@@ -89,7 +89,7 @@ export const tours = [
     ],
   },
   {
-    id: 6,
+    id: 6, slug: 'manali-snow-escape',
     img: 'https://images.unsplash.com/photo-1597074866923-dc0589150358?w=800&q=80',
     price: '₹11,000/person', days: '6 Days Tour', title: 'Manali Snow Escape',
     location: 'Manali, Himachal Pradesh, India', features: ['🚿 2', '🛏 3', '⛰ Near Mountain'],
@@ -107,7 +107,7 @@ export const tours = [
     ],
   },
   {
-    id: 7,
+    id: 7, slug: 'andaman-islands',
     img: 'https://images.unsplash.com/photo-1586500036706-41963de24d8b?w=800&q=80',
     price: '₹7,500/person', days: '4 Days Tour', title: 'Andaman Islands',
     location: 'Port Blair, Andaman, India', features: ['🚿 2', '🛏 2', '🏖 Near Beach'],
@@ -123,7 +123,7 @@ export const tours = [
     ],
   },
   {
-    id: 8,
+    id: 8, slug: 'rajasthan-desert-safari',
     img: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?w=800&q=80',
     price: '₹13,000/person', days: '6 Days Tour', title: 'Rajasthan Desert Safari',
     location: 'Jaisalmer, Rajasthan, India', features: ['🚿 1', '🛏 2', '🌅 Desert'],
@@ -141,7 +141,7 @@ export const tours = [
     ],
   },
   {
-    id: 9,
+    id: 9, slug: 'coorg-coffee-trails',
     img: 'https://images.unsplash.com/photo-1580889240911-ced85d8b3b37?w=800&q=80',
     price: '₹10,500/person', days: '5 Days Tour', title: 'Coorg Coffee Trails',
     location: 'Coorg, Karnataka, India', features: ['🚿 2', '🛏 3', '🌿 Nature'],
@@ -158,7 +158,7 @@ export const tours = [
     ],
   },
   {
-    id: 10,
+    id: 10, slug: 'darjeeling-sikkim',
     img: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80',
     price: '₹14,000/person', days: '7 Days Tour', title: 'Darjeeling & Sikkim',
     location: 'Darjeeling, West Bengal, India', features: ['🚿 2', '🛏 2', '⛰ Near Mountain'],
@@ -177,7 +177,7 @@ export const tours = [
     ],
   },
   {
-    id: 11,
+    id: 11, slug: 'spiti-valley-expedition',
     img: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?w=800&q=80',
     price: '₹16,500/person', days: '8 Days Tour', title: 'Spiti Valley Expedition',
     location: 'Spiti, Himachal Pradesh, India', features: ['🚿 1', '🛏 2', '⛰ Near Mountain'],
@@ -197,7 +197,7 @@ export const tours = [
     ],
   },
   {
-    id: 12,
+    id: 12, slug: 'pondicherry-coastal-tour',
     img: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&q=80',
     price: '₹8,000/person', days: '4 Days Tour', title: 'Pondicherry Coastal Tour',
     location: 'Pondicherry, India', features: ['🚿 2', '🛏 2', '🏖 Near Beach'],

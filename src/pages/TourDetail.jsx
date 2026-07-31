@@ -1,10 +1,30 @@
+import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { tours } from '../data/tours';
+import { createBooking } from '../services/api';
+import { useSelector } from 'react-redux';
+
+const TABS = ['Overview', 'Itinerary', 'Includes'];
 
 export default function TourDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useSelector(s => s.auth);
   const tour = tours.find(t => t.id === Number(id));
+
+  const [tab, setTab] = useState('Overview');
+  const [showBooking, setShowBooking] = useState(false);
+  const [step, setStep] = useState(1); // 1=details, 2=payment
+  const [form, setForm] = useState({
+    name: user?.name || '', email: user?.email || '', phone: '',
+    travelDate: '', persons: 1, specialRequests: '',
+  });
+  const [payMethod, setPayMethod] = useState('upi');
+  const [upiId, setUpiId] = useState('');
+  const [card, setCard] = useState({ number: '', expiry: '', cvv: '', holder: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   if (!tour) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4">
@@ -13,115 +33,506 @@ export default function TourDetail() {
     </div>
   );
 
+  const priceNum = parseInt(tour.price.replace(/[^0-9]/g, ''));
+  const totalNum = priceNum * form.persons;
+  const total = `₹${totalNum.toLocaleString('en-IN')}`;
+
+  const closeModal = () => { setShowBooking(false); setSuccess(false); setError(''); setStep(1); };
+
+  const handleDetailsSubmit = (e) => {
+    e.preventDefault();
+    setStep(2);
+  };
+
+  const handlePayment = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError('');
+    try {
+      await createBooking({
+        tourSlug: tour.slug,
+        ...form,
+        totalPrice: totalNum,
+        paymentMethod: payMethod,
+      });
+      setSuccess(true);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Payment failed. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <>
       {/* Hero */}
-      <section
-        className="relative flex items-end justify-center bg-cover bg-center"
-        style={{ backgroundImage: `url('${tour.img}')`, minHeight: '55vh' }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
-        <div className="relative z-10 text-center text-white pb-16 px-4">
-          <p className="text-sm mb-3 flex items-center justify-center gap-2 text-gray-300">
+      <section className="relative flex items-end justify-center bg-cover bg-center" style={{ backgroundImage: `url('${tour.img}')`, minHeight: '60vh' }}>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 pb-10">
+          <p className="text-sm mb-4 flex items-center gap-2 text-gray-300">
             <Link to="/" className="hover:text-orange-400 transition-colors">Home</Link>
             <i className="fa fa-chevron-right text-xs text-orange-500" />
             <Link to="/destination" className="hover:text-orange-400 transition-colors">Destinations</Link>
             <i className="fa fa-chevron-right text-xs text-orange-500" />
             <span className="text-white">{tour.title}</span>
           </p>
-          <h1 className="text-3xl md:text-4xl md:text-5xl font-extrabold tracking-tight">{tour.title}</h1>
-          <p className="mt-2 text-gray-300 flex items-center justify-center gap-2">
-            <i className="fa fa-map-marker text-orange-400" /> {tour.location}
-          </p>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <div className="flex flex-wrap gap-2 mb-3">
+                <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">{tour.category}</span>
+                <span className="bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5">
+                  <i className="fa fa-clock-o text-orange-400" />{tour.days}
+                </span>
+              </div>
+              <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">{tour.title}</h1>
+              <p className="mt-2 text-gray-300 flex items-center gap-2 text-sm">
+                <i className="fa fa-map-marker text-orange-400" />{tour.location}
+              </p>
+              <div className="flex items-center gap-1 mt-3">
+                {[...Array(5)].map((_, i) => (
+                  <i key={i} className={`fa fa-star text-sm ${i < 4 ? 'text-yellow-400' : 'text-gray-500'}`} />
+                ))}
+                <span className="text-gray-300 text-xs ml-1.5">4.0 · 24 reviews</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-gray-400 text-xs">Starting from</p>
+                <p className="text-3xl font-extrabold text-orange-400">{tour.price}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-14 grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10">
-
-        {/* Left: Main Details */}
-        <div className="lg:col-span-2 space-y-10">
-
-          {/* Overview */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">Overview</h2>
-            <p className="text-gray-600 leading-relaxed">{tour.description}</p>
+      {/* Sticky Tab Bar */}
+      <div className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
+        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
+          <div className="flex">
+            {TABS.map(t => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={`px-5 py-4 text-sm font-semibold border-b-2 transition-colors ${tab === t ? 'border-orange-500 text-orange-500' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
+              >
+                {t}
+              </button>
+            ))}
           </div>
+          <button
+            onClick={() => { setShowBooking(true); setStep(1); }}
+            className="hidden md:flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2 rounded-xl transition-colors"
+          >
+            <i className="fa fa-calendar-check-o" /> Book Now
+          </button>
+        </div>
+      </div>
 
-          {/* Highlights */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Highlights</h2>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {tour.highlights.map((h, i) => (
-                <li key={i} className="flex items-start gap-2 text-gray-600 text-sm">
-                  <i className="fa fa-check-circle text-orange-500 mt-0.5" /> {h}
-                </li>
-              ))}
-            </ul>
-          </div>
+      <section className="max-w-6xl mx-auto px-4 md:px-6 py-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
 
-          {/* Itinerary */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Itinerary</h2>
-            <div className="space-y-3">
-              {tour.itinerary.map((item) => (
-                <div key={item.day} className="flex gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                  <div className="w-10 h-10 shrink-0 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                    {item.day}
+        {/* Left Content */}
+        <div className="lg:col-span-2">
+
+          {/* Overview Tab */}
+          {tab === 'Overview' && (
+            <div className="space-y-10">
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {[
+                  { icon: 'fa-clock-o', label: 'Duration', val: tour.days },
+                  { icon: 'fa-users', label: 'Group Size', val: 'Max 15' },
+                  { icon: 'fa-map-marker', label: 'Location', val: tour.location.split(',')[0] },
+                  { icon: 'fa-language', label: 'Language', val: 'English' },
+                ].map(s => (
+                  <div key={s.label} className="bg-gray-50 rounded-2xl p-4 border border-gray-100 text-center">
+                    <i className={`fa ${s.icon} text-orange-500 text-lg mb-2`} />
+                    <p className="text-xs text-gray-400 font-medium">{s.label}</p>
+                    <p className="text-sm font-bold text-gray-800 mt-0.5">{s.val}</p>
                   </div>
-                  <div>
-                    <p className="font-semibold text-gray-800">{item.title}</p>
-                    <p className="text-sm text-gray-500 mt-0.5">{item.desc}</p>
-                  </div>
+                ))}
+              </div>
+
+              {/* Description */}
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-3">About This Tour</h2>
+                <p className="text-gray-600 leading-relaxed">{tour.description}</p>
+              </div>
+
+              {/* Highlights */}
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Tour Highlights</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {tour.highlights.map((h, i) => (
+                    <div key={i} className="flex items-start gap-3 bg-orange-50 border border-orange-100 rounded-xl p-3.5">
+                      <span className="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0 mt-0.5">
+                        <i className="fa fa-check text-xs" />
+                      </span>
+                      <span className="text-sm text-gray-700 font-medium">{h}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              {/* Features */}
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-3">Amenities</h2>
+                <div className="flex flex-wrap gap-3">
+                  {tour.features.map((f, i) => (
+                    <span key={i} className="bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2 rounded-xl shadow-sm">{f}</span>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Itinerary Tab */}
+          {tab === 'Itinerary' && (
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-6">Day-by-Day Itinerary</h2>
+              <div className="relative">
+                <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-orange-100" />
+                <div className="space-y-4">
+                  {tour.itinerary.map((item, idx) => (
+                    <div key={item.day} className="flex gap-5 relative">
+                      <div className="w-10 h-10 shrink-0 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold z-10 shadow-md">
+                        {item.day}
+                      </div>
+                      <div className={`flex-1 rounded-2xl border p-5 ${idx % 2 === 0 ? 'bg-white border-gray-100' : 'bg-gray-50 border-gray-100'}`}>
+                        <p className="text-xs font-semibold text-orange-500 uppercase tracking-wide mb-1">Day {item.day}</p>
+                        <p className="font-bold text-gray-900 mb-1">{item.title}</p>
+                        <p className="text-sm text-gray-500">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Includes Tab */}
+          {tab === 'Includes' && (
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">What's Included</h2>
+                <div className="space-y-3">
+                  {tour.includes.map((inc, i) => (
+                    <div key={i} className="flex items-center gap-3 p-4 bg-green-50 border border-green-100 rounded-xl">
+                      <span className="w-7 h-7 rounded-full bg-green-500 text-white flex items-center justify-center shrink-0">
+                        <i className="fa fa-check text-xs" />
+                      </span>
+                      <span className="text-sm font-medium text-gray-700">{inc}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">What's Not Included</h2>
+                <div className="space-y-3">
+                  {['Personal expenses & shopping', 'Travel insurance', 'Tips & gratuities', 'Meals not mentioned in itinerary'].map((exc, i) => (
+                    <div key={i} className="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-xl">
+                      <span className="w-7 h-7 rounded-full bg-red-400 text-white flex items-center justify-center shrink-0">
+                        <i className="fa fa-times text-xs" />
+                      </span>
+                      <span className="text-sm font-medium text-gray-700">{exc}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right: Booking Card */}
-        <div className="space-y-6">
-          <div className="bg-white border border-gray-100 rounded-2xl shadow-md p-6 sticky top-24">
-            <div className="text-3xl font-extrabold text-orange-500 mb-1">{tour.price}</div>
-            <div className="flex items-center gap-2 text-sm text-gray-400 mb-5">
-              <i className="fa fa-clock-o text-orange-400" /> {tour.days}
-            </div>
-
-            {/* Features */}
-            <div className="flex flex-wrap gap-2 mb-5">
-              {tour.features.map((f, i) => (
-                <span key={i} className="text-xs bg-gray-50 border border-gray-100 text-gray-500 px-2.5 py-1 rounded-full">{f}</span>
-              ))}
-            </div>
-
-            {/* Rating */}
-            <div className="flex items-center gap-1 mb-5">
-              {[...Array(5)].map((_, i) => (
-                <i key={i} className={`fa fa-star text-xs ${i < 4 ? 'text-yellow-400' : 'text-gray-200'}`} />
-              ))}
-              <span className="text-xs text-gray-400 ml-1">(24 reviews)</span>
-            </div>
-
-            {/* What's Included */}
-            <div className="mb-6">
-              <p className="font-semibold text-gray-800 mb-2">What's Included</p>
-              <ul className="space-y-1.5">
-                {tour.includes.map((inc, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                    <i className="fa fa-check text-green-500 mt-0.5" /> {inc}
-                  </li>
+        <div>
+          <div className="bg-white border border-gray-100 rounded-2xl shadow-lg p-6 sticky top-24">
+            <div className="flex items-end justify-between mb-1">
+              <div>
+                <p className="text-xs text-gray-400 font-medium">Starting from</p>
+                <p className="text-3xl font-extrabold text-orange-500">{tour.price}</p>
+              </div>
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <i key={i} className={`fa fa-star text-xs ${i < 4 ? 'text-yellow-400' : 'text-gray-200'}`} />
                 ))}
-              </ul>
+              </div>
+            </div>
+            <p className="text-xs text-gray-400 mb-5">24 reviews · {tour.days}</p>
+
+            <div className="space-y-3 mb-5">
+              {[
+                { icon: 'fa-clock-o', text: tour.days },
+                { icon: 'fa-map-marker', text: tour.location },
+                { icon: 'fa-users', text: 'Max 15 people' },
+                { icon: 'fa-language', text: 'English guided' },
+              ].map((r, i) => (
+                <div key={i} className="flex items-center gap-3 text-sm text-gray-600">
+                  <i className={`fa ${r.icon} text-orange-400 w-4 text-center`} />
+                  {r.text}
+                </div>
+              ))}
             </div>
 
-            <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition-colors">
-              Book Now
+            <div className="border-t border-gray-100 pt-5 mb-5">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Includes</p>
+              <div className="space-y-2">
+                {tour.includes.slice(0, 3).map((inc, i) => (
+                  <div key={i} className="flex items-center gap-2 text-xs text-gray-600">
+                    <i className="fa fa-check text-green-500" />{inc}
+                  </div>
+                ))}
+                {tour.includes.length > 3 && (
+                  <button onClick={() => setTab('Includes')} className="text-xs text-orange-500 hover:underline">
+                    +{tour.includes.length - 3} more
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <button
+              onClick={() => { setShowBooking(true); setStep(1); }}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm"
+            >
+              <i className="fa fa-calendar-check-o" /> Book This Tour
             </button>
-            <Link to="/destination" className="block text-center text-sm text-gray-400 hover:text-orange-500 mt-3 transition-colors">
+            <Link to="/destination" className="block text-center text-xs text-gray-400 hover:text-orange-500 mt-3 transition-colors">
               ← Back to Destinations
             </Link>
           </div>
         </div>
       </section>
+
+      {/* Booking Modal */}
+      {showBooking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={closeModal}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+
+            {/* Modal Header */}
+            <div className="relative h-32 bg-cover bg-center rounded-t-2xl overflow-hidden" style={{ backgroundImage: `url('${tour.img}')` }}>
+              <div className="absolute inset-0 bg-black/50" />
+              <button onClick={closeModal} className="absolute top-3 right-3 w-8 h-8 bg-white/20 hover:bg-white/40 rounded-full flex items-center justify-center text-white transition-colors">
+                <i className="fa fa-times" />
+              </button>
+              <div className="absolute bottom-4 left-5">
+                <p className="text-white font-bold text-lg">{tour.title}</p>
+                <p className="text-orange-300 text-sm font-semibold">{tour.price}</p>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {success ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i className="fa fa-check text-green-500 text-2xl" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Payment Successful!</h3>
+                  <p className="text-gray-500 text-sm mb-1">Your booking is confirmed.</p>
+                  <p className="text-orange-500 font-bold text-lg mb-6">{total}</p>
+                  <div className="flex gap-3">
+                    <button onClick={closeModal} className="flex-1 border border-gray-200 text-gray-700 font-semibold py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm">Close</button>
+                    <button onClick={() => navigate('/bookings')} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-xl transition-colors text-sm">View Bookings</button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {/* Step indicator */}
+                  <div className="flex items-center gap-2 mb-5">
+                    {['Booking Details', 'Payment'].map((label, i) => (
+                      <div key={label} className="flex items-center gap-2 flex-1">
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                          step > i + 1 ? 'bg-green-500 text-white' : step === i + 1 ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-400'
+                        }`}>
+                          {step > i + 1 ? <i className="fa fa-check" /> : i + 1}
+                        </div>
+                        <span className={`text-xs font-semibold ${step === i + 1 ? 'text-gray-800' : 'text-gray-400'}`}>{label}</span>
+                        {i === 0 && <div className={`flex-1 h-0.5 ${step > 1 ? 'bg-orange-400' : 'bg-gray-100'}`} />}
+                      </div>
+                    ))}
+                  </div>
+
+                  {error && (
+                    <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
+                      <i className="fa fa-exclamation-circle text-red-500" />{error}
+                    </div>
+                  )}
+
+                  {/* Step 1: Booking Details */}
+                  {step === 1 && (
+                    <form onSubmit={handleDetailsSubmit} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">Full Name</label>
+                          <input required type="text" value={form.name}
+                            onChange={e => setForm({ ...form, name: e.target.value })}
+                            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">Phone</label>
+                          <input required type="tel" value={form.phone} placeholder="+91 XXXXX XXXXX"
+                            onChange={e => setForm({ ...form, phone: e.target.value })}
+                            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-500 mb-1.5">Email</label>
+                        <input required type="email" value={form.email}
+                          onChange={e => setForm({ ...form, email: e.target.value })}
+                          className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">Travel Date</label>
+                          <input required type="date" value={form.travelDate} min={new Date().toISOString().split('T')[0]}
+                            onChange={e => setForm({ ...form, travelDate: e.target.value })}
+                            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">Persons</label>
+                          <input required type="number" min={1} max={15} value={form.persons}
+                            onChange={e => setForm({ ...form, persons: Number(e.target.value) })}
+                            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-500 mb-1.5">Special Requests <span className="text-gray-300">(optional)</span></label>
+                        <textarea rows={2} value={form.specialRequests}
+                          onChange={e => setForm({ ...form, specialRequests: e.target.value })}
+                          placeholder="Any dietary requirements, accessibility needs..."
+                          className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors resize-none" />
+                      </div>
+                      <div className="bg-orange-50 border border-orange-100 rounded-xl p-4">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-500">{tour.price} × {form.persons} person{form.persons > 1 ? 's' : ''}</span>
+                          <span className="font-bold text-gray-900">{total}</span>
+                        </div>
+                      </div>
+                      <button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+                        Proceed to Payment <i className="fa fa-arrow-right" />
+                      </button>
+                    </form>
+                  )}
+
+                  {/* Step 2: Payment */}
+                  {step === 2 && (
+                    <form onSubmit={handlePayment} className="space-y-4">
+                      {/* Order summary */}
+                      <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 flex justify-between items-center">
+                        <div>
+                          <p className="text-xs text-gray-400">Booking for</p>
+                          <p className="font-bold text-gray-800 text-sm">{tour.title}</p>
+                          <p className="text-xs text-gray-400">{form.travelDate} · {form.persons} person{form.persons > 1 ? 's' : ''}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-gray-400">Total</p>
+                          <p className="text-xl font-extrabold text-orange-500">{total}</p>
+                        </div>
+                      </div>
+
+                      {/* Payment method selector */}
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 mb-2">Payment Method</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { id: 'upi', icon: 'fa-mobile', label: 'UPI' },
+                            { id: 'card', icon: 'fa-credit-card', label: 'Card' },
+                            { id: 'netbanking', icon: 'fa-university', label: 'Net Banking' },
+                            { id: 'cod', icon: 'fa-money', label: 'Pay on Arrival' },
+                          ].map(m => (
+                            <button key={m.id} type="button" onClick={() => setPayMethod(m.id)}
+                              className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-semibold transition-colors ${
+                                payMethod === m.id ? 'border-orange-400 bg-orange-50 text-orange-600' : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                              }`}>
+                              <i className={`fa ${m.icon}`} />{m.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* UPI */}
+                      {payMethod === 'upi' && (
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">UPI ID</label>
+                          <input required type="text" value={upiId} placeholder="yourname@upi"
+                            onChange={e => setUpiId(e.target.value)}
+                            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
+                        </div>
+                      )}
+
+                      {/* Card */}
+                      {payMethod === 'card' && (
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-xs font-semibold text-gray-500 mb-1.5">Cardholder Name</label>
+                            <input required type="text" value={card.holder} placeholder="Name on card"
+                              onChange={e => setCard({ ...card, holder: e.target.value })}
+                              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold text-gray-500 mb-1.5">Card Number</label>
+                            <input required type="text" value={card.number} placeholder="XXXX XXXX XXXX XXXX" maxLength={19}
+                              onChange={e => setCard({ ...card, number: e.target.value.replace(/[^0-9]/g, '').replace(/(.{4})/g, '$1 ').trim() })}
+                              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-xs font-semibold text-gray-500 mb-1.5">Expiry</label>
+                              <input required type="text" value={card.expiry} placeholder="MM/YY" maxLength={5}
+                                onChange={e => {
+                                  let v = e.target.value.replace(/[^0-9]/g, '');
+                                  if (v.length >= 3) v = v.slice(0, 2) + '/' + v.slice(2);
+                                  setCard({ ...card, expiry: v });
+                                }}
+                                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-semibold text-gray-500 mb-1.5">CVV</label>
+                              <input required type="password" value={card.cvv} placeholder="•••" maxLength={4}
+                                onChange={e => setCard({ ...card, cvv: e.target.value.replace(/[^0-9]/g, '') })}
+                                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Net Banking */}
+                      {payMethod === 'netbanking' && (
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">Select Bank</label>
+                          <select required className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors bg-white">
+                            <option value="">Choose your bank</option>
+                            {['SBI', 'HDFC Bank', 'ICICI Bank', 'Axis Bank', 'Kotak Bank', 'PNB', 'Bank of Baroda'].map(b => (
+                              <option key={b} value={b}>{b}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+
+                      {/* Pay on Arrival */}
+                      {payMethod === 'cod' && (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-800">
+                          <i className="fa fa-info-circle mr-2" />
+                          Pay <strong>{total}</strong> in cash on the day of your tour. A confirmation email will be sent to {form.email}.
+                        </div>
+                      )}
+
+                      <div className="flex gap-3 pt-1">
+                        <button type="button" onClick={() => setStep(1)}
+                          className="flex-1 border border-gray-200 text-gray-600 font-semibold py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm">
+                          <i className="fa fa-arrow-left mr-1" /> Back
+                        </button>
+                        <button type="submit" disabled={submitting}
+                          className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-bold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
+                          {submitting ? <i className="fa fa-spinner fa-spin" /> : <i className="fa fa-lock" />}
+                          {payMethod === 'cod' ? 'Confirm Booking' : `Pay ${total}`}
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

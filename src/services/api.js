@@ -14,6 +14,8 @@ api.interceptors.request.use(config => {
 // Auth
 export const loginCustomer = (data) => api.post('/auth/login/customer', data);
 export const registerCustomer = (data) => api.post('/auth/register/customer', data);
+export const verifyEmail = (data) => api.post('/auth/verify-email', data);
+export const resendOtp = (data) => api.post('/auth/resend-otp', data);
 export const getMe = () => api.get('/auth/me');
 
 // Tours
@@ -40,5 +42,9 @@ export const sendContact = (data) => api.post('/contact', data);
 // Profile
 export const getProfile = () => api.get('/profile');
 export const updateProfile = (data) => api.put('/profile', data);
+
+// Admin
+export const adminGetBookings = (params) => api.get('/admin/bookings', { params });
+export const adminUpdateBookingStatus = (id, status) => api.put(`/admin/bookings/${id}/status`, { status });
 
 export default api;
