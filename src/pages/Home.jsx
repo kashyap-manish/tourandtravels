@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Lottie from 'lottie-react';
 import SearchForm from '../components/SearchForm';
 import TourCard from '../components/TourCard';
@@ -14,11 +15,11 @@ const services = [
 ];
 
 const places = [
-  { img: '/images/place-1.jpg', name: 'Philippines', tours: '8 Tours' },
-  { img: '/images/place-2.jpg', name: 'Canada', tours: '2 Tours' },
-  { img: '/images/place-3.jpg', name: 'Thailand', tours: '5 Tours' },
-  { img: '/images/place-4.jpg', name: 'Australia', tours: '5 Tours' },
-  { img: '/images/place-5.jpg', name: 'Greece', tours: '7 Tours' },
+  { img: '/images/place-1.jpg', name: 'Philippines', tours: '8 Tours', slug: 'philippines' },
+  { img: '/images/place-2.jpg', name: 'Canada', tours: '2 Tours', slug: 'canada' },
+  { img: '/images/place-3.jpg', name: 'Thailand', tours: '5 Tours', slug: 'thailand' },
+  { img: '/images/place-4.jpg', name: 'Australia', tours: '5 Tours', slug: 'australia' },
+  { img: '/images/place-5.jpg', name: 'Greece', tours: '7 Tours', slug: 'greece' },
 ];
 
 const tours = [
@@ -223,14 +224,14 @@ export default function Home() {
             {places.map((p, i) => (
               <AnimSection key={p.name} anim="animate-scale-in" delay={`delay-${(i + 1) * 100}`}
                 className={i === places.length - 1 && places.length % 2 !== 0 ? 'col-span-2 md:col-span-1' : ''}>
-                <a href="#"
+                <Link to={`/destination?country=${p.slug}`}
                   className="dest-card block"
                   style={{ backgroundImage: `url('${p.img}')` }}>
                   <div className="dest-text">
                     <h3 className="font-bold text-lg">{p.name}</h3>
                     <span className="text-sm text-gray-200">{p.tours}</span>
                   </div>
-                </a>
+                </Link>
               </AnimSection>
             ))}
           </div>

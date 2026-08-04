@@ -112,13 +112,13 @@ export default function Navbar() {
               <i className="fa fa-user text-xs" /> Login
             </Link>
           )}
-          <Link
+          {/* <Link
             to="/contact"
             className="hidden md:inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2 rounded-full transition-colors duration-200"
           >
             <i className="fa fa-paper-plane text-xs" />
             Book Now
-          </Link>
+          </Link> */} 
           <button
             className="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-lg hover:bg-white/10 transition-colors"
             onClick={() => setOpen(!open)}

@@ -17,7 +17,7 @@ export const register = createAsyncThunk('auth/register', async (data, { rejectW
     return res.data;
   } catch (e) {
     return rejectWithValue(e.response?.data?.message || 'Registration failed');
-  }
+  }   
 });
 
 const token = localStorage.getItem('token');

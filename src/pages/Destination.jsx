@@ -1,19 +1,24 @@
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setCategory, setSortBy, setPage } from '../store/toursSlice';
+import { setCategory, setSortBy, setPage, loadDestinations } from '../store/toursSlice';
 import TourCard from '../components/TourCard';
 import SearchForm from '../components/SearchForm';
 import CallToAction from '../components/CallToAction';
-import { Link } from 'react-router-dom';
-import { tours } from '../data/tours';
+import { Link, useSearchParams } from 'react-router-dom';
 
 const categories = ['All', 'Beach', 'Adventure', 'Nature', 'Culture'];
 const ITEMS_PER_PAGE = 9;
 
 export default function Destination() {
   const dispatch = useDispatch();
-  const { activeCategory, sortBy, currentPage } = useSelector(s => s.tours);
+  const { activeCategory, sortBy, currentPage, destinations, loading, error } = useSelector(s => s.tours);
 
-  const filtered = tours.filter(t => activeCategory === 'All' || t.category === activeCategory);
+  const [searchParams] = useSearchParams();
+  const country = searchParams.get('country');
+
+  useEffect(() => { dispatch(loadDestinations(country || 'India')); }, [dispatch, country]);
+
+  const filtered = destinations.filter(t => activeCategory === 'All' || t.category === activeCategory);
 
   const sorted = [...filtered].sort((a, b) => {
     const priceA = parseInt(a.price.replace(/\D/g, ''));
@@ -89,9 +94,13 @@ export default function Destination() {
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {paginated.map((t, i) => <TourCard key={i} {...t} />)}
-          </div>
+          {loading && <p className="text-center text-gray-400 py-16">Loading destinations...</p>}
+          {error && <p className="text-center text-red-400 py-16">{error}</p>}
+          {!loading && !error && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {paginated.map((t, i) => <TourCard key={i} {...t} />)}
+            </div>
+          )}
 
           {/* Pagination */}
           {totalPages > 1 && (
