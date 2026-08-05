@@ -6,6 +6,8 @@ import TourCard from '../components/TourCard';
 import BlogCard from '../components/BlogCard';
 import CallToAction from '../components/CallToAction';
 import useInView from '../hooks/useInView';
+import { tours as allTours } from '../data/tours';
+import { fetchBlogs } from '../services/blogApi';
 
 const services = [
   { img: '/images/services-1.jpg', icon: 'fa-paper-plane', title: 'Activities', color: 'bg-orange-500/80' },
@@ -22,25 +24,12 @@ const places = [
   { img: '/images/place-5.jpg', name: 'Greece', tours: '7 Tours', slug: 'greece' },
 ];
 
-const tours = [
-  { img: '/images/destination-1.jpg', price: '$550/person', days: '8 Days Tour', title: 'Banaue Rice Terraces', location: 'Banaue, Ifugao, Philippines', features: ['🚿 2', '🛏 3', '⛰ Near Mountain'] },
-  { img: '/images/destination-2.jpg', price: '$550/person', days: '10 Days Tour', title: 'Banaue Rice Terraces', location: 'Banaue, Ifugao, Philippines', features: ['🚿 2', '🛏 3', '🏖 Near Beach'] },
-  { img: '/images/destination-3.jpg', price: '$550/person', days: '7 Days Tour', title: 'Banaue Rice Terraces', location: 'Banaue, Ifugao, Philippines', features: ['🚿 2', '🛏 3', '🏖 Near Beach'] },
-  { img: '/images/destination-4.jpg', price: '$550/person', days: '8 Days Tour', title: 'Banaue Rice Terraces', location: 'Banaue, Ifugao, Philippines', features: ['🚿 2', '🛏 3', '🏖 Near Beach'] },
-  { img: '/images/destination-5.jpg', price: '$550/person', days: '10 Days Tour', title: 'Banaue Rice Terraces', location: 'Banaue, Ifugao, Philippines', features: ['🚿 2', '🛏 3', '🏖 Near Beach'] },
-  { img: '/images/destination-6.jpg', price: '$550/person', days: '7 Days Tour', title: 'Banaue Rice Terraces', location: 'Banaue, Ifugao, Philippines', features: ['🚿 2', '🛏 3', '🏖 Near Beach'] },
-];
+const tours = allTours.slice(0, 6);
 
 const testimonials = [
   { img: '/images/person_1.jpg', name: 'Roger Scott', role: 'Marketing Manager', text: 'Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.' },
   { img: '/images/person_2.jpg', name: 'Anna Smith', role: 'Travel Blogger', text: 'Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.' },
   { img: '/images/person_3.jpg', name: 'John Doe', role: 'Adventure Seeker', text: 'Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.' },
-];
-
-const blogs = [
-  { img: '/images/image_1.jpg', day: '11', year: '2020', month: 'September', title: 'Most Popular Place In This World' },
-  { img: '/images/image_2.jpg', day: '11', year: '2020', month: 'September', title: 'Most Popular Place In This World' },
-  { img: '/images/image_3.jpg', day: '11', year: '2020', month: 'September', title: 'Most Popular Place In This World' },
 ];
 
 const stats = [
@@ -94,6 +83,11 @@ function LottieURL({ url, className = '', loop = true, autoplay = true }) {
 
 export default function Home() {
   const [statsRef, statsInView] = useInView();
+  const [blogs, setBlogs] = useState([]);
+
+  useEffect(() => {
+    fetchBlogs('All').then(data => setBlogs(data.slice(0, 3))).catch(() => {});
+  }, []);
 
   return (
     <>

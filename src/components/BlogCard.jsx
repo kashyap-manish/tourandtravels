@@ -1,4 +1,4 @@
-export default function BlogCard({ img, date, category, title, excerpt, author, readTime }) {
+export default function BlogCard({ img, date, category, title, excerpt, author, readTime, url }) {
   return (
     <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col">
 
@@ -36,7 +36,7 @@ export default function BlogCard({ img, date, category, title, excerpt, author, 
             </div>
             <span className="text-xs font-semibold text-gray-600">{author}</span>
           </div>
-          <a href = "/blog" className="text-xs font-semibold text-orange-500 hover:text-white hover:bg-orange-500 border border-orange-500 px-3 py-1.5 rounded-lg transition-all duration-200 flex items-center gap-1" >
+          <a href={url || '/blog'} target={url ? '_blank' : '_self'} rel="noreferrer" className="text-xs font-semibold text-orange-500 hover:text-white hover:bg-orange-500 border border-orange-500 px-3 py-1.5 rounded-lg transition-all duration-200 flex items-center gap-1">
             Read More <i className="fa fa-arrow-right text-xs" />
           </a>
         </div>

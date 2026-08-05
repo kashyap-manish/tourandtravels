@@ -1,60 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import BlogCard from '../components/BlogCard';
 import CallToAction from '../components/CallToAction';
-
-const blogs = [
-  {
-    img: '/images/image_1.jpg',
-    title: 'Top 10 Hidden Beaches You Must Visit in 2025',
-    excerpt: 'From the turquoise coves of Palawan to the untouched shores of Andaman, discover the world\'s most secluded beaches before the crowds arrive.',
-    category: 'Travel Tips', date: 'Jan 15, 2025', author: 'Priya Sharma', readTime: '5 min read',
-  },
-  {
-    img: '/images/image_2.jpg',
-    title: 'How to Plan a Budget Trip to Southeast Asia',
-    excerpt: 'Travelling Southeast Asia on a shoestring is easier than you think. Here\'s our complete guide to flights, stays, food, and transport on a budget.',
-    category: 'Budget Travel', date: 'Feb 3, 2025', author: 'Rahul Mehta', readTime: '7 min read',
-  },
-  {
-    img: '/images/image_3.jpg',
-    title: 'A Complete Guide to the Golden Triangle, India',
-    excerpt: 'Delhi, Agra, and Jaipur form India\'s most iconic travel circuit. Here\'s everything you need to know to make the most of your Golden Triangle trip.',
-    category: 'Destinations', date: 'Feb 18, 2025', author: 'Ananya Iyer', readTime: '6 min read',
-  },
-  {
-    img: '/images/image_4.jpg',
-    title: 'Ladakh in Summer vs Winter: Which Season to Visit?',
-    excerpt: 'Both seasons offer a completely different Ladakh experience. We break down the pros and cons so you can pick the perfect time for your adventure.',
-    category: 'Adventure', date: 'Mar 5, 2025', author: 'Vikram Singh', readTime: '4 min read',
-  },
-  {
-    img: '/images/image_5.jpg',
-    title: 'The Ultimate Kerala Backwaters Houseboat Experience',
-    excerpt: 'Floating through the serene canals of Alleppey on a traditional kettuvallam is a bucket-list experience. Here\'s how to plan it perfectly.',
-    category: 'Destinations', date: 'Mar 22, 2025', author: 'Meera Nair', readTime: '5 min read',
-  },
-  {
-    img: '/images/image_6.jpg',
-    title: '10 Essential Packing Tips for Long-Haul Flights',
-    excerpt: 'Avoid overpacking and under-preparing with our tried-and-tested packing checklist for international travel. Your future self will thank you.',
-    category: 'Travel Tips', date: 'Apr 10, 2025', author: 'Arjun Kapoor', readTime: '3 min read',
-  },
-];
+import { fetchBlogs } from '../services/blogApi';
 
 const categories = ['All', 'Travel Tips', 'Destinations', 'Adventure', 'Budget Travel'];
-
-const recentPosts = blogs.slice(0, 3);
 
 export default function Blog() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [search, setSearch] = useState('');
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const filtered = blogs.filter(b => {
-    const matchCat = activeCategory === 'All' || b.category === activeCategory;
-    const matchSearch = b.title.toLowerCase().includes(search.toLowerCase());
-    return matchCat && matchSearch;
-  });
+  useEffect(() => {
+    setLoading(true);
+    setError('');
+    fetchBlogs(activeCategory, search)
+      .then(setBlogs)
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [activeCategory]);
+
+  // debounced search
+  useEffect(() => {
+    if (search === '') return;
+    const timer = setTimeout(() => {
+      setLoading(true);
+      setError('');
+      fetchBlogs(activeCategory, search)
+        .then(setBlogs)
+        .catch(e => setError(e.message))
+        .finally(() => setLoading(false));
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const filtered = blogs;
 
   return (
     <>
@@ -98,16 +80,40 @@ export default function Blog() {
               ))}
             </div>
 
-            {/* Grid */}
-            {filtered.length > 0 ? (
+            {loading && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filtered.map((b, i) => <BlogCard key={i} {...b} />)}
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="bg-white rounded-2xl overflow-hidden border border-gray-100 animate-pulse">
+                    <div className="h-52 bg-gray-200" />
+                    <div className="p-5 space-y-3">
+                      <div className="h-3 bg-gray-200 rounded w-1/3" />
+                      <div className="h-4 bg-gray-200 rounded w-full" />
+                      <div className="h-4 bg-gray-200 rounded w-4/5" />
+                      <div className="h-3 bg-gray-200 rounded w-2/3" />
+                    </div>
+                  </div>
+                ))}
               </div>
-            ) : (
-              <div className="text-center py-20 text-gray-400">
-                <i className="fa fa-search text-4xl mb-3 block" />
-                <p className="text-lg">No posts found.</p>
+            )}
+
+            {error && (
+              <div className="text-center py-20 text-red-400">
+                <i className="fa fa-exclamation-circle text-4xl mb-3 block" />
+                <p>{error}</p>
               </div>
+            )}
+
+            {!loading && !error && (
+              filtered.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {filtered.map((b, i) => <BlogCard key={i} {...b} />)}
+                </div>
+              ) : (
+                <div className="text-center py-20 text-gray-400">
+                  <i className="fa fa-search text-4xl mb-3 block" />
+                  <p className="text-lg">No posts found.</p>
+                </div>
+              )
             )}
           </div>
 
@@ -133,51 +139,59 @@ export default function Blog() {
             <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
               <h4 className="font-bold text-gray-900 mb-4">Categories</h4>
               <ul className="space-y-2">
-                {categories.filter(c => c !== 'All').map(cat => {
-                  const count = blogs.filter(b => b.category === cat).length;
-                  return (
-                    <li key={cat}>
-                      <button
-                        onClick={() => setActiveCategory(cat)}
-                        className="w-full flex items-center justify-between text-sm text-gray-600 hover:text-orange-500 transition-colors py-1"
-                      >
-                        <span className="flex items-center gap-2">
-                          <i className="fa fa-chevron-right text-xs text-orange-400" />{cat}
-                        </span>
-                        <span className="bg-orange-50 text-orange-500 text-xs font-semibold px-2 py-0.5 rounded-full">{count}</span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-
-            {/* Recent Posts */}
-            <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
-              <h4 className="font-bold text-gray-900 mb-4">Recent Posts</h4>
-              <ul className="space-y-4">
-                {recentPosts.map((p, i) => (
-                  <li key={i} className="flex gap-3 items-start">
-                    <div
-                      className="w-14 h-14 shrink-0 rounded-xl bg-cover bg-center"
-                      style={{ backgroundImage: `url('${p.img}')` }}
-                    />
-                    <div>
-                      <p className="text-sm font-semibold text-gray-800 hover:text-orange-500 cursor-pointer leading-snug line-clamp-2">{p.title}</p>
-                      <p className="text-xs text-gray-400 mt-1">{p.date}</p>
-                    </div>
+                {categories.filter(c => c !== 'All').map(cat => (
+                  <li key={cat}>
+                    <button
+                      onClick={() => setActiveCategory(cat)}
+                      className="w-full flex items-center justify-between text-sm text-gray-600 hover:text-orange-500 transition-colors py-1"
+                    >
+                      <span className="flex items-center gap-2">
+                        <i className="fa fa-chevron-right text-xs text-orange-400" />{cat}
+                      </span>
+                    </button>
                   </li>
                 ))}
               </ul>
             </div>
+
+            {/* Recent Posts */}
+            {blogs.length > 0 && (
+              <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+                <h4 className="font-bold text-gray-900 mb-4">Recent Posts</h4>
+                <ul className="space-y-4">
+                  {blogs.slice(0, 3).map((p, i) => (
+                    <li key={i} className="flex gap-3 items-start">
+                      <a href={p.url} target="_blank" rel="noreferrer" className="flex gap-3 items-start group">
+                        <div
+                          className="w-14 h-14 shrink-0 rounded-xl bg-cover bg-center"
+                          style={{ backgroundImage: `url('${p.img}')` }}
+                        />
+                        <div>
+                          <p className="text-sm font-semibold text-gray-800 group-hover:text-orange-500 transition-colors leading-snug line-clamp-2">{p.title}</p>
+                          <p className="text-xs text-gray-400 mt-1">{p.date}</p>
+                        </div>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Tags */}
             <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
               <h4 className="font-bold text-gray-900 mb-4">Popular Tags</h4>
               <div className="flex flex-wrap gap-2">
                 {['Travel', 'Adventure', 'Beach', 'Mountains', 'Budget', 'Luxury', 'Food', 'Culture', 'Solo Travel', 'Family'].map(tag => (
-                  <span key={tag} className="text-xs bg-gray-50 border border-gray-100 text-gray-500 hover:bg-orange-500 hover:text-white hover:border-orange-500 px-3 py-1.5 rounded-full cursor-pointer transition-all duration-200">
-                    {tag}
+                  <span
+                    key={tag}
+                    onClick={() => { setSearch(tag); setActiveCategory('All'); }}
+                    className={`text-xs border px-3 py-1.5 rounded-full cursor-pointer transition-all duration-200
+                      ${search === tag
+                        ? 'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-500/20'
+                        : 'bg-gray-50 border-gray-100 text-gray-500 hover:bg-orange-500 hover:text-white hover:border-orange-500'
+                      }`}
+                  >
+                  {tag}
                   </span>
                 ))}
               </div>

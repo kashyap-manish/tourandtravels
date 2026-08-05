@@ -187,11 +187,11 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500 text-center">
           <p>© {new Date().getFullYear()} Pacific Travel Agency. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <a href="#" className="hover:text-orange-400 transition-colors">Privacy Policy</a>
+            <a href="/privacy-policy" className="hover:text-orange-400 transition-colors">Privacy Policy</a>
             <span className="text-gray-700">·</span>
-            <a href="#" className="hover:text-orange-400 transition-colors">Terms of Service</a>
+            <Link to="/terms-of-service" className="hover:text-orange-400 transition-colors">Terms of Service</Link>
             <span className="text-gray-700">·</span>
-            <a href="#" className="hover:text-orange-400 transition-colors">Sitemap</a>
+            <Link to="/sitemap" className="hover:text-orange-400 transition-colors">Sitemap</Link>
           </div>
         </div>
       </div>

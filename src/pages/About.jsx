@@ -9,12 +9,12 @@ const stats = [
 ];
 
 const services = [
-  { img: '/images/services-1.jpg', icon: 'fa-paper-plane', title: 'Activities', desc: 'Curated local experiences and adventures tailored to every traveler.' },
-  { img: '/images/services-2.jpg', icon: 'fa-road', title: 'Travel Arrangements', desc: 'Seamless logistics from flights to transfers, all handled for you.' },
-  { img: '/images/services-3.jpg', icon: 'fa-user', title: 'Private Guide', desc: 'Expert local guides who bring destinations to life with insider knowledge.' },
-  { img: '/images/services-4.jpg', icon: 'fa-map', title: 'Location Manager', desc: 'On-ground support ensuring every detail of your journey runs smoothly.' },
-  { img: '/images/hotel-resto-1.jpg', icon: 'fa-building', title: 'Hotel Booking', desc: 'Handpicked hotels for every budget — from luxury resorts to cozy boutique stays.' },
-  { img: '/images/bg_3.jpg', icon: 'fa-plane', title: 'Flight Booking', desc: 'Best fares on domestic and international flights, booked hassle-free.' },
+  { img: '/images/services-1.jpg', icon: 'fa-paper-plane', title: 'Activities', desc: 'Curated local experiences and adventures tailored to every traveler.', to: '/experience/adventure' },
+  { img: '/images/services-2.jpg', icon: 'fa-road', title: 'Travel Arrangements', desc: 'Seamless logistics from flights to transfers, all handled for you.', to: '/destination' },
+  { img: '/images/services-3.jpg', icon: 'fa-user', title: 'Private Guide', desc: 'Expert local guides who bring destinations to life with insider knowledge.', to: '/contact' },
+  { img: '/images/services-4.jpg', icon: 'fa-map', title: 'Location Manager', desc: 'On-ground support ensuring every detail of your journey runs smoothly.', to: '/destination' },
+  { img: '/images/hotel-resto-1.jpg', icon: 'fa-building', title: 'Hotel Booking', desc: 'Handpicked hotels for every budget — from luxury resorts to cozy boutique stays.', to: '/hotel' },
+  { img: '/images/bg_3.jpg', icon: 'fa-plane', title: 'Flight Booking', desc: 'Best fares on domestic and international flights, booked hassle-free.', to: '/flight' },
 ];
 
 const team = [
@@ -123,20 +123,24 @@ export default function About() {
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {services.map(s => (
-              <div
+              <Link
                 key={s.title}
-                className="group relative rounded-2xl overflow-hidden bg-cover bg-center h-72 shadow-md hover:shadow-xl transition-shadow"
+                to={s.to}
+                className="group relative rounded-2xl overflow-hidden bg-cover bg-center h-72 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
                 style={{ backgroundImage: `url('${s.img}')` }}
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent group-hover:from-black/90 transition-all duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent group-hover:from-orange-900/90 group-hover:via-black/50 transition-all duration-500" />
                 <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                  <div className="w-11 h-11 rounded-xl bg-orange-500 flex items-center justify-center mb-3 shadow-lg">
-                    <i className={`fa ${s.icon} text-white`} />
+                  <div className="w-11 h-11 rounded-xl bg-orange-500 group-hover:bg-white flex items-center justify-center mb-3 shadow-lg transition-colors duration-300">
+                    <i className={`fa ${s.icon} text-white group-hover:text-orange-500 transition-colors duration-300`} />
                   </div>
                   <h3 className="text-white font-bold text-base">{s.title}</h3>
                   <p className="text-gray-300 text-xs mt-1.5 leading-relaxed opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">{s.desc}</p>
+                  <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-orange-400 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500">
+                    Explore <i className="fa fa-arrow-right text-[10px]" />
+                  </span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
