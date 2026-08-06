@@ -132,11 +132,11 @@ export default function Home() {
       </section>
 
       {/* Search */}
-      <section className="max-w-7xl mx-auto px-4 -mt-6 md:-mt-8 relative z-20">
+      {/* <section className="max-w-7xl mx-auto px-4 -mt-6 md:-mt-8 relative z-20">
         <AnimSection anim="animate-fade-up">
           <SearchForm />
         </AnimSection>
-      </section>
+      </section> */}
 
       {/* Stats Banner */}
       <section className="py-16 bg-cover bg-center relative" style={{ backgroundImage: "url('/images/bg_2.jpg')" }}>

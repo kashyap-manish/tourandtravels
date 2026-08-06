@@ -47,4 +47,11 @@ export const updateProfile = (data) => api.put('/profile', data);
 export const adminGetBookings = (params) => api.get('/admin/bookings', { params });
 export const adminUpdateBookingStatus = (id, status) => api.put(`/admin/bookings/${id}/status`, { status });
 
+// Payment
+export const createPaymentOrder = (amount) => api.post('/payment/order', { amount });
+export const verifyPayment = (data) => api.post('/payment/verify', data);
+
+// Newsletter
+export const subscribeNewsletter = (email) => api.post('/newsletter', { email });
+
 export default api;

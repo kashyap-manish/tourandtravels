@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { subscribeNewsletter } from '../services/api';
 
 const information = [
   { label: 'Online Enquiry', to: '/online-enquiry' },
@@ -62,6 +64,45 @@ const socials = [
   },
 ];
 
+function NewsletterForm() {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState(null); // null | 'loading' | 'success' | 'error'
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setStatus('loading');
+    try {
+      await subscribeNewsletter(email);
+      setStatus('success');
+      setEmail('');
+    } catch {
+      setStatus('error');
+    }
+  }
+
+  return (
+    <form className="flex w-full md:w-auto gap-0 max-w-md flex-col sm:flex-row" onSubmit={handleSubmit}>
+      <input
+        type="email"
+        required
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        placeholder="Enter your email address"
+        className="flex-1 bg-white/10 border border-white/10 sm:rounded-l-full rounded-t-full sm:rounded-tr-none px-5 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-orange-500 transition-colors"
+      />
+      <button
+        type="submit"
+        disabled={status === 'loading'}
+        className="bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white text-sm font-semibold px-6 py-3 sm:rounded-r-full rounded-b-full sm:rounded-bl-none transition-colors whitespace-nowrap"
+      >
+        {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
+      </button>
+      {status === 'success' && <p className="w-full text-green-400 text-xs mt-2 sm:mt-1 sm:ml-3 self-center">✓ Subscribed successfully!</p>}
+      {status === 'error' && <p className="w-full text-red-400 text-xs mt-2 sm:mt-1 sm:ml-3 self-center">Something went wrong, try again.</p>}
+    </form>
+  );
+}
+
 function SocialIcon({ label, href, bg, icon }) {
   return (
     <a
@@ -93,19 +134,7 @@ export default function Footer() {
             <p className="text-orange-400 text-xs font-semibold tracking-widest uppercase mb-1">Stay Updated</p>
             <h3 className="text-xl font-bold text-white">Subscribe to our newsletter</h3>
           </div>
-          <form className="flex w-full md:w-auto gap-0 max-w-md flex-col sm:flex-row" onSubmit={e => e.preventDefault()}>
-            <input
-              type="email"
-              placeholder="Enter your email address"
-              className="flex-1 bg-white/10 border border-white/10 sm:rounded-l-full rounded-t-full sm:rounded-tr-none px-5 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-orange-500 transition-colors"
-            />
-            <button
-              type="submit"
-              className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-6 py-3 sm:rounded-r-full rounded-b-full sm:rounded-bl-none transition-colors whitespace-nowrap"
-            >
-              Subscribe
-            </button>
-          </form>
+<NewsletterForm />
         </div>
       </div>
 

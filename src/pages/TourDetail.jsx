@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { tours } from '../data/tours';
-import { createBooking } from '../services/api';
+import { createBooking, createPaymentOrder, verifyPayment } from '../services/api';
 import { useSelector } from 'react-redux';
 
 const TABS = ['Overview', 'Itinerary', 'Includes'];
 
 export default function TourDetail() {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const { user } = useSelector(s => s.auth);
-  const tour = tours.find(t => t.id === Number(id));
+  const tour = tours.find(t => t.slug === slug);
 
   const [tab, setTab] = useState('Overview');
   const [showBooking, setShowBooking] = useState(false);
@@ -19,9 +19,6 @@ export default function TourDetail() {
     name: user?.name || '', email: user?.email || '', phone: '',
     travelDate: '', persons: 1, specialRequests: '',
   });
-  const [payMethod, setPayMethod] = useState('upi');
-  const [upiId, setUpiId] = useState('');
-  const [card, setCard] = useState({ number: '', expiry: '', cvv: '', holder: '' });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -39,6 +36,16 @@ export default function TourDetail() {
 
   const closeModal = () => { setShowBooking(false); setSuccess(false); setError(''); setStep(1); };
 
+  const loadRazorpayScript = () => new Promise(resolve => {
+    if (document.getElementById('razorpay-script')) return resolve(true);
+    const s = document.createElement('script');
+    s.id = 'razorpay-script';
+    s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    s.onload = () => resolve(true);
+    s.onerror = () => resolve(false);
+    document.body.appendChild(s);
+  });
+
   const handleDetailsSubmit = (e) => {
     e.preventDefault();
     setStep(2);
@@ -49,16 +56,52 @@ export default function TourDetail() {
     setSubmitting(true);
     setError('');
     try {
-      await createBooking({
+      // 1. Create booking with pending status
+      const bookingRes = await createBooking({
         tourSlug: tour.slug,
         ...form,
         totalPrice: totalNum,
-        paymentMethod: payMethod,
+        paymentMethod: 'razorpay',
       });
-      setSuccess(true);
+      const bookingId = bookingRes.data._id;
+
+      // 2. Load Razorpay script
+      const loaded = await loadRazorpayScript();
+      if (!loaded) throw new Error('Razorpay SDK failed to load');
+
+      // 3. Create Razorpay order
+      const orderRes = await createPaymentOrder(totalNum);
+      const { orderId, amount, currency } = orderRes.data;
+
+      // 4. Open Razorpay checkout
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount,
+        currency,
+        name: 'Pacific Travel',
+        description: tour.title,
+        order_id: orderId,
+        prefill: { name: form.name, email: form.email, contact: form.phone },
+        theme: { color: '#f97316' },
+        handler: async (response) => {
+          try {
+            await verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              bookingId,
+            });
+            setSuccess(true);
+          } catch {
+            setError('Payment verification failed. Contact support.');
+          }
+        },
+        modal: { ondismiss: () => setSubmitting(false) },
+      };
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (err) {
-      setError(err.response?.data?.message || 'Payment failed. Please try again.');
-    } finally {
+      setError(err.response?.data?.message || err.message || 'Payment failed. Please try again.');
       setSubmitting(false);
     }
   };
@@ -128,7 +171,21 @@ export default function TourDetail() {
         </div>
       </div>
 
-      <section className="max-w-6xl mx-auto px-4 md:px-6 py-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
+      {/* Mobile sticky Book Now bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-100 shadow-lg px-4 py-3 flex items-center justify-between gap-3">
+        <div>
+          <p className="text-xs text-gray-400">Starting from</p>
+          <p className="text-lg font-extrabold text-orange-500">{tour.price}</p>
+        </div>
+        <button
+          onClick={() => { setShowBooking(true); setStep(1); }}
+          className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-2.5 rounded-xl transition-colors flex items-center gap-2 text-sm"
+        >
+          <i className="fa fa-calendar-check-o" /> Book Now
+        </button>
+      </div>
+
+      <section className="max-w-6xl mx-auto px-4 md:px-6 py-10 pb-24 lg:pb-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
 
         {/* Left Content */}
         <div className="lg:col-span-2">
@@ -242,8 +299,8 @@ export default function TourDetail() {
           )}
         </div>
 
-        {/* Right: Booking Card */}
-        <div>
+        {/* Right: Booking Card — desktop only */}
+        <div className="hidden lg:block">
           <div className="bg-white border border-gray-100 rounded-2xl shadow-lg p-6 sticky top-24">
             <div className="flex items-end justify-between mb-1">
               <div>
@@ -414,7 +471,6 @@ export default function TourDetail() {
                   {/* Step 2: Payment */}
                   {step === 2 && (
                     <form onSubmit={handlePayment} className="space-y-4">
-                      {/* Order summary */}
                       <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 flex justify-between items-center">
                         <div>
                           <p className="text-xs text-gray-400">Booking for</p>
@@ -427,92 +483,10 @@ export default function TourDetail() {
                         </div>
                       </div>
 
-                      {/* Payment method selector */}
-                      <div>
-                        <p className="text-xs font-semibold text-gray-500 mb-2">Payment Method</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          {[
-                            { id: 'upi', icon: 'fa-mobile', label: 'UPI' },
-                            { id: 'card', icon: 'fa-credit-card', label: 'Card' },
-                            { id: 'netbanking', icon: 'fa-university', label: 'Net Banking' },
-                            { id: 'cod', icon: 'fa-money', label: 'Pay on Arrival' },
-                          ].map(m => (
-                            <button key={m.id} type="button" onClick={() => setPayMethod(m.id)}
-                              className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-semibold transition-colors ${
-                                payMethod === m.id ? 'border-orange-400 bg-orange-50 text-orange-600' : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                              }`}>
-                              <i className={`fa ${m.icon}`} />{m.label}
-                            </button>
-                          ))}
-                        </div>
+                      <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 text-sm text-orange-800">
+                        <i className="fa fa-info-circle mr-2" />
+                        You will be redirected to Razorpay's secure payment page. Supports UPI, Cards, Net Banking & Wallets.
                       </div>
-
-                      {/* UPI */}
-                      {payMethod === 'upi' && (
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">UPI ID</label>
-                          <input required type="text" value={upiId} placeholder="yourname@upi"
-                            onChange={e => setUpiId(e.target.value)}
-                            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
-                        </div>
-                      )}
-
-                      {/* Card */}
-                      {payMethod === 'card' && (
-                        <div className="space-y-3">
-                          <div>
-                            <label className="block text-xs font-semibold text-gray-500 mb-1.5">Cardholder Name</label>
-                            <input required type="text" value={card.holder} placeholder="Name on card"
-                              onChange={e => setCard({ ...card, holder: e.target.value })}
-                              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-semibold text-gray-500 mb-1.5">Card Number</label>
-                            <input required type="text" value={card.number} placeholder="XXXX XXXX XXXX XXXX" maxLength={19}
-                              onChange={e => setCard({ ...card, number: e.target.value.replace(/[^0-9]/g, '').replace(/(.{4})/g, '$1 ').trim() })}
-                              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
-                          </div>
-                          <div className="grid grid-cols-2 gap-3">
-                            <div>
-                              <label className="block text-xs font-semibold text-gray-500 mb-1.5">Expiry</label>
-                              <input required type="text" value={card.expiry} placeholder="MM/YY" maxLength={5}
-                                onChange={e => {
-                                  let v = e.target.value.replace(/[^0-9]/g, '');
-                                  if (v.length >= 3) v = v.slice(0, 2) + '/' + v.slice(2);
-                                  setCard({ ...card, expiry: v });
-                                }}
-                                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-semibold text-gray-500 mb-1.5">CVV</label>
-                              <input required type="password" value={card.cvv} placeholder="•••" maxLength={4}
-                                onChange={e => setCard({ ...card, cvv: e.target.value.replace(/[^0-9]/g, '') })}
-                                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Net Banking */}
-                      {payMethod === 'netbanking' && (
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">Select Bank</label>
-                          <select required className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors bg-white">
-                            <option value="">Choose your bank</option>
-                            {['SBI', 'HDFC Bank', 'ICICI Bank', 'Axis Bank', 'Kotak Bank', 'PNB', 'Bank of Baroda'].map(b => (
-                              <option key={b} value={b}>{b}</option>
-                            ))}
-                          </select>
-                        </div>
-                      )}
-
-                      {/* Pay on Arrival */}
-                      {payMethod === 'cod' && (
-                        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-800">
-                          <i className="fa fa-info-circle mr-2" />
-                          Pay <strong>{total}</strong> in cash on the day of your tour. A confirmation email will be sent to {form.email}.
-                        </div>
-                      )}
 
                       <div className="flex gap-3 pt-1">
                         <button type="button" onClick={() => setStep(1)}
@@ -522,7 +496,7 @@ export default function TourDetail() {
                         <button type="submit" disabled={submitting}
                           className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-bold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
                           {submitting ? <i className="fa fa-spinner fa-spin" /> : <i className="fa fa-lock" />}
-                          {payMethod === 'cod' ? 'Confirm Booking' : `Pay ${total}`}
+                          Pay {total}
                         </button>
                       </div>
                     </form>
