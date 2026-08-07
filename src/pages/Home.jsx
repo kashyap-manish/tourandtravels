@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Lottie from 'lottie-react';
 import SearchForm from '../components/SearchForm';
@@ -8,6 +8,150 @@ import CallToAction from '../components/CallToAction';
 import useInView from '../hooks/useInView';
 import { tours as allTours } from '../data/tours';
 import { fetchBlogs } from '../services/blogApi';
+
+const slides = [
+  {
+    img: '/images/bg_1.jpg',
+    tag: 'Welcome to Pacific',
+    heading: 'Discover Your Favorite Place with Us',
+    sub: 'Travel to any corner of the world, without going around in circles',
+  },
+  {
+    img: '/images/bg_2.jpg',
+    tag: 'Explore the World',
+    heading: 'Adventure Awaits Around Every Corner',
+    sub: 'From mountain peaks to tropical shores — your journey starts here',
+  },
+  {
+    img: '/images/bg_3.jpg',
+    tag: 'Handpicked Tours',
+    heading: 'Unforgettable Experiences, Every Trip',
+    sub: 'Expert-curated tours designed to create memories that last a lifetime',
+  },
+  {
+    img: '/images/bg_4.jpg',
+    tag: 'Best Price Guarantee',
+    heading: 'Travel More, Spend Less with Pacific',
+    sub: 'Premium experiences at prices that let you explore without limits',
+  },
+];
+
+function HeroSlider() {
+  const [current, setCurrent] = useState(0);
+  const [prev, setPrev] = useState(null);
+  const [animKey, setAnimKey] = useState(0);
+  const timerRef = useRef(null);
+
+  const goTo = (idx) => {
+    setPrev(current);
+    setCurrent(idx);
+    setAnimKey(k => k + 1);
+  };
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      goTo((current + 1) % slides.length);
+    }, 5500);
+    return () => clearInterval(timerRef.current);
+  }, [current]);
+
+  const slide = slides[current];
+
+  return (
+    <section className="relative overflow-hidden" style={{ minHeight: '100vh' }}>
+      {/* Slides — crossfade */}
+      {slides.map((s, i) => (
+        <div
+          key={i}
+          className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
+          style={{
+            backgroundImage: `url('${s.img}')`,
+            opacity: i === current ? 1 : 0,
+            zIndex: i === current ? 1 : 0,
+          }}
+        />
+      ))}
+
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/20 z-10" />
+
+      {/* Bottom accent */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-yellow-400 to-orange-500 z-30" />
+
+      {/* Content */}
+      <div className="relative z-20 max-w-7xl mx-auto px-6 w-full flex items-center justify-between gap-8" style={{ minHeight: '100vh' }}>
+        <div className="max-w-2xl text-white" key={animKey}>
+          <span className="hero-line-1 inline-block text-orange-400 font-semibold tracking-widest uppercase text-sm border border-orange-400/40 px-3 py-1 rounded-full mb-4">
+            {slide.tag}
+          </span>
+          <h1 className="hero-line-2 text-4xl sm:text-5xl md:text-7xl font-bold mt-3 mb-5 leading-tight">
+            {slide.heading.split(' ').map((word, i, arr) =>
+              i === arr.length - 2
+                ? <span key={i} className="text-orange-400">{word} </span>
+                : word + ' '
+            )}
+          </h1>
+          <p className="hero-line-3 text-gray-200 text-base md:text-xl mb-8">{slide.sub}</p>
+          <div className="hero-line-4 flex items-center gap-5 flex-wrap">
+            <a
+              href="#tours"
+              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full font-semibold transition-all hover:shadow-lg hover:shadow-orange-500/40 hover:-translate-y-0.5"
+            >
+              Explore Tours
+            </a>
+            <a
+              href="https://vimeo.com/45830194"
+              target="_blank"
+              rel="noreferrer"
+              className="play-btn-pulse w-14 h-14 rounded-full border-2 border-white flex items-center justify-center hover:bg-orange-500 hover:border-orange-500 transition-colors"
+            >
+              <i className="fa fa-play text-white ml-1" />
+            </a>
+            <span className="text-gray-300 text-sm">Watch our story</span>
+          </div>
+        </div>
+        {/* Lottie plane */}
+        <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0 hero-line-4">
+          <LottieURL url={LOTTIE_PLANE} className="w-full" />
+        </div>
+      </div>
+
+      {/* Dot indicators */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => { clearInterval(timerRef.current); goTo(i); }}
+            className={`transition-all duration-300 rounded-full ${
+              i === current
+                ? 'w-8 h-2.5 bg-orange-500'
+                : 'w-2.5 h-2.5 bg-white/40 hover:bg-white/70'
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* Arrow controls */}
+      <button
+        onClick={() => { clearInterval(timerRef.current); goTo((current - 1 + slides.length) % slides.length); }}
+        className="absolute left-5 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/10 hover:bg-orange-500 border border-white/20 hover:border-orange-500 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200"
+      >
+        <i className="fa fa-chevron-left text-sm" />
+      </button>
+      <button
+        onClick={() => { clearInterval(timerRef.current); goTo((current + 1) % slides.length); }}
+        className="absolute right-5 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/10 hover:bg-orange-500 border border-white/20 hover:border-orange-500 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200"
+      >
+        <i className="fa fa-chevron-right text-sm" />
+      </button>
+
+      {/* Slide counter */}
+      <div className="absolute bottom-8 right-8 z-30 text-white/50 text-xs font-semibold tracking-widest">
+        {String(current + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
+      </div>
+    </section>
+  );
+}
 
 const services = [
   { img: '/images/services-1.jpg', icon: 'fa-paper-plane', title: 'Activities', color: 'bg-orange-500/80' },
@@ -64,11 +208,9 @@ function AnimSection({ children, className = '', anim = 'animate-fade-up', delay
   );
 }
 
-// Lottie animation URLs (free public CDN)
-const LOTTIE_PLANE   = 'https://assets2.lottiefiles.com/packages/lf20_jhu1lqdz.json';
 const LOTTIE_GLOBE   = 'https://assets9.lottiefiles.com/packages/lf20_uu0x8lqv.json';
-const LOTTIE_SCROLL  = 'https://assets3.lottiefiles.com/packages/lf20_t9gkkhz4.json';
 const LOTTIE_SUCCESS = 'https://assets4.lottiefiles.com/packages/lf20_jbrw3hcz.json';
+const LOTTIE_PLANE   = 'https://assets2.lottiefiles.com/packages/lf20_jhu1lqdz.json';
 
 function LottieURL({ url, className = '', loop = true, autoplay = true }) {
   const [data, setData] = useState(null);
@@ -76,7 +218,6 @@ function LottieURL({ url, className = '', loop = true, autoplay = true }) {
     fetch(url).then(r => r.json()).then(setData).catch(() => {});
   }, [url]);
   if (!data) return null;
-  // lottie-react default export is the component
   const Player = Lottie?.default ?? Lottie;
   return <Player animationData={data} loop={loop} autoplay={autoplay} className={className} />;
 }
@@ -91,52 +232,7 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero */}
-      <section
-        className="relative hero-bg flex items-center"
-        style={{ backgroundImage: "url('/images/bg_5.jpg')", minHeight: '100vh' }}
-      >
-        <div className="overlay" />
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-yellow-400 to-orange-500 z-20" />
-        <div className="relative z-10 max-w-7xl mx-auto px-6 w-full flex items-center justify-between gap-8">
-          <div className="max-w-2xl text-white">
-            <span className="hero-line-1 inline-block text-orange-400 font-semibold tracking-widest uppercase text-sm border border-orange-400/40 px-3 py-1 rounded-full mb-4">
-              Welcome to Pacific
-            </span>
-            <h1 className="hero-line-2 text-4xl sm:text-5xl md:text-7xl font-bold mt-3 mb-5 leading-tight">
-              Discover Your <span className="text-orange-400">Favorite</span> Place with Us
-            </h1>
-            <p className="hero-line-3 text-gray-200 text-base md:text-xl mb-8">
-              Travel to any corner of the world, without going around in circles
-            </p>
-            <div className="hero-line-4 flex items-center gap-5 flex-wrap">
-              <a href="#tours" className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full font-semibold transition-all hover:shadow-lg hover:shadow-orange-500/40 hover:-translate-y-0.5">
-                Explore Tours
-              </a>
-              <a href="https://vimeo.com/45830194" target="_blank" rel="noreferrer"
-                className="play-btn-pulse w-14 h-14 rounded-full border-2 border-white flex items-center justify-center hover:bg-orange-500 hover:border-orange-500 transition-colors">
-                <i className="fa fa-play text-white ml-1" />
-              </a>
-              <span className="text-gray-300 text-sm">Watch our story</span>
-            </div>
-          </div>
-          {/* Lottie plane animation — hidden on small screens */}
-          <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0 hero-line-4">
-            <LottieURL url={LOTTIE_PLANE} className="w-full" />
-          </div>
-        </div>
-        {/* scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
-          <LottieURL url={LOTTIE_SCROLL} className="w-10 h-10" />
-        </div>
-      </section>
-
-      {/* Search */}
-      {/* <section className="max-w-7xl mx-auto px-4 -mt-6 md:-mt-8 relative z-20">
-        <AnimSection anim="animate-fade-up">
-          <SearchForm />
-        </AnimSection>
-      </section> */}
+      <HeroSlider />
 
       {/* Stats Banner */}
       <section className="py-16 bg-cover bg-center relative" style={{ backgroundImage: "url('/images/bg_2.jpg')" }}>
@@ -218,9 +314,7 @@ export default function Home() {
             {places.map((p, i) => (
               <AnimSection key={p.name} anim="animate-scale-in" delay={`delay-${(i + 1) * 100}`}
                 className={i === places.length - 1 && places.length % 2 !== 0 ? 'col-span-2 md:col-span-1' : ''}>
-                <Link to={`/destination?country=${p.slug}`}
-                  className="dest-card block"
-                  style={{ backgroundImage: `url('${p.img}')` }}>
+                <Link to={`/destination?country=${p.slug}`} className="dest-card block" style={{ backgroundImage: `url('${p.img}')` }}>
                   <div className="dest-text">
                     <h3 className="font-bold text-lg">{p.name}</h3>
                     <span className="text-sm text-gray-200">{p.tours}</span>
@@ -251,10 +345,7 @@ export default function Home() {
       </section>
 
       {/* Video Banner */}
-      <section
-        className="relative hero-bg py-40 flex items-center justify-center"
-        style={{ backgroundImage: "url('/images/bg_4.jpg')" }}
-      >
+      <section className="relative hero-bg py-40 flex items-center justify-center" style={{ backgroundImage: "url('/images/bg_4.jpg')" }}>
         <div className="overlay" />
         <AnimSection anim="animate-scale-in" className="relative z-10 text-center text-white">
           <p className="text-orange-400 font-semibold tracking-widest uppercase text-sm mb-3">Watch Our Story</p>

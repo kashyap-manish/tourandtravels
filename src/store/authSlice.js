@@ -24,9 +24,13 @@ const token = localStorage.getItem('token');
 let user = null;
 try { user = JSON.parse(localStorage.getItem('user')); } catch {}
 
+// Clear session on every fresh app load
+localStorage.removeItem('token');
+localStorage.removeItem('user');
+
 const authSlice = createSlice({
   name: 'auth',
-  initialState: { user, token: token || null, loading: false, error: null },
+  initialState: { user: null, token: null, loading: false, error: null },
   reducers: {
     logout(state) {
       state.user = null;

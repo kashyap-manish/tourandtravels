@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import HotelCard from '../components/HotelCard';
 import SearchForm from '../components/SearchForm';
@@ -59,6 +59,7 @@ export default function Hotel() {
   const [city, setCity] = useState('Philippines');
 
   const [gridRef, gridInView] = useInView();
+  const gridSectionRef = useRef(null);
 
   useEffect(() => {
     setLoading(true);
@@ -81,6 +82,17 @@ export default function Hotel() {
   const paginated = sorted.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   const handleSearch = (newCity) => { setCity(newCity); setCurrentPage(1); setStarFilter(0); };
+
+  const DESTINATIONS = [
+    { city: 'Manila', img: 'https://images.unsplash.com/photo-1555990793-da11153b2473?w=400&h=300&fit=crop', badge: '🏙️', highlight: 'City of Dreams' },
+    { city: 'Cebu', img: 'https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=400&h=300&fit=crop', badge: '🌊', highlight: 'Queen City' },
+    { city: 'Boracay', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=300&fit=crop', badge: '🏖️', highlight: 'White Beach' },
+    { city: 'Palawan', img: 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop', badge: '🌴', highlight: 'Island Paradise' },
+    { city: 'Davao', img: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', badge: '🦅', highlight: 'Eagle Country' },
+    { city: 'Baguio', img: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop', badge: '🌿', highlight: 'Summer Capital' },
+  ];
+
+  const cityCount = (c) => hotels.filter(h => h.location?.toLowerCase().includes(c.toLowerCase())).length;
   const handleStarFilter = (v) => { setStarFilter(v); setCurrentPage(1); };
 
   return (
@@ -170,35 +182,57 @@ export default function Hotel() {
               <span className="text-orange-500 text-xs font-bold uppercase tracking-widest">Popular Picks</span>
               <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 mt-1">Top Hotel Destinations</h2>
             </div>
-            <span className="text-xs text-gray-400 hidden sm:block">Scroll to explore →</span>
+            <span className="text-xs text-gray-400 hidden sm:block">Click to explore hotels →</span>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollSnapType: 'x mandatory' }}>
-            {[
-              { city: 'Manila', img: 'https://picsum.photos/seed/manila/400/300', hotels: '120+ Hotels', badge: '🏙️' },
-              { city: 'Cebu', img: 'https://picsum.photos/seed/cebu/400/300', hotels: '85+ Hotels', badge: '🌊' },
-              { city: 'Boracay', img: 'https://picsum.photos/seed/boracay/400/300', hotels: '60+ Hotels', badge: '🏖️' },
-              { city: 'Palawan', img: 'https://picsum.photos/seed/palawan/400/300', hotels: '45+ Hotels', badge: '🌴' },
-              { city: 'Davao', img: 'https://picsum.photos/seed/davao/400/300', hotels: '55+ Hotels', badge: '🦅' },
-              { city: 'Baguio', img: 'https://picsum.photos/seed/baguio/400/300', hotels: '40+ Hotels', badge: '🌿' },
-            ].map((d, i) => (
-              <button
-                key={i}
-                onClick={() => { handleSearch(d.city); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                className="group relative shrink-0 w-44 h-56 rounded-3xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer border-0"
-                style={{ scrollSnapAlign: 'start' }}
-              >
-                <div className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500" style={{ backgroundImage: `url('${d.img}')` }} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-4 text-white text-left">
-                  <div className="text-xl mb-1">{d.badge}</div>
-                  <div className="font-bold text-sm">{d.city}</div>
-                  <div className="text-[10px] text-gray-300">{d.hotels}</div>
-                </div>
-                <div className="absolute top-3 right-3 bg-orange-500 text-white text-[9px] font-bold px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  Search
-                </div>
-              </button>
-            ))}
+
+          {/* Mobile: horizontal scroll | Desktop: grid */}
+          <div className="flex gap-4 overflow-x-auto pb-4 sm:overflow-visible sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:pb-0" style={{ scrollSnapType: 'x mandatory' }}>
+            {DESTINATIONS.map((d, i) => {
+              const count = cityCount(d.city);
+              const isActive = city === d.city;
+              return (
+                <button
+                  key={i}
+                  onClick={() => {
+                    handleSearch(d.city);
+                    setTimeout(() => gridSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+                  }}
+                  className={`group relative shrink-0 w-44 sm:w-auto h-56 rounded-3xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer border-2 ${
+                    isActive ? 'border-orange-500 shadow-orange-500/30 shadow-lg -translate-y-1' : 'border-transparent'
+                  }`}
+                  style={{ scrollSnapAlign: 'start' }}
+                >
+                  <div className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500" style={{ backgroundImage: `url('${d.img}')` }} />
+                  <div className={`absolute inset-0 transition-all duration-300 ${
+                    isActive ? 'bg-gradient-to-t from-orange-900/80 via-orange-800/20 to-transparent' : 'bg-gradient-to-t from-black/80 via-black/20 to-transparent'
+                  }`} />
+
+                  {/* Active checkmark */}
+                  {isActive && (
+                    <div className="absolute top-3 left-3 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                      <i className="fa fa-check text-white text-[10px]" />
+                    </div>
+                  )}
+
+                  {/* Hover tooltip */}
+                  <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white text-[9px] font-semibold px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                    {d.highlight}
+                  </div>
+
+                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white text-left">
+                    <div className="text-xl mb-1">{d.badge}</div>
+                    <div className="font-bold text-sm">{d.city}</div>
+                    <div className="text-[10px] text-gray-300">
+                      {!loading && count > 0 ? `${count} Hotels` : loading ? '...' : `${d.city} Hotels`}
+                    </div>
+                  </div>
+
+                  {isActive && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500" />
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -242,7 +276,7 @@ export default function Hotel() {
       </section>
 
       {/* ── Filters & Grid ── */}
-      <section className="py-14">
+      <section className="py-14" ref={gridSectionRef}>
         <div className="max-w-7xl mx-auto px-6">
 
           {/* Toolbar */}
