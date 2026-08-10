@@ -37,6 +37,8 @@ import PrivateRoute from './components/PrivateRoute';
 import AdminBookings from './pages/AdminBookings';
 import TermsOfService from './pages/TermsOfService';
 import Sitemap from './pages/Sitemap';
+import Gallery from './pages/Gallery';
+import Wishlist from './pages/Wishlist';
 
 export default function App() {
   return (
@@ -79,6 +81,8 @@ export default function App() {
                 <Route path="/admin/bookings" element={<AdminBookings />} />
                 <Route path="/terms-of-service" element={<TermsOfService />} />
                 <Route path="/sitemap" element={<Sitemap />} />
+                <Route path="/gallery" element={<Gallery />} />
+                <Route path="/wishlist" element={<Wishlist />} />
               </Routes>
             </main>
             <Footer />

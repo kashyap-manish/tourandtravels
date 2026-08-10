@@ -1,0 +1,108 @@
+.rt-wrap {
+  display: block;
+  overflow: visible;
+}
+
+.rt-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ── base char state ── */
+.rt-char {
+  display: inline-block;
+  opacity: 0;
+  will-change: opacity, transform, filter;
+}
+
+/* ── effect 0: fade in ── */
+.rt-char--0 {
+  transform: translateY(6px);
+  transition: none;
+}
+.rt-char--0.rt-char--visible {
+  animation: rt-fade-in 0.5s ease forwards;
+}
+@keyframes rt-fade-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── effect 1: unblur ── */
+.rt-char--1 {
+  filter: blur(8px);
+  transform: translateX(-4px);
+}
+.rt-char--1.rt-char--visible {
+  animation: rt-unblur 0.6s ease forwards;
+}
+@keyframes rt-unblur {
+  to { opacity: 1; filter: blur(0); transform: translateX(0); }
+}
+
+/* ── effect 2: unblur & fade ── */
+.rt-char--2 {
+  filter: blur(6px);
+  transform: scale(0.85);
+}
+.rt-char--2.rt-char--visible {
+  animation: rt-unblur-fade 0.65s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+@keyframes rt-unblur-fade {
+  to { opacity: 1; filter: blur(0); transform: scale(1); }
+}
+
+/* ── effect 3: grow ── */
+.rt-char--3 {
+  filter: blur(4px);
+  transform: scaleY(0.4) translateY(10px);
+  transform-origin: bottom center;
+}
+.rt-char--3.rt-char--visible {
+  animation: rt-grow 0.55s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes rt-grow {
+  to { opacity: 1; filter: blur(0); transform: scaleY(1) translateY(0); }
+}
+
+/* ── effect 4: unshear ── */
+.rt-char--4 {
+  filter: blur(3px);
+  transform: skewX(20deg) translateX(-8px);
+}
+.rt-char--4.rt-char--visible {
+  animation: rt-unshear 0.55s ease forwards;
+}
+@keyframes rt-unshear {
+  to { opacity: 1; filter: blur(0); transform: skewX(0deg) translateX(0); }
+}
+
+/* ── effect 5: undissolve ── */
+.rt-char--5 {
+  filter: blur(2px) contrast(0);
+  transform: translate(
+    calc((var(--rx, 0.5) - 0.5) * 14px),
+    calc((var(--ry, 0.5) - 0.5) * 14px)
+  );
+}
+.rt-char--5.rt-char--visible {
+  animation: rt-dissolve 0.7s ease forwards;
+}
+@keyframes rt-dissolve {
+  to { opacity: 1; filter: blur(0) contrast(1); transform: translate(0, 0); }
+}
+
+/* ── effect 6: wave ── */
+.rt-char--6 {
+  transform: translateY(12px) rotate(8deg);
+  filter: blur(3px);
+}
+.rt-char--6.rt-char--visible {
+  animation: rt-wave 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes rt-wave {
+  to { opacity: 1; transform: translateY(0) rotate(0deg); filter: blur(0); }
+}

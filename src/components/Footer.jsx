@@ -193,7 +193,7 @@ export default function Footer() {
               <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <i className="fa fa-map-marker text-orange-400 text-sm" />
               </div>
-              <span className="text-gray-400 text-sm leading-relaxed">203 Fake St. Mountain View, San Francisco, California, USA</span>
+              <a href= "https://maps.google.com/?q=198+West+21st+Street+New+York+NY+10016" className="text-gray-400 text-sm leading-relaxed">203 Fake St. Mountain View, San Francisco, California, USA</a>
             </li>
             <li className="flex gap-3 items-center">
               <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0">

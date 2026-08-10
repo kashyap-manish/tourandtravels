@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleWishlist } from '../store/wishlistSlice';
+import '../styles/FlipCard.css';
 
 export default function TourCard({ _id, id, slug, img, price, days, title, location, features, rating = 4, reviews = 24, rank = 99 }) {
   const navigate = useNavigate();
@@ -10,91 +11,52 @@ export default function TourCard({ _id, id, slug, img, price, days, title, locat
   const isPopular = rank < 3;
 
   return (
-    <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col">
+    <div className="flip-card-container">
+      <div className="flip-card">
 
-      {/* Image */}
-      <div className="relative overflow-hidden h-52 shrink-0">
-        <div
-          className="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-          style={{ backgroundImage: `url('${img}')` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+        {/* Front */}
+        <div className="card-front">
+          <figure>
+            <img className="card-photo" src={img} alt={title} />
+            <div className="img-bg" />
+            <figcaption>{location}</figcaption>
+          </figure>
 
-        {/* Badges row */}
-        <div className="absolute top-3 left-3 flex gap-2">
-          {isPopular && (
-            <span className="bg-orange-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shadow">
-              🔥 Popular
-            </span>
-          )}
+          {isPopular && <span className="badge-popular">🔥 Popular</span>}
+          <button className="wishlist-btn" onClick={e => { e.stopPropagation(); dispatch(toggleWishlist({ id: cardId, type: 'tour', title, img, price, location, slug })); }}>
+            <i className={`fa ${isWishlisted ? 'fa-heart text-red-500' : 'fa-heart-o text-gray-400'} text-sm`} />
+          </button>
+          <span className="badge-days"><i className="fa fa-clock-o" style={{ color: '#f97316' }} />{days}</span>
+          <span className="badge-price">{price}</span>
+
+          <ul className="front-content">
+            <li style={{ fontWeight: 700, fontSize: 14 }}>{title}</li>
+            {[...Array(5)].map((_, i) => (
+              <li key={i}><i className={`fa fa-star text-xs ${i < rating ? 'text-yellow-400' : 'text-white/20'}`} /></li>
+            )).slice(0, 1)}
+            <li style={{ fontSize: 11, color: '#94a3b8' }}>({reviews} reviews)</li>
+            {features.slice(0, 3).map((f, i) => <li key={i}>{f}</li>)}
+          </ul>
         </div>
 
-        {/* Wishlist */}
-        <button
-          onClick={() => dispatch(toggleWishlist(cardId))}
-          className="absolute top-3 right-3 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-md transition-colors"
-        >
-          <i className={`fa ${isWishlisted ? 'fa-heart text-red-500' : 'fa-heart-o text-gray-400 hover:text-red-500'} text-sm transition-colors`} />
-        </button>
+        {/* Back */}
+        <div className="card-back">
+          <figure>
+            <img className="card-photo" src={img} alt={title} />
+            <div className="img-bg" />
+          </figure>
 
-        {/* Duration */}
-        <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5">
-          <i className="fa fa-clock-o text-orange-400" />
-          {days}
+          <div className="back-content">
+            <p style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 15, textAlign: 'center', letterSpacing: 1 }}>{title}</p>
+            <p style={{ color: '#94a3b8', fontSize: 12 }}><i className="fa fa-map-marker" style={{ color: '#f97316' }} /> {location}</p>
+            <p style={{ color: '#f97316', fontWeight: 700, fontSize: 18 }}>{price}</p>
+            <button className="book-btn" onClick={() => navigate(`/destination/${slug}`)}>Book Now</button>
+            <div className="design-container">
+              {[1,2,3,4,5,6,7,8].map(n => <span key={n} className={`design design--${n}`} />)}
+            </div>
+          </div>
         </div>
 
-        {/* Price */}
-        <div className="absolute bottom-3 right-3 bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
-          {price}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-5 flex flex-col flex-1">
-        <h3
-          onClick={() => navigate(`/destination/${slug}`)}
-          className="font-bold text-gray-900 text-base leading-snug hover:text-orange-500 transition-colors cursor-pointer mb-1 line-clamp-2"
-        >
-          {title}
-        </h3>
-
-        <p className="text-sm text-gray-400 flex items-center gap-1.5 mb-3">
-          <i className="fa fa-map-marker text-orange-400" />
-          {location}
-        </p>
-
-        {/* Rating */}
-        <div className="flex items-center gap-1 mb-4">
-          {[...Array(5)].map((_, i) => (
-            <i key={i} className={`fa fa-star text-xs ${i < rating ? 'text-yellow-400' : 'text-gray-200'}`} />
-          ))}
-          <span className="text-xs text-gray-400 ml-1.5">({reviews} reviews)</span>
-        </div>
-
-        {/* Features */}
-        <div className="flex flex-wrap gap-1.5 pt-4 border-t border-gray-100 mt-auto">
-          {features.slice(0, 3).map((f, i) => (
-            <span key={i} className="text-[11px] bg-gray-50 border border-gray-100 text-gray-500 px-2.5 py-1 rounded-full">
-              {f}
-            </span>
-          ))}
-          {features.length > 3 && (
-            <span className="text-[11px] bg-orange-50 border border-orange-100 text-orange-500 px-2.5 py-1 rounded-full">
-              +{features.length - 3} more
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* CTA */}
-      <div className="px-5 pb-5">
-        <button
-          onClick={() => navigate(`/destination/${slug}`)}
-          className="w-full flex items-center justify-center gap-2 bg-gray-950 hover:bg-orange-500 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors duration-200 group/btn"
-        >
-          View Details
-          <i className="fa fa-arrow-right text-xs group-hover/btn:translate-x-1 transition-transform" />
-        </button>
       </div>
     </div>
   );

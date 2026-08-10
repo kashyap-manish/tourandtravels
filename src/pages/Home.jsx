@@ -8,6 +8,7 @@ import CallToAction from '../components/CallToAction';
 import useInView from '../hooks/useInView';
 import { tours as allTours } from '../data/tours';
 import { fetchBlogs } from '../services/blogApi';
+import '../styles/Firefly.css';
 
 const slides = [
   {
@@ -59,6 +60,8 @@ function HeroSlider() {
 
   return (
     <section className="relative overflow-hidden" style={{ minHeight: '100vh' }}>
+      {/* Fireflies */}
+      {[...Array(15)].map((_, i) => <div key={i} className="firefly" />)}
       {/* Slides — crossfade */}
       {slides.map((s, i) => (
         <div

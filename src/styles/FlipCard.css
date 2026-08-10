@@ -1,0 +1,285 @@
+.flip-card-container {
+  width: 100%;
+  height: 420px;
+  perspective: 1000px;
+}
+
+.flip-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: 0.6s 0.1s;
+}
+
+.flip-card-container:hover .flip-card {
+  transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  background: #0f172a;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-front { transform: rotateY(0deg); z-index: 2; }
+.card-back  { transform: rotateY(180deg); z-index: 1; }
+
+/* figure */
+.flip-card figure {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
+  margin: 0;
+}
+
+.flip-card .img-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+}
+
+.flip-card img.card-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+/* front img-bg: diagonal clip + orange line */
+.card-front .img-bg {
+  background: rgba(15, 23, 42, 0.55);
+  clip-path: polygon(0 20%, 100% 40%, 100% 100%, 0 100%);
+}
+
+.card-front .img-bg::before {
+  content: "";
+  position: absolute;
+  top: 34%; left: 50%;
+  transform: translate(-50%, -50%) rotate(18deg);
+  width: 100%;
+  height: 6px;
+  border: 1px solid #f97316;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  transition: 0.1s;
+}
+
+.flip-card-container:hover .card-front .img-bg::before {
+  width: 6px;
+  border-left-color: #f97316;
+  border-right-color: #f97316;
+}
+
+/* back img-bg */
+.card-back .img-bg {
+  background: rgba(15, 23, 42, 0.6);
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 0 60%);
+}
+
+/* front content list */
+.flip-card .front-content {
+  padding-top: 52%;
+  width: 75%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  list-style: none;
+  color: #e2e8f0;
+  z-index: 1;
+}
+
+.flip-card .front-content li {
+  width: 100%;
+  padding: 10px 0;
+  font-size: 13px;
+  text-align: center;
+  position: relative;
+  color: #e2e8f0;
+}
+
+.flip-card .front-content li:nth-child(2n) { color: #94a3b8; }
+
+.flip-card .front-content li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%; height: 1px;
+  background: currentColor;
+  opacity: 0.2;
+}
+
+/* figcaption */
+.flip-card figcaption {
+  display: block;
+  width: auto;
+  margin-top: 12%;
+  padding: 8px 22px;
+  font-weight: bold;
+  line-height: 1.6;
+  letter-spacing: 2px;
+  text-align: right;
+  position: absolute;
+  top: 0; right: 12px;
+  color: #f1f5f9;
+  background: rgba(15, 23, 42, 0.55);
+  font-size: 13px;
+}
+
+/* back content */
+.flip-card .back-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 1;
+  padding: 1rem;
+}
+
+/* Book button */
+.flip-card .book-btn {
+  font-family: inherit;
+  font-weight: bold;
+  color: #f1f5f9;
+  letter-spacing: 2px;
+  padding: 9px 24px;
+  border: 1px solid #475569;
+  border-radius: 1000px;
+  background: transparent;
+  transition: 0.3s;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.flip-card .book-btn:hover,
+.flip-card .book-btn:focus {
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.1);
+  border-color: #f97316;
+}
+
+.flip-card .book-btn:active { transform: translate(2px); }
+
+/* design lines */
+.design-container {
+  --tr: 90;
+  --op: 0.5;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  position: absolute;
+  top: 0; left: 0;
+  pointer-events: none;
+}
+
+.design {
+  display: block;
+  background: #475569;
+  position: absolute;
+  opacity: var(--op);
+  transition: 0.3s;
+}
+
+.design--1, .design--2, .design--3, .design--4 { width: 1px; height: 100%; }
+.design--1, .design--2 { top: 0; transform: translateY(calc((var(--tr) - (var(--tr) * 2)) * 1%)); }
+.design--1 { left: 20%; }
+.design--2 { left: 80%; }
+.design--3, .design--4 { bottom: 0; transform: translateY(calc((var(--tr) + (var(--tr) - var(--tr))) * 1%)); }
+.design--3 { left: 24%; }
+.design--4 { left: 76%; }
+
+.design--5, .design--6, .design--7, .design--8 { width: 100%; height: 1px; }
+.design--5, .design--6 { left: 0; transform: translateX(calc((var(--tr) - (var(--tr) * 2)) * 1%)); }
+.design--5 { top: 41%; }
+.design--6 { top: 59%; }
+.design--7, .design--8 { right: 0; transform: translateX(calc((var(--tr) + (var(--tr) - var(--tr))) * 1%)); }
+.design--7 { top: 44%; }
+.design--8 { top: 56%; }
+
+.flip-card .book-btn:hover + .design-container,
+.flip-card .book-btn:focus + .design-container {
+  --tr: 20;
+  --op: 0.7;
+}
+
+/* top badges */
+.flip-card .badge-popular {
+  position: absolute;
+  top: 12px; left: 12px;
+  background: #f97316;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  z-index: 3;
+  letter-spacing: 0.05em;
+}
+
+.flip-card .badge-price {
+  position: absolute;
+  bottom: 12px; right: 12px;
+  background: #f97316;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  z-index: 3;
+}
+
+.flip-card .badge-days {
+  position: absolute;
+  bottom: 12px; left: 12px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.flip-card .badge-stars {
+  position: absolute;
+  bottom: 12px; left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  z-index: 3;
+}
+
+/* wishlist btn */
+.flip-card .wishlist-btn {
+  position: absolute;
+  top: 12px; right: 12px;
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 3;
+  transition: background 0.2s;
+}
+
+.flip-card .wishlist-btn:hover { background: white; }

@@ -9,6 +9,7 @@ const links = [
   { to: '/destination', label: 'Destination' },
   { to: '/hotel', label: 'Hotel' },
   { to: '/blog', label: 'Blog' },
+  { to: '/gallery', label: 'Gallery' },
   { to: '/flight', label: 'Flight' },
   { to: '/contact', label: 'Contact' },
 ];
@@ -21,6 +22,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, token } = useSelector(s => s.auth);
+  const wishlistCount = useSelector(s => s.wishlist.ids.length);
   const dropRef = useRef(null);
 
   useEffect(() => {
@@ -74,6 +76,17 @@ export default function Navbar() {
 
         {/* CTA + Hamburger */}
         <div className="flex items-center gap-3">
+          {/* Wishlist icon */}
+          {token && (
+            <Link to="/wishlist" className="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors">
+              <i className="fa fa-heart-o text-gray-300 hover:text-red-400 transition-colors text-base" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                  {wishlistCount > 9 ? '9+' : wishlistCount}
+                </span>
+              )}
+            </Link>
+          )}
           {token ? (
             <div className="relative hidden md:block" ref={dropRef}>
               <button onClick={() => setDropOpen(o => !o)}

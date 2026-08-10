@@ -146,136 +146,7 @@ export default function Hotel() {
         <SearchForm hotelOnly onHotelSearch={handleSearch} />
       </section>
 
-      {/* ── Why Choose Us ── */}
-      <section className="py-14 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <span className="text-orange-500 text-xs font-bold uppercase tracking-widest">Why Book With Us</span>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 mt-1">The Pacific Advantage</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { icon: 'fa-ban', color: 'bg-blue-50 text-blue-500', title: 'Free Cancellation', desc: 'Cancel up to 48 hours before check-in at no charge.' },
-              { icon: 'fa-tag', color: 'bg-green-50 text-green-500', title: 'Best Price Guarantee', desc: "Find a lower price? We'll match it, no questions asked." },
-              { icon: 'fa-headphones', color: 'bg-orange-50 text-orange-500', title: '24/7 Support', desc: 'Our travel experts are available around the clock for you.' },
-              { icon: 'fa-shield', color: 'bg-purple-50 text-purple-500', title: 'Verified Hotels', desc: 'Every property is personally vetted for quality and comfort.' },
-            ].map((f, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col items-start gap-4">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl ${f.color}`}>
-                  <i className={`fa ${f.icon}`} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 text-sm mb-1">{f.title}</h4>
-                  <p className="text-xs text-gray-400 leading-relaxed">{f.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Top Destinations ── */}
-      <section className="py-14">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <span className="text-orange-500 text-xs font-bold uppercase tracking-widest">Popular Picks</span>
-              <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 mt-1">Top Hotel Destinations</h2>
-            </div>
-            <span className="text-xs text-gray-400 hidden sm:block">Click to explore hotels →</span>
-          </div>
-
-          {/* Mobile: horizontal scroll | Desktop: grid */}
-          <div className="flex gap-4 overflow-x-auto pb-4 sm:overflow-visible sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:pb-0" style={{ scrollSnapType: 'x mandatory' }}>
-            {DESTINATIONS.map((d, i) => {
-              const count = cityCount(d.city);
-              const isActive = city === d.city;
-              return (
-                <button
-                  key={i}
-                  onClick={() => {
-                    handleSearch(d.city);
-                    setTimeout(() => gridSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-                  }}
-                  className={`group relative shrink-0 w-44 sm:w-auto h-56 rounded-3xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer border-2 ${
-                    isActive ? 'border-orange-500 shadow-orange-500/30 shadow-lg -translate-y-1' : 'border-transparent'
-                  }`}
-                  style={{ scrollSnapAlign: 'start' }}
-                >
-                  <div className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500" style={{ backgroundImage: `url('${d.img}')` }} />
-                  <div className={`absolute inset-0 transition-all duration-300 ${
-                    isActive ? 'bg-gradient-to-t from-orange-900/80 via-orange-800/20 to-transparent' : 'bg-gradient-to-t from-black/80 via-black/20 to-transparent'
-                  }`} />
-
-                  {/* Active checkmark */}
-                  {isActive && (
-                    <div className="absolute top-3 left-3 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center shadow-lg">
-                      <i className="fa fa-check text-white text-[10px]" />
-                    </div>
-                  )}
-
-                  {/* Hover tooltip */}
-                  <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white text-[9px] font-semibold px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                    {d.highlight}
-                  </div>
-
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white text-left">
-                    <div className="text-xl mb-1">{d.badge}</div>
-                    <div className="font-bold text-sm">{d.city}</div>
-                    <div className="text-[10px] text-gray-300">
-                      {!loading && count > 0 ? `${count} Hotels` : loading ? '...' : `${d.city} Hotels`}
-                    </div>
-                  </div>
-
-                  {isActive && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Testimonials ── */}
-      <section className="py-14 bg-gray-950">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <span className="text-orange-400 text-xs font-bold uppercase tracking-widest">Guest Reviews</span>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-white mt-1">What Our Guests Say</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { name: 'Sarah M.', location: 'Manila', avatar: 'https://i.pravatar.cc/80?img=47', rating: 5, text: 'Absolutely stunning hotel! The views were breathtaking and the staff went above and beyond. Will definitely book again through Pacific.' },
-              { name: 'James R.', location: 'Cebu', avatar: 'https://i.pravatar.cc/80?img=12', rating: 5, text: "Best booking experience I've had. Found a 5-star resort at an unbeatable price. The free cancellation policy gave me total peace of mind." },
-              { name: 'Anika L.', location: 'Boracay', avatar: 'https://i.pravatar.cc/80?img=32', rating: 4, text: "The beachfront hotel was exactly as described. Pacific's 24/7 support helped me sort a last-minute room change instantly. Highly recommend!" },
-            ].map((r, i) => (
-              <div key={i} className="bg-white/5 border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-colors duration-300">
-                <div className="flex items-center gap-0.5 mb-4">
-                  {[...Array(5)].map((_, j) => (
-                    <i key={j} className={`fa fa-star text-xs ${j < r.rating ? 'text-yellow-400' : 'text-white/20'}`} />
-                  ))}
-                </div>
-                <p className="text-gray-300 text-sm leading-relaxed mb-6 italic">"{r.text}"</p>
-                <div className="flex items-center gap-3">
-                  <img src={r.avatar} alt={r.name} className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40" />
-                  <div>
-                    <div className="text-white font-semibold text-sm">{r.name}</div>
-                    <div className="text-gray-500 text-xs flex items-center gap-1">
-                      <i className="fa fa-map-marker text-orange-400 text-[10px]" />{r.location}
-                    </div>
-                  </div>
-                  <div className="ml-auto">
-                    <i className="fa fa-quote-right text-orange-500/30 text-3xl" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Filters & Grid ── */}
+            {/* ── Filters & Grid ── */}
       <section className="py-14" ref={gridSectionRef}>
         <div className="max-w-7xl mx-auto px-6">
 
@@ -409,6 +280,137 @@ export default function Hotel() {
           )}
         </div>
       </section>
+
+      {/* ── Why Choose Us ── */}
+      <section className="py-14 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <span className="text-orange-500 text-xs font-bold uppercase tracking-widest">Why Book With Us</span>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 mt-1">The Pacific Advantage</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: 'fa-ban', color: 'bg-blue-50 text-blue-500', title: 'Free Cancellation', desc: 'Cancel up to 48 hours before check-in at no charge.' },
+              { icon: 'fa-tag', color: 'bg-green-50 text-green-500', title: 'Best Price Guarantee', desc: "Find a lower price? We'll match it, no questions asked." },
+              { icon: 'fa-headphones', color: 'bg-orange-50 text-orange-500', title: '24/7 Support', desc: 'Our travel experts are available around the clock for you.' },
+              { icon: 'fa-shield', color: 'bg-purple-50 text-purple-500', title: 'Verified Hotels', desc: 'Every property is personally vetted for quality and comfort.' },
+            ].map((f, i) => (
+              <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col items-start gap-4">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl ${f.color}`}>
+                  <i className={`fa ${f.icon}`} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-gray-900 text-sm mb-1">{f.title}</h4>
+                  <p className="text-xs text-gray-400 leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Top Destinations ── */}
+      <section className="py-14">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <span className="text-orange-500 text-xs font-bold uppercase tracking-widest">Popular Picks</span>
+              <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 mt-1">Top Hotel Destinations</h2>
+            </div>
+            <span className="text-xs text-gray-400 hidden sm:block">Click to explore hotels →</span>
+          </div>
+
+          {/* Mobile: horizontal scroll | Desktop: grid */}
+          <div className="flex gap-4 overflow-x-auto pb-4 sm:overflow-visible sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:pb-0" style={{ scrollSnapType: 'x mandatory' }}>
+            {DESTINATIONS.map((d, i) => {
+              const count = cityCount(d.city);
+              const isActive = city === d.city;
+              return (
+                <button
+                  key={i}
+                  onClick={() => {
+                    handleSearch(d.city);
+                    setTimeout(() => gridSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+                  }}
+                  className={`group relative shrink-0 w-44 sm:w-auto h-56 rounded-3xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer border-2 ${
+                    isActive ? 'border-orange-500 shadow-orange-500/30 shadow-lg -translate-y-1' : 'border-transparent'
+                  }`}
+                  style={{ scrollSnapAlign: 'start' }}
+                >
+                  <div className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500" style={{ backgroundImage: `url('${d.img}')` }} />
+                  <div className={`absolute inset-0 transition-all duration-300 ${
+                    isActive ? 'bg-gradient-to-t from-orange-900/80 via-orange-800/20 to-transparent' : 'bg-gradient-to-t from-black/80 via-black/20 to-transparent'
+                  }`} />
+
+                  {/* Active checkmark */}
+                  {isActive && (
+                    <div className="absolute top-3 left-3 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                      <i className="fa fa-check text-white text-[10px]" />
+                    </div>
+                  )}
+
+                  {/* Hover tooltip */}
+                  <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white text-[9px] font-semibold px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                    {d.highlight}
+                  </div>
+
+                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white text-left">
+                    <div className="text-xl mb-1">{d.badge}</div>
+                    <div className="font-bold text-sm">{d.city}</div>
+                    <div className="text-[10px] text-gray-300">
+                      {!loading && count > 0 ? `${count} Hotels` : loading ? '...' : `${d.city} Hotels`}
+                    </div>
+                  </div>
+
+                  {isActive && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Testimonials ── */}
+      <section className="py-14 bg-gray-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <span className="text-orange-400 text-xs font-bold uppercase tracking-widest">Guest Reviews</span>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-white mt-1">What Our Guests Say</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { name: 'Sarah M.', location: 'Manila', avatar: 'https://i.pravatar.cc/80?img=47', rating: 5, text: 'Absolutely stunning hotel! The views were breathtaking and the staff went above and beyond. Will definitely book again through Pacific.' },
+              { name: 'James R.', location: 'Cebu', avatar: 'https://i.pravatar.cc/80?img=12', rating: 5, text: "Best booking experience I've had. Found a 5-star resort at an unbeatable price. The free cancellation policy gave me total peace of mind." },
+              { name: 'Anika L.', location: 'Boracay', avatar: 'https://i.pravatar.cc/80?img=32', rating: 4, text: "The beachfront hotel was exactly as described. Pacific's 24/7 support helped me sort a last-minute room change instantly. Highly recommend!" },
+            ].map((r, i) => (
+              <div key={i} className="bg-white/5 border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-colors duration-300">
+                <div className="flex items-center gap-0.5 mb-4">
+                  {[...Array(5)].map((_, j) => (
+                    <i key={j} className={`fa fa-star text-xs ${j < r.rating ? 'text-yellow-400' : 'text-white/20'}`} />
+                  ))}
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed mb-6 italic">"{r.text}"</p>
+                <div className="flex items-center gap-3">
+                  <img src={r.avatar} alt={r.name} className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40" />
+                  <div>
+                    <div className="text-white font-semibold text-sm">{r.name}</div>
+                    <div className="text-gray-500 text-xs flex items-center gap-1">
+                      <i className="fa fa-map-marker text-orange-400 text-[10px]" />{r.location}
+                    </div>
+                  </div>
+                  <div className="ml-auto">
+                    <i className="fa fa-quote-right text-orange-500/30 text-3xl" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
 
       <CallToAction />
     </>

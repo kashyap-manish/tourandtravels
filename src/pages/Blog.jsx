@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import BlogCard from '../components/BlogCard';
 import CallToAction from '../components/CallToAction';
 import { fetchBlogs } from '../services/blogApi';
+import '../styles/TreesCard.css';
 
 const categories = ['All', 'Travel Tips', 'Destinations', 'Adventure', 'Budget Travel'];
 
