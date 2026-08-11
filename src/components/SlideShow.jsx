@@ -39,8 +39,9 @@ export default function SlideShow() {
       if (!THREE || !TweenMax) return;
 
       const container = mountRef.current;
-      const W = container.clientWidth;
-      const H = container.clientHeight;
+      const rect = container.getBoundingClientRect();
+      const W = rect.width || window.innerWidth;
+      const H = rect.height || window.innerHeight;
 
       // ── Renderer ──
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -58,9 +59,12 @@ export default function SlideShow() {
       // ── Resize ──
       function onResize() {
         if (!container) return;
-        camera.aspect = container.clientWidth / container.clientHeight;
+        const r = container.getBoundingClientRect();
+        const w = r.width || window.innerWidth;
+        const h = r.height || window.innerHeight;
+        camera.aspect = w / h;
         camera.updateProjectionMatrix();
-        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setSize(w, h);
       }
       window.addEventListener('resize', onResize);
 
@@ -290,11 +294,6 @@ export default function SlideShow() {
   }, []);
 
   return (
-    <div className="relative w-full h-full overflow-hidden" style={{ background: '#111' }}>
-      <div ref={mountRef} className="w-full h-full" />
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 pointer-events-none flex items-center gap-2 bg-black/40 backdrop-blur-sm text-white/70 text-xs font-sans px-4 py-2 rounded-full border border-white/10">
-        <i className="fa fa-arrows-h text-orange-400" /> click and drag to scrub the animation
-      </div>
-    </div>
+    <div ref={mountRef} className="w-full h-full" style={{ display: 'block', minHeight: '100%' }} />
   );
 }

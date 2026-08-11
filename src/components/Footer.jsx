@@ -129,7 +129,7 @@ export default function Footer() {
 
       {/* Newsletter Banner */}
       <div className="border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="container-grid py-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
             <p className="text-orange-400 text-xs font-semibold tracking-widest uppercase mb-1">Stay Updated</p>
             <h3 className="text-xl font-bold text-white">Subscribe to our newsletter</h3>
@@ -139,7 +139,7 @@ export default function Footer() {
       </div>
 
       {/* Main Grid */}
-      <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+      <div className="container-grid py-16 row">
 
         {/* Brand */}
         <div>
@@ -213,7 +213,7 @@ export default function Footer() {
 
       {/* Bottom Bar */}
       <div className="border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500 text-center">
+        <div className="container-grid py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500 text-center">
           <p>© {new Date().getFullYear()} Pacific Travel Agency. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <a href="/privacy-policy" className="hover:text-orange-400 transition-colors">Privacy Policy</a>

@@ -135,7 +135,7 @@ export default function Contact() {
       </section>
 
       {/* Info Cards */}
-      <section className="max-w-7xl mx-auto px-6 -mt-10 relative z-20">
+      <section className="container-grid -mt-10 relative z-20">
         <div
           ref={ref1}
           className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 anim-hidden ${inView1 ? 'anim-visible animate-fade-up' : ''}`}
@@ -213,7 +213,7 @@ export default function Contact() {
 
       {/* Form + Map */}
       <section className="py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-5 gap-10">
+        <div className="container-grid grid grid-cols-1 lg:grid-cols-5 gap-10">
 
           {/* Form — 3 cols */}
           <div
@@ -420,3 +420,4 @@ export default function Contact() {
     </>
   );
 }
+

@@ -37,7 +37,7 @@ export default function CallToAction({
             className={`intro-bg rounded-2xl text-center relative overflow-hidden ${isDark ? 'text-white' : 'text-gray-900'} anim-hidden ${inView ? 'anim-visible animate-fade-up' : ''}`}
             style={{ backgroundImage: `url('${bgImage}')` }}
           >
-            <div className={`overlay rounded-2xl ${isDark ? '' : 'bg-white/70'}`} />
+
             <div className="relative z-10 py-12 md:py-16 px-6">
               <h2 className="text-2xl md:text-3xl font-bold mb-3">{title}</h2>
               <p className={`mb-6 text-sm md:text-base ${isDark ? 'text-gray-200' : 'text-gray-600'}`}>{description}</p>

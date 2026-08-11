@@ -82,7 +82,7 @@ function HeroSlider() {
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-yellow-400 to-orange-500 z-30" />
 
       {/* Content */}
-      <div className="relative z-20 max-w-7xl mx-auto px-6 w-full flex items-center justify-between gap-8" style={{ minHeight: '100vh' }}>
+      <div className="container-grid relative z-20 w-full flex flex-col lg:flex-row items-center justify-between gap-8" style={{ minHeight: '100vh' }}>
         <div className="max-w-2xl text-white" key={animKey}>
           <span className="hero-line-1 inline-block text-orange-400 font-semibold tracking-widest uppercase text-sm border border-orange-400/40 px-3 py-1 rounded-full mb-4">
             {slide.tag}
@@ -114,7 +114,7 @@ function HeroSlider() {
           </div>
         </div>
         {/* Lottie plane */}
-        <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0 hero-line-4">
+        <div className="w-48 h-48 sm:w-64 sm:h-64 lg:w-80 xl:w-96 flex-shrink-0 hero-line-4 mx-auto lg:mx-0">
           <LottieURL url={LOTTIE_PLANE} className="w-full" />
         </div>
       </div>
@@ -240,7 +240,7 @@ export default function Home() {
       {/* Stats Banner */}
       <section className="py-16 bg-cover bg-center relative" style={{ backgroundImage: "url('/images/bg_2.jpg')" }}>
         <div className="absolute inset-0 bg-black/65" />
-        <div ref={statsRef} className="relative z-10 max-w-7xl mx-auto px-6">
+        <div ref={statsRef} className="container-grid relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {stats.map((s, i) => (
               <div key={s.label} className={`stat-card anim-hidden ${statsInView ? `anim-visible animate-scale-in delay-${(i + 1) * 100}` : ''}`}>
@@ -257,7 +257,7 @@ export default function Home() {
 
       {/* Lottie Globe Feature Strip */}
       <section className="py-10 bg-orange-50">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center gap-8">
+        <div className="container-grid flex flex-col md:flex-row items-center gap-8">
           <AnimSection anim="animate-fade-left" className="w-48 h-48 flex-shrink-0 mx-auto md:mx-0">
             <LottieURL url={LOTTIE_GLOBE} className="w-full h-full" />
           </AnimSection>
@@ -270,7 +270,7 @@ export default function Home() {
 
       {/* Services */}
       <section className="py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="container-grid">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="order-2 md:order-1 grid grid-cols-2 gap-4">
               {services.map((s, i) => (
@@ -308,7 +308,7 @@ export default function Home() {
       {/* Select Destination */}
       <section className="py-16 md:py-24 bg-cover bg-center relative" style={{ backgroundImage: "url('/images/bg_3.jpg')" }}>
         <div className="absolute inset-0 bg-black/55" />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6">
+        <div className="container-grid relative z-10">
           <AnimSection anim="animate-fade-up" className="text-center text-white mb-12 px-6">
             <span className="text-orange-400 font-semibold tracking-widest uppercase text-sm">Pacific Provide Places</span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2">Select Your Destination</h2>
@@ -331,7 +331,7 @@ export default function Home() {
 
       {/* Tour Destinations */}
       <section id="tours" className="py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="container-grid">
           <AnimSection anim="animate-fade-up" className="text-center mb-12">
             <span className="text-orange-500 font-semibold tracking-widest uppercase text-sm">Destination</span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2">Tour Destination</h2>
@@ -349,7 +349,7 @@ export default function Home() {
 
       {/* Video Banner */}
       <section className="relative hero-bg py-40 flex items-center justify-center" style={{ backgroundImage: "url('/images/bg_4.jpg')" }}>
-        <div className="overlay" />
+        {/* <div className="overlay" /> */}
         <AnimSection anim="animate-scale-in" className="relative z-10 text-center text-white">
           <p className="text-orange-400 font-semibold tracking-widest uppercase text-sm mb-3">Watch Our Story</p>
           <h2 className="text-3xl md:text-5xl font-bold mb-8">Experience the World</h2>
@@ -362,7 +362,7 @@ export default function Home() {
 
       {/* About */}
       <section className="py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="container-grid">
           <div className="grid md:grid-cols-2 gap-0 rounded-2xl overflow-hidden shadow-2xl">
             <AnimSection anim="animate-fade-left" className="h-72 md:h-auto bg-cover bg-center" style={{ backgroundImage: "url('/images/about-1.jpg')" }} />
             <AnimSection anim="animate-fade-right" className="bg-white p-8 md:p-12 flex flex-col justify-center">
@@ -390,7 +390,7 @@ export default function Home() {
       {/* Testimonials */}
       <section className="py-16 md:py-24 bg-cover bg-center relative" style={{ backgroundImage: "url('/images/bg_1.jpg')" }}>
         <div className="absolute inset-0 bg-black/65" />
-        <div className="relative z-10 max-w-7xl mx-auto px-6">
+        <div className="container-grid relative z-10">
           <AnimSection anim="animate-fade-up" className="text-center text-white mb-12">
             <span className="text-orange-400 font-semibold tracking-widest uppercase text-sm">Testimonial</span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2">Tourist Feedback</h2>
@@ -421,7 +421,7 @@ export default function Home() {
 
       {/* Blog */}
       <section className="py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="container-grid">
           <AnimSection anim="animate-fade-up" className="text-center mb-12">
             <span className="text-orange-500 font-semibold tracking-widest uppercase text-sm">Our Blog</span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2">Recent Posts</h2>

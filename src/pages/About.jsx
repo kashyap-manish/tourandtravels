@@ -56,7 +56,7 @@ export default function About() {
 
       {/* Stats Bar */}
       <section className="bg-orange-500">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 divide-x divide-orange-400">
+        <div className="container-grid grid grid-cols-2 md:grid-cols-4 divide-x divide-orange-400">
           {stats.map(s => (
             <div key={s.label} className="py-6 md:py-8 text-center text-white">
               <RevealText text={s.value} filterId={2} as="p" className="text-2xl md:text-3xl font-extrabold" />
@@ -68,7 +68,7 @@ export default function About() {
 
       {/* Our Story */}
       <section className="py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="container-grid">
           <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
             {/* Images collage */}
             <div className="relative h-72 sm:h-96 md:h-[480px]">
@@ -114,7 +114,7 @@ export default function About() {
 
       {/* Services */}
       <section className="py-16 md:py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="container-grid">
           <div className="text-center mb-10 md:mb-14">
             <RevealText text="What We Offer" filterId={5} as="span" className="text-orange-500 font-semibold tracking-widest uppercase text-xs" />
             <RevealText text="Our Services" filterId={4} as="h2" className="text-3xl md:text-4xl font-extrabold mt-3 text-gray-900" />
@@ -166,7 +166,7 @@ export default function About() {
 
       {/* Team */}
       <section className="py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="container-grid">
           <div className="text-center mb-10 md:mb-14">
             <RevealText text="The People Behind Pacific" filterId={5} as="span" className="text-orange-500 font-semibold tracking-widest uppercase text-xs" />
             <RevealText text="Meet Our Team" filterId={1} as="h2" className="text-3xl md:text-4xl font-extrabold mt-3 text-gray-900" />
@@ -197,7 +197,7 @@ export default function About() {
       <section className="py-16 md:py-24 bg-gray-950 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-72 h-72 bg-orange-500/5 rounded-full -translate-x-1/2 -translate-y-1/2" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-orange-500/5 rounded-full translate-x-1/3 translate-y-1/3" />
-        <div className="relative z-10 max-w-7xl mx-auto px-6">
+        <div className="relative z-10 container-grid">
           <div className="text-center mb-10 md:mb-14">
             <RevealText text="Testimonials" filterId={5} as="span" className="text-orange-400 font-semibold tracking-widest uppercase text-xs" />
             <RevealText text="What Our Travelers Say" filterId={6} as="h2" className="text-3xl md:text-4xl font-extrabold mt-3 text-white" />
@@ -228,3 +228,4 @@ export default function About() {
     </>
   );
 }
+

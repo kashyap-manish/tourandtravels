@@ -1,42 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
-import SlideShow from '../components/SlideShow';
+import { fetchGalleryImages, fetchHeroSlides } from '../services/pexelsApi';
 
 const CATEGORIES = ['All', 'Beaches', 'Mountains', 'Culture', 'Adventure', 'Wildlife', 'Cities'];
-
-const IMAGES = [
-  // Beaches
-  { id: 1,  src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=70', cat: 'Beaches',   title: 'Boracay White Beach',    location: 'Philippines', span: 'tall' },
-  { id: 2,  src: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=400&q=70', cat: 'Beaches',   title: 'Maldives Overwater',     location: 'Maldives',    span: 'wide' },
-  { id: 3,  src: 'https://images.unsplash.com/photo-1473116763249-2faaef81ccda?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1473116763249-2faaef81ccda?w=400&q=70', cat: 'Beaches',   title: 'Tropical Shoreline',     location: 'Bali',        span: 'normal' },
-  { id: 4,  src: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&q=70', cat: 'Beaches',   title: 'Crystal Cove',           location: 'Thailand',    span: 'normal' },
-  // Mountains
-  { id: 5,  src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=70', cat: 'Mountains', title: 'Himalayan Peaks',        location: 'Nepal',       span: 'wide' },
-  { id: 6,  src: 'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=400&q=70', cat: 'Mountains', title: 'Snow Capped Summit',     location: 'Switzerland', span: 'tall' },
-  { id: 7,  src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=70', cat: 'Mountains', title: 'Alpine Valley',          location: 'Austria',     span: 'normal' },
-  { id: 8,  src: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400&q=70', cat: 'Mountains', title: 'Starry Mountain Night',  location: 'Norway',      span: 'normal' },
-  // Culture
-  { id: 9,  src: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=400&q=70', cat: 'Culture',   title: 'Taj Mahal at Dawn',      location: 'India',       span: 'wide' },
-  { id: 10, src: 'https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=400&q=70', cat: 'Culture',   title: 'Ancient Temples',        location: 'Cambodia',    span: 'tall' },
-  { id: 11, src: 'https://images.unsplash.com/photo-1548013146-72479768bada?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1548013146-72479768bada?w=400&q=70', cat: 'Culture',   title: 'Rajasthan Forts',        location: 'India',       span: 'normal' },
-  { id: 12, src: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&q=70', cat: 'Culture',   title: 'Kyoto Shrine',           location: 'Japan',       span: 'normal' },
-  // Adventure
-  { id: 13, src: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&q=70', cat: 'Adventure', title: 'Mountain Hiking Trail',  location: 'Patagonia',   span: 'tall' },
-  { id: 14, src: 'https://images.unsplash.com/photo-1530866495561-507c9faab2ed?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1530866495561-507c9faab2ed?w=400&q=70', cat: 'Adventure', title: 'River Rafting',          location: 'Colorado',    span: 'wide' },
-  { id: 15, src: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&q=70', cat: 'Adventure', title: 'Camping Under Stars',    location: 'Iceland',     span: 'normal' },
-  { id: 16, src: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?w=400&q=70', cat: 'Adventure', title: 'Rock Climbing',          location: 'Yosemite',    span: 'normal' },
-  // Wildlife
-  { id: 17, src: 'https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=400&q=70', cat: 'Wildlife',  title: 'African Safari',         location: 'Kenya',       span: 'wide' },
-  { id: 18, src: 'https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=400&q=70', cat: 'Wildlife',  title: 'Arctic Fox',             location: 'Finland',     span: 'tall' },
-  { id: 19, src: 'https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=400&q=70', cat: 'Wildlife',  title: 'Elephant Herd',          location: 'Botswana',    span: 'normal' },
-  { id: 20, src: 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=400&q=70', cat: 'Wildlife',  title: 'Lion at Sunset',         location: 'Tanzania',    span: 'normal' },
-  // Cities
-  { id: 21, src: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=400&q=70', cat: 'Cities',    title: 'City Skyline at Night',  location: 'New York',    span: 'wide' },
-  { id: 22, src: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&q=70', cat: 'Cities',    title: 'London Bridge',          location: 'UK',          span: 'tall' },
-  { id: 23, src: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&q=70', cat: 'Cities',    title: 'Tokyo Neon Streets',     location: 'Japan',       span: 'normal' },
-  { id: 24, src: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80', thumb: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&q=70', cat: 'Cities',    title: 'Paris at Dusk',          location: 'France',      span: 'normal' },
-];
 
 const STATS = [
   { value: '2,400+', label: 'Photos', icon: 'fa-camera' },
@@ -45,44 +12,96 @@ const STATS = [
   { value: '50K+',   label: 'Downloads', icon: 'fa-download' },
 ];
 
+function HeroSlider({ slides }) {
+  const [current, setCurrent] = useState(0);
+  useEffect(() => {
+    if (!slides.length) return;
+    const t = setInterval(() => setCurrent(i => (i + 1) % slides.length), 4000);
+    return () => clearInterval(t);
+  }, [slides.length]);
+  return (
+    <div className="absolute inset-0 overflow-hidden bg-gray-900">
+      {slides.map((src, i) => (
+        <div
+          key={i}
+          className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
+          style={{ backgroundImage: `url('${src}')`, opacity: i === current ? 1 : 0 }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function Gallery() {
   const [activeCategory, setActiveCategory] = useState('All');
-  const [lightbox, setLightbox] = useState(null); // index in filtered
-  const [visible, setVisible] = useState(12);
-  const [loaded, setLoaded] = useState({});
+  const [lightbox, setLightbox] = useState(null);
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [heroSlides, setHeroSlides] = useState([]);
+  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const inputRef = useRef(null);
 
-  const filtered = activeCategory === 'All' ? IMAGES : IMAGES.filter(i => i.cat === activeCategory);
-  const shown = filtered.slice(0, visible);
+  // Fetch hero slides once
+  useEffect(() => {
+    fetchHeroSlides().then(setHeroSlides).catch(() => {});
+  }, []);
+
+  // Fetch images on category/page/search change
+  useEffect(() => {
+    setLoading(true);
+    fetchGalleryImages(activeCategory, page, 12, searchQuery)
+      .then(({ images: imgs, nextPage }) => {
+        setImages(prev => page === 1 ? imgs : [...prev, ...imgs]);
+        setHasMore(!!nextPage);
+      })
+      .catch(() => setHasMore(false))
+      .finally(() => setLoading(false));
+  }, [activeCategory, page, searchQuery]);
+
+  // Reset on category change
+  useEffect(() => { setImages([]); setPage(1); setHasMore(true); }, [activeCategory, searchQuery]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const q = searchInput.trim();
+    if (q === searchQuery) return;
+    setSearchQuery(q);
+    if (q) setActiveCategory('All');
+  };
+
+  const clearSearch = () => {
+    setSearchInput('');
+    setSearchQuery('');
+    inputRef.current?.focus();
+  };
 
   // keyboard nav for lightbox
   const handleKey = useCallback((e) => {
     if (lightbox === null) return;
-    if (e.key === 'ArrowRight') setLightbox(i => Math.min(i + 1, filtered.length - 1));
+    if (e.key === 'ArrowRight') setLightbox(i => Math.min(i + 1, images.length - 1));
     if (e.key === 'ArrowLeft')  setLightbox(i => Math.max(i - 1, 0));
     if (e.key === 'Escape')     setLightbox(null);
-  }, [lightbox, filtered.length]);
+  }, [lightbox, images.length]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, [handleKey]);
 
-  // reset visible on category change
-  useEffect(() => { setVisible(12); }, [activeCategory]);
-
-  const current = lightbox !== null ? filtered[lightbox] : null;
+  const current = lightbox !== null ? images[lightbox] : null;
 
   return (
     <>
-      {/* ── Hero: Full Screen SlideShow ── */}
-      <section className="relative" style={{ height: '100vh' }}>
+      {/* ── Hero ── */}
+      <section className="relative h-screen">
 
-        {/* SlideShow fills entire hero */}
-        <div className="absolute inset-0">
-          <SlideShow />
-        </div>
+        {/* CSS Slideshow */}
+        <HeroSlider slides={heroSlides} />
 
-        {/* Dark gradient overlay for text readability */}
+        {/* Dark gradient overlay */}
         <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-black/80 via-black/30 to-black/20" />
 
         {/* Centered text */}
@@ -117,49 +136,92 @@ export default function Gallery() {
         </div>
       </section>
 
-      {/* ── Category Filter ── */}
+      {/* ── Category Filter + Search ── */}
       <section className="bg-gray-950 sticky top-[72px] z-30 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-3 overflow-x-auto scrollbar-hide">
-          {CATEGORIES.map(cat => (
+        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center gap-3">
+
+          {/* Category pills */}
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide shrink-0">
+            {CATEGORIES.map(cat => (
+              <button
+                key={cat}
+                onClick={() => { setActiveCategory(cat); setSearchInput(''); setSearchQuery(''); }}
+                className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-200
+                  ${activeCategory === cat && !searchQuery
+                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
+                  }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Search bar */}
+          <form onSubmit={handleSearch} className="flex items-center gap-2 ml-auto w-full sm:w-72">
+            <div className="relative flex-1">
+              <i className="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
+              <input
+                ref={inputRef}
+                type="text"
+                value={searchInput}
+                onChange={e => setSearchInput(e.target.value)}
+                placeholder="Search photos..."
+                className="w-full bg-white/10 border border-white/10 text-white text-sm placeholder-gray-500 rounded-full pl-8 pr-8 py-2 outline-none focus:border-orange-500 transition-colors"
+              />
+              {searchInput && (
+                <button type="button" onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+                  <i className="fa fa-times text-xs" />
+                </button>
+              )}
+            </div>
             <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`shrink-0 px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-200
-                ${activeCategory === cat
-                  ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
-                  : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
-                }`}
+              type="submit"
+              className="shrink-0 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-full transition-colors"
             >
-              {cat}
+              Search
             </button>
-          ))}
-          <span className="ml-auto shrink-0 text-xs text-gray-500 whitespace-nowrap">
-            <span className="text-white font-bold">{filtered.length}</span> photos
+          </form>
+
+          <span className="shrink-0 text-xs text-gray-500 whitespace-nowrap hidden sm:block">
+            <span className="text-white font-bold">{images.length}</span> photos
           </span>
         </div>
+
+        {/* Active search tag */}
+        {searchQuery && (
+          <div className="max-w-7xl mx-auto px-6 pb-3 flex items-center gap-2">
+            <span className="text-xs text-gray-400">Results for:</span>
+            <span className="flex items-center gap-1.5 bg-orange-500/20 border border-orange-500/30 text-orange-300 text-xs font-semibold px-3 py-1 rounded-full">
+              "{searchQuery}"
+              <button onClick={clearSearch} className="hover:text-white ml-1">
+                <i className="fa fa-times text-[10px]" />
+              </button>
+            </span>
+          </div>
+        )}
       </section>
 
       {/* ── Masonry Grid ── */}
       <section className="bg-gray-950 py-10 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
-            {shown.map((img, idx) => (
+            {loading && images.length === 0 && (
+              [...Array(12)].map((_, i) => (
+                <div key={i} className={`break-inside-avoid w-full bg-gray-800 animate-pulse rounded-2xl mb-4 ${i % 3 === 0 ? 'h-80' : i % 3 === 1 ? 'h-48' : 'h-60'}`} />
+              ))
+            )}
+            {images.map((img, idx) => (
               <div
                 key={img.id}
-                className="break-inside-avoid group relative overflow-hidden rounded-2xl cursor-zoom-in bg-gray-900"
-                style={{ animationDelay: `${(idx % 12) * 0.05}s` }}
+                className="break-inside-avoid group relative overflow-hidden rounded-2xl cursor-zoom-in bg-gray-900 mb-4"
                 onClick={() => setLightbox(idx)}
               >
-                {/* skeleton shimmer */}
-                {!loaded[img.id] && (
-                  <div className={`w-full bg-gray-800 animate-pulse rounded-2xl ${img.span === 'tall' ? 'h-80' : img.span === 'wide' ? 'h-48' : 'h-60'}`} />
-                )}
                 <img
                   src={img.thumb}
                   alt={img.title}
                   loading="lazy"
-                  onLoad={() => setLoaded(p => ({ ...p, [img.id]: true }))}
-                  className={`w-full object-cover rounded-2xl transition-transform duration-700 group-hover:scale-105 ${loaded[img.id] ? 'block' : 'hidden'} ${img.span === 'tall' ? 'h-80' : img.span === 'wide' ? 'h-48' : 'h-60'}`}
+                  className="w-full object-cover rounded-2xl transition-transform duration-700 group-hover:scale-105"
                 />
 
                 {/* Hover overlay */}
@@ -191,19 +253,23 @@ export default function Gallery() {
           </div>
 
           {/* Load More */}
-          {visible < filtered.length && (
+          {hasMore && !loading && (
             <div className="flex justify-center mt-12">
               <button
-                onClick={() => setVisible(v => v + 8)}
+                onClick={() => setPage(p => p + 1)}
                 className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-3 rounded-full transition-colors shadow-lg shadow-orange-500/30"
               >
                 <i className="fa fa-plus" /> Load More
-                <span className="text-orange-200 text-xs font-normal">({filtered.length - visible} remaining)</span>
               </button>
             </div>
           )}
+          {loading && images.length > 0 && (
+            <div className="flex justify-center mt-8">
+              <i className="fa fa-spinner fa-spin text-orange-400 text-2xl" />
+            </div>
+          )}
 
-          {shown.length === 0 && (
+          {!loading && images.length === 0 && (
             <div className="flex flex-col items-center py-32 text-center">
               <i className="fa fa-image text-5xl text-gray-700 mb-4" />
               <p className="text-gray-500 font-semibold">No photos in this category</p>
@@ -228,7 +294,7 @@ export default function Gallery() {
 
           {/* Counter */}
           <div className="absolute top-5 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-sm text-white text-xs font-semibold px-4 py-2 rounded-full">
-            {lightbox + 1} / {filtered.length}
+            {lightbox + 1} / {images.length}
           </div>
 
           {/* Prev */}
@@ -236,6 +302,7 @@ export default function Gallery() {
             className="absolute left-4 md:left-8 w-12 h-12 bg-white/10 hover:bg-orange-500 rounded-full flex items-center justify-center text-white transition-all duration-200 disabled:opacity-20 z-10"
             onClick={e => { e.stopPropagation(); setLightbox(i => Math.max(i - 1, 0)); }}
             disabled={lightbox === 0}
+
           >
             <i className="fa fa-chevron-left" />
           </button>
@@ -276,15 +343,15 @@ export default function Gallery() {
           {/* Next */}
           <button
             className="absolute right-4 md:right-8 w-12 h-12 bg-white/10 hover:bg-orange-500 rounded-full flex items-center justify-center text-white transition-all duration-200 disabled:opacity-20 z-10"
-            onClick={e => { e.stopPropagation(); setLightbox(i => Math.min(i + 1, filtered.length - 1)); }}
-            disabled={lightbox === filtered.length - 1}
+            onClick={e => { e.stopPropagation(); setLightbox(i => Math.min(i + 1, images.length - 1)); }}
+            disabled={lightbox === images.length - 1}
           >
             <i className="fa fa-chevron-right" />
           </button>
 
           {/* Thumbnail strip */}
           <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2 overflow-x-auto max-w-lg px-4 scrollbar-hide">
-            {filtered.map((img, i) => (
+            {images.map((img, i) => (
               <button
                 key={img.id}
                 onClick={e => { e.stopPropagation(); setLightbox(i); }}

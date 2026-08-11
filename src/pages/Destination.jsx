@@ -180,14 +180,14 @@ export default function Destination() {
 
       {/* ── Search ── */}
       <section className="bg-white py-8 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="container-grid">
           <SearchForm tourOnly />
         </div>
       </section>
 
       {/* ── Featured Destinations Mosaic ── */}
       <section className="py-14 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="container-grid">
           <div className="flex items-end justify-between mb-8">
             <div>
               <p className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-1">Top Picks</p>
@@ -215,7 +215,7 @@ export default function Destination() {
 
       {/* ── Travel Moods Strip ── */}
       <section className="py-8 bg-gray-50 border-y border-gray-100" id="tours">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="container-grid">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Browse by Mood</p>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {moods.map(({ icon, label, color }) => (
@@ -233,7 +233,7 @@ export default function Destination() {
 
       {/* ── Main Content ── */}
       <section className="py-14 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="container-grid">
 
           {/* Top bar */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">

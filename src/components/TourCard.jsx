@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleWishlist } from '../store/wishlistSlice';
-import '../styles/FlipCard.css';
 
 export default function TourCard({ _id, id, slug, img, price, days, title, location, features, rating = 4, reviews = 24, rank = 99 }) {
   const navigate = useNavigate();
@@ -11,52 +10,44 @@ export default function TourCard({ _id, id, slug, img, price, days, title, locat
   const isPopular = rank < 3;
 
   return (
-    <div className="flip-card-container">
-      <div className="flip-card">
+    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+      <div className="relative">
+        <img src={img} alt={title} className="w-full h-52 object-cover" />
+        {isPopular && (
+          <span className="absolute top-3 left-3 bg-orange-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">Popular</span>
+        )}
+        <button
+          className="absolute top-3 right-3 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors"
+          onClick={e => { e.stopPropagation(); dispatch(toggleWishlist({ id: cardId, type: 'tour', title, img, price, location, slug })); }}
+        >
+          <i className={`fa ${isWishlisted ? 'fa-heart text-red-500' : 'fa-heart-o text-gray-400'} text-sm`} />
+        </button>
+        <span className="absolute bottom-3 left-3 bg-black/60 text-white text-[11px] font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+          <i className="fa fa-clock-o text-orange-400" />{days}
+        </span>
+        <span className="absolute bottom-3 right-3 bg-orange-500 text-white text-[11px] font-bold px-3 py-1 rounded-full">{price}</span>
+      </div>
 
-        {/* Front */}
-        <div className="card-front">
-          <figure>
-            <img className="card-photo" src={img} alt={title} />
-            <div className="img-bg" />
-            <figcaption>{location}</figcaption>
-          </figure>
-
-          {isPopular && <span className="badge-popular">🔥 Popular</span>}
-          <button className="wishlist-btn" onClick={e => { e.stopPropagation(); dispatch(toggleWishlist({ id: cardId, type: 'tour', title, img, price, location, slug })); }}>
-            <i className={`fa ${isWishlisted ? 'fa-heart text-red-500' : 'fa-heart-o text-gray-400'} text-sm`} />
-          </button>
-          <span className="badge-days"><i className="fa fa-clock-o" style={{ color: '#f97316' }} />{days}</span>
-          <span className="badge-price">{price}</span>
-
-          <ul className="front-content">
-            <li style={{ fontWeight: 700, fontSize: 14 }}>{title}</li>
-            {[...Array(5)].map((_, i) => (
-              <li key={i}><i className={`fa fa-star text-xs ${i < rating ? 'text-yellow-400' : 'text-white/20'}`} /></li>
-            )).slice(0, 1)}
-            <li style={{ fontSize: 11, color: '#94a3b8' }}>({reviews} reviews)</li>
-            {features.slice(0, 3).map((f, i) => <li key={i}>{f}</li>)}
-          </ul>
+      <div className="p-4">
+        <h3 className="font-bold text-gray-900 text-sm mb-1">{title}</h3>
+        <p className="text-xs text-gray-400 mb-2"><i className="fa fa-map-marker text-orange-400 mr-1" />{location}</p>
+        <div className="flex items-center gap-1 mb-3">
+          {[...Array(5)].map((_, i) => (
+            <i key={i} className={`fa fa-star text-xs ${i < rating ? 'text-yellow-400' : 'text-gray-200'}`} />
+          ))}
+          <span className="text-[11px] text-gray-400 ml-1">({reviews})</span>
         </div>
-
-        {/* Back */}
-        <div className="card-back">
-          <figure>
-            <img className="card-photo" src={img} alt={title} />
-            <div className="img-bg" />
-          </figure>
-
-          <div className="back-content">
-            <p style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 15, textAlign: 'center', letterSpacing: 1 }}>{title}</p>
-            <p style={{ color: '#94a3b8', fontSize: 12 }}><i className="fa fa-map-marker" style={{ color: '#f97316' }} /> {location}</p>
-            <p style={{ color: '#f97316', fontWeight: 700, fontSize: 18 }}>{price}</p>
-            <button className="book-btn" onClick={() => navigate(`/destination/${slug}`)}>Book Now</button>
-            <div className="design-container">
-              {[1,2,3,4,5,6,7,8].map(n => <span key={n} className={`design design--${n}`} />)}
-            </div>
-          </div>
+        <div className="flex flex-wrap gap-1 mb-4">
+          {features.slice(0, 3).map((f, i) => (
+            <span key={i} className="text-[10px] bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full">{f}</span>
+          ))}
         </div>
-
+        <button
+          onClick={() => navigate(`/destination/${slug}`)}
+          className="w-full py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold rounded-xl transition-colors"
+        >
+          Book Now
+        </button>
       </div>
     </div>
   );

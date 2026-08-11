@@ -41,7 +41,7 @@ export default function Navbar() {
 
   return (
     <nav className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-gray-950/95 backdrop-blur-md shadow-lg shadow-black/20' : 'bg-gray-950'}`}>
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-18">
+      <div className="container-grid flex items-center justify-between h-18">
 
         {/* Logo */}
         <Link to="/" className="flex flex-col leading-none group">
