@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
+import TourCard from '../components/TourCard';
+import api from '../services/api';
 
 const highlights = [
   { icon: 'fa-music', title: 'Music Festivals', desc: 'Dance to world-class artists at iconic global music festivals.' },
@@ -10,13 +13,17 @@ const highlights = [
   { icon: 'fa-ship', title: 'Yacht Parties', desc: 'Host spectacular parties on luxury yachts in stunning waters.' },
 ];
 
-const tours = [
-  { img: '/images/place-1.jpg', title: 'Ibiza Party Week', days: '7 Days', price: '₹1,32,999' },
-  { img: '/images/place-2.jpg', title: 'Rio Carnival', days: '5 Days', price: '₹1,07,999' },
-  { img: '/images/place-3.jpg', title: 'Bangkok Nightlife', days: '6 Days', price: '₹74,999' },
-];
-
 export default function Party() {
+  const [tours, setTours] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/tours', { params: { category: 'Culture' } })
+      .then(r => setTours(r.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <>
       <section
@@ -61,26 +68,35 @@ export default function Party() {
             <span className="text-orange-500 font-semibold tracking-widest uppercase text-xs">Popular Picks</span>
             <h2 className="text-3xl md:text-4xl font-extrabold mt-3 text-gray-900">Party Tours</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {tours.map(t => (
-              <div key={t.title} className="group rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow bg-white">
-                <div
-                  className="h-56 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                  style={{ backgroundImage: `url('${t.img}')` }}
-                />
-                <div className="p-5">
-                  <h3 className="font-bold text-gray-900 text-lg">{t.title}</h3>
-                  <div className="flex items-center justify-between mt-3">
-                    <span className="text-sm text-gray-500"><i className="fa fa-clock-o mr-1 text-orange-500" />{t.days}</span>
-                    <span className="text-orange-500 font-bold">{t.price}</span>
+          {loading ? (
+            <div className="row">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="col-12 col-md-4">
+                  <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 animate-pulse">
+                    <div className="h-52 bg-gray-200" />
+                    <div className="p-5 space-y-3">
+                      <div className="h-4 bg-gray-200 rounded w-3/4" />
+                      <div className="h-3 bg-gray-100 rounded w-1/2" />
+                      <div className="h-9 bg-gray-200 rounded-xl mt-4" />
+                    </div>
                   </div>
-                  <Link to="/destination" className="mt-4 block text-center bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-full text-sm font-semibold transition-colors">
-                    Book Now
-                  </Link>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : tours.length === 0 ? (
+            <div className="text-center py-16 text-gray-400">
+              <i className="fa fa-music text-4xl mb-3 block" />
+              <p>No party tours available right now.</p>
+            </div>
+          ) : (
+            <div className="row">
+              {tours.map((t, i) => (
+                <div key={t._id || i} className="col-12 col-md-4">
+                  <TourCard {...t} rank={i} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

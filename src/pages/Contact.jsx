@@ -138,7 +138,7 @@ export default function Contact() {
       <section className="container-grid -mt-10 relative z-20">
         <div
           ref={ref1}
-          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 anim-hidden ${inView1 ? 'anim-visible animate-fade-up' : ''}`}
+          className={`row anim-hidden ${inView1 ? 'anim-visible animate-fade-up' : ''}`}
         >
           {INFO.map((c, i) => {
             const Tag = c.href ? 'a' : 'div';
@@ -147,7 +147,7 @@ export default function Contact() {
             <Tag
               key={c.title}
               {...linkProps}
-              className={`relative rounded-3xl overflow-hidden transition-all duration-500 group ${c.href ? 'cursor-pointer hover:-translate-y-3' : 'hover:-translate-y-1'}`}
+              className={`col-12 col-sm-6 col-lg-3 relative rounded-3xl overflow-hidden transition-all duration-500 group ${c.href ? 'cursor-pointer hover:-translate-y-3' : 'hover:-translate-y-1'}`}
               style={{ animationDelay: `${i * 0.1}s` }}
             >
               {/* Dark base */}
@@ -213,12 +213,12 @@ export default function Contact() {
 
       {/* Form + Map */}
       <section className="py-16 md:py-24">
-        <div className="container-grid grid grid-cols-1 lg:grid-cols-5 gap-10">
+        <div className="container-grid row">
 
-          {/* Form — 3 cols */}
+          {/* Form — 7 cols */}
           <div
             ref={ref2}
-            className={`lg:col-span-3 anim-hidden ${inView2 ? 'anim-visible animate-fade-left' : ''}`}
+            className={`col-12 col-lg-7 anim-hidden ${inView2 ? 'anim-visible animate-fade-left' : ''}`}
           >
             <div className="bg-white rounded-3xl border border-gray-100 shadow-xl p-8 md:p-10">
               {/* Header */}
@@ -255,8 +255,8 @@ export default function Contact() {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div>
+                <div className="row">
+                  <div className="col-12 col-sm-6">
                     <label htmlFor="contact-name" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Full Name *</label>
                     <div className="relative">
                       <i className="fa fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
@@ -268,7 +268,7 @@ export default function Contact() {
                       />
                     </div>
                   </div>
-                  <div>
+                  <div className="col-12 col-sm-6">
                     <label htmlFor="contact-email" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Email Address *</label>
                     <div className="relative">
                       <i className="fa fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
@@ -282,8 +282,8 @@ export default function Contact() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div>
+                <div className="row">
+                  <div className="col-12 col-sm-6">
                     <label htmlFor="contact-phone" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Phone Number</label>
                     <div className="relative">
                       <i className="fa fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
@@ -295,7 +295,7 @@ export default function Contact() {
                       />
                     </div>
                   </div>
-                  <div>
+                  <div className="col-12 col-sm-6">
                     <label htmlFor="contact-subject" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Subject *</label>
                     <div className="relative">
                       <i className="fa fa-tag absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
@@ -341,10 +341,10 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* Right side — 2 cols */}
+          {/* Right side — 5 cols */}
           <div
             ref={ref3}
-            className={`lg:col-span-2 flex flex-col gap-6 anim-hidden ${inView3 ? 'anim-visible animate-fade-right' : ''}`}
+            className={`col-12 col-lg-5 flex flex-col gap-6 anim-hidden ${inView3 ? 'anim-visible animate-fade-right' : ''}`}
           >
             {/* Map */}
             <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-100 h-64 lg:h-72">

@@ -241,9 +241,9 @@ export default function Home() {
       <section className="py-16 bg-cover bg-center relative" style={{ backgroundImage: "url('/images/bg_2.jpg')" }}>
         <div className="absolute inset-0 bg-black/65" />
         <div ref={statsRef} className="container-grid relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="row">
             {stats.map((s, i) => (
-              <div key={s.label} className={`stat-card anim-hidden ${statsInView ? `anim-visible animate-scale-in delay-${(i + 1) * 100}` : ''}`}>
+              <div key={s.label} className={`col-6 col-md-3 stat-card anim-hidden ${statsInView ? `anim-visible animate-scale-in delay-${(i + 1) * 100}` : ''}`}>
                 <i className={`fa ${s.icon} text-orange-400 text-3xl mb-3`} />
                 <p className="text-3xl font-bold">
                   <AnimatedCounter target={s.value} inView={statsInView} />
@@ -271,10 +271,10 @@ export default function Home() {
       {/* Services */}
       <section className="py-16 md:py-24">
         <div className="container-grid">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="order-2 md:order-1 grid grid-cols-2 gap-4">
+          <div className="row items-center">
+            <div className="order-2 md:order-1 row col-12 col-md-6">
               {services.map((s, i) => (
-                <AnimSection key={s.title} anim="animate-scale-in" delay={`delay-${(i + 1) * 100}`}>
+                <AnimSection key={s.title} anim="animate-scale-in" delay={`delay-${(i + 1) * 100}`} className="col-6">
                   <div className="service-card rounded-xl" style={{ backgroundImage: `url('${s.img}')` }}>
                     <div className={`w-12 h-12 rounded-full ${s.color} flex items-center justify-center mb-3`}>
                       <i className={`fa ${s.icon} text-white`} />
@@ -285,7 +285,7 @@ export default function Home() {
                 </AnimSection>
               ))}
             </div>
-            <div className="order-1 md:order-2">
+            <div className="order-1 md:order-2 col-12 col-md-6">
               <AnimSection anim="animate-fade-right">
                 <span className="text-orange-500 font-semibold tracking-widest uppercase text-sm">Welcome to Pacific</span>
                 <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4 leading-tight">It's time to start your <span className="text-orange-500">adventure</span></h2>
@@ -313,10 +313,10 @@ export default function Home() {
             <span className="text-orange-400 font-semibold tracking-widest uppercase text-sm">Pacific Provide Places</span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2">Select Your Destination</h2>
           </AnimSection>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
+          <div className="row">
             {places.map((p, i) => (
               <AnimSection key={p.name} anim="animate-scale-in" delay={`delay-${(i + 1) * 100}`}
-                className={i === places.length - 1 && places.length % 2 !== 0 ? 'col-span-2 md:col-span-1' : ''}>
+                className={`col-6 col-md-2 ${i === places.length - 1 && places.length % 2 !== 0 ? 'col-md-2' : ''}`}>
                 <Link to={`/destination?country=${p.slug}`} className="dest-card block" style={{ backgroundImage: `url('${p.img}')` }}>
                   <div className="dest-text">
                     <h3 className="font-bold text-lg">{p.name}</h3>
@@ -337,9 +337,9 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold mt-2">Tour Destination</h2>
             <div className="w-16 h-1 bg-orange-500 mx-auto mt-4 rounded-full" />
           </AnimSection>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="row">
             {tours.map((t, i) => (
-              <AnimSection key={i} anim="animate-fade-up" delay={`delay-${((i % 3) + 1) * 100}`}>
+              <AnimSection key={i} anim="animate-fade-up" delay={`delay-${((i % 3) + 1) * 100}`} className="col-12 col-sm-6 col-md-4">
                 <TourCard {...t} />
               </AnimSection>
             ))}
@@ -363,9 +363,9 @@ export default function Home() {
       {/* About */}
       <section className="py-16 md:py-24">
         <div className="container-grid">
-          <div className="grid md:grid-cols-2 gap-0 rounded-2xl overflow-hidden shadow-2xl">
-            <AnimSection anim="animate-fade-left" className="h-72 md:h-auto bg-cover bg-center" style={{ backgroundImage: "url('/images/about-1.jpg')" }} />
-            <AnimSection anim="animate-fade-right" className="bg-white p-8 md:p-12 flex flex-col justify-center">
+          <div className="row rounded-2xl overflow-hidden shadow-2xl">
+            <AnimSection anim="animate-fade-left" className="col-12 col-md-6 h-72 md:h-auto bg-cover bg-center" style={{ backgroundImage: "url('/images/about-1.jpg')" }} />
+            <AnimSection anim="animate-fade-right" className="col-12 col-md-6 bg-white p-8 md:p-12 flex flex-col justify-center">
               <span className="text-orange-500 font-semibold tracking-widest uppercase text-sm">About Us</span>
               <h2 className="text-2xl md:text-3xl font-bold mt-2 mb-4 leading-tight">Make Your Tour <span className="text-orange-500">Memorable</span> and Safe With Us</h2>
               <p className="text-gray-500 mb-6">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
@@ -396,9 +396,9 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold mt-2">Tourist Feedback</h2>
             <div className="w-16 h-1 bg-orange-500 mx-auto mt-4 rounded-full" />
           </AnimSection>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="row">
             {testimonials.map((t, i) => (
-              <AnimSection key={i} anim="animate-fade-up" delay={`delay-${(i + 1) * 100}`}>
+              <AnimSection key={i} anim="animate-fade-up" delay={`delay-${(i + 1) * 100}`} className="col-12 col-sm-6 col-md-4">
                 <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-white border border-white/10 hover:border-orange-400/40 transition-colors h-full">
                   <i className="fa fa-quote-left text-orange-400 text-2xl mb-3" />
                   <p className="text-gray-200 mb-5 text-sm leading-relaxed">{t.text}</p>
@@ -427,9 +427,9 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold mt-2">Recent Posts</h2>
             <div className="w-16 h-1 bg-orange-500 mx-auto mt-4 rounded-full" />
           </AnimSection>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="row">
             {blogs.map((b, i) => (
-              <AnimSection key={i} anim="animate-fade-up" delay={`delay-${(i + 1) * 100}`}>
+              <AnimSection key={i} anim="animate-fade-up" delay={`delay-${(i + 1) * 100}`} className="col-12 col-sm-6 col-md-4">
                 <BlogCard {...b} />
               </AnimSection>
             ))}

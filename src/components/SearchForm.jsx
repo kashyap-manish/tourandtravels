@@ -1,6 +1,13 @@
 import { useState } from 'react';
 
-const prices = ['Any Budget', '₹1,000', '₹5,000', '₹10,000', '₹25,000', '₹50,000', '₹1,00,000', '₹2,00,000', '₹5,00,000'];
+const prices = [
+  { label: 'Any Budget', max: Infinity },
+  { label: 'Under ₹5,000', max: 5000 },
+  { label: 'Under ₹10,000', max: 10000 },
+  { label: 'Under ₹15,000', max: 15000 },
+  { label: 'Under ₹20,000', max: 20000 },
+  { label: 'Under ₹50,000', max: 50000 },
+];
 
 const tabs = [
   { key: 'tour', label: 'Search Tour', icon: 'fa-paper-plane' },
@@ -19,10 +26,23 @@ function Field({ label, icon, children }) {
   );
 }
 
-export default function SearchForm({ onHotelSearch, hotelOnly, tourOnly }) {
+export default function SearchForm({ onHotelSearch, hotelOnly, tourOnly, onTourSearch }) {
   const [tab, setTab] = useState(hotelOnly ? 'hotel' : 'tour');
   const filteredTabs = hotelOnly ? tabs.filter(t => t.key === 'hotel') : tourOnly ? tabs.filter(t => t.key === 'tour') : tabs;
   const [destination, setDestination] = useState('');
+  const [checkIn, setCheckIn] = useState('');
+  const [checkOut, setCheckOut] = useState('');
+  const [budget, setBudget] = useState(0);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (tab === 'hotel' && onHotelSearch && destination.trim()) {
+      onHotelSearch(destination.trim());
+    }
+    if (tab === 'tour' && onTourSearch) {
+      onTourSearch({ destination: destination.trim(), checkIn, checkOut, maxBudget: prices[budget].max });
+    }
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-2xl shadow-black/15 overflow-hidden">
@@ -50,7 +70,7 @@ export default function SearchForm({ onHotelSearch, hotelOnly, tourOnly }) {
       {/* Form */}
       <form
         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 divide-y sm:divide-x sm:divide-y-0 md:divide-x divide-gray-100"
-        onSubmit={e => { e.preventDefault(); if (onHotelSearch && destination.trim()) onHotelSearch(destination.trim()); }}
+        onSubmit={handleSubmit}
       >
         <Field label="Destination" icon="fa-map-marker">
           <input
@@ -65,6 +85,9 @@ export default function SearchForm({ onHotelSearch, hotelOnly, tourOnly }) {
         <Field label="Check-in" icon="fa-calendar-o">
           <input
             type="date"
+            value={checkIn}
+            min={new Date().toISOString().split('T')[0]}
+            onChange={e => setCheckIn(e.target.value)}
             className="w-full outline-none text-sm text-gray-600 bg-transparent"
           />
         </Field>
@@ -72,13 +95,20 @@ export default function SearchForm({ onHotelSearch, hotelOnly, tourOnly }) {
         <Field label="Check-out" icon="fa-calendar-check-o">
           <input
             type="date"
+            value={checkOut}
+            min={checkIn || new Date().toISOString().split('T')[0]}
+            onChange={e => setCheckOut(e.target.value)}
             className="w-full outline-none text-sm text-gray-600 bg-transparent"
           />
         </Field>
 
         <Field label="Budget" icon="fa-rupee">
-          <select className="w-full outline-none text-sm text-gray-600 bg-transparent cursor-pointer">
-            {prices.map(p => <option key={p}>{p}</option>)}
+          <select
+            value={budget}
+            onChange={e => setBudget(Number(e.target.value))}
+            className="w-full outline-none text-sm text-gray-600 bg-transparent cursor-pointer"
+          >
+            {prices.map((p, i) => <option key={p.label} value={i}>{p.label}</option>)}
           </select>
         </Field>
 

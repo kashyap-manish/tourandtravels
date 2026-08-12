@@ -11,6 +11,8 @@ export default function TourDetail() {
   const navigate = useNavigate();
   const { user } = useSelector(s => s.auth);
   const tour = tours.find(t => t.slug === slug);
+  const fullStars = Math.floor(tour?.rating ?? 4.5);
+  const hasHalf = (tour?.rating ?? 4.5) - fullStars >= 0.5;
 
   const [tab, setTab] = useState('Overview');
   const [showBooking, setShowBooking] = useState(false);
@@ -133,9 +135,13 @@ export default function TourDetail() {
               </p>
               <div className="flex items-center gap-1 mt-3">
                 {[...Array(5)].map((_, i) => (
-                  <i key={i} className={`fa fa-star text-sm ${i < 4 ? 'text-yellow-400' : 'text-gray-500'}`} />
+                  <i key={i} className={`fa ${
+                    i < fullStars ? 'fa-star text-yellow-400' :
+                    i === fullStars && hasHalf ? 'fa-star-half-o text-yellow-400' :
+                    'fa-star text-gray-500'
+                  } text-sm`} />
                 ))}
-                <span className="text-gray-300 text-xs ml-1.5">4.0 · 24 reviews</span>
+                <span className="text-gray-300 text-xs ml-1.5">{tour.rating} · {tour.reviews} reviews</span>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -199,7 +205,7 @@ export default function TourDetail() {
                   { icon: 'fa-clock-o', label: 'Duration', val: tour.days },
                   { icon: 'fa-users', label: 'Group Size', val: 'Max 15' },
                   { icon: 'fa-map-marker', label: 'Location', val: tour.location.split(',')[0] },
-                  { icon: 'fa-language', label: 'Language', val: 'English' },
+                  { icon: 'fa-language', label: 'Language', val: 'English, Hindi' },
                 ].map(s => (
                   <div key={s.label} className="bg-gray-50 rounded-2xl p-4 border border-gray-100 text-center">
                     <i className={`fa ${s.icon} text-orange-500 text-lg mb-2`} />
@@ -309,18 +315,22 @@ export default function TourDetail() {
               </div>
               <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (
-                  <i key={i} className={`fa fa-star text-xs ${i < 4 ? 'text-yellow-400' : 'text-gray-200'}`} />
+                  <i key={i} className={`fa ${
+                    i < fullStars ? 'fa-star text-yellow-400' :
+                    i === fullStars && hasHalf ? 'fa-star-half-o text-yellow-400' :
+                    'fa-star text-gray-200'
+                  } text-xs`} />
                 ))}
               </div>
             </div>
-            <p className="text-xs text-gray-400 mb-5">24 reviews · {tour.days}</p>
+            <p className="text-xs text-gray-400 mb-5">{tour.reviews} reviews · {tour.days}</p>
 
             <div className="space-y-3 mb-5">
               {[
                 { icon: 'fa-clock-o', text: tour.days },
                 { icon: 'fa-map-marker', text: tour.location },
                 { icon: 'fa-users', text: 'Max 15 people' },
-                { icon: 'fa-language', text: 'English guided' },
+                { icon: 'fa-language', text: 'English & Hindi guided' },
               ].map((r, i) => (
                 <div key={i} className="flex items-center gap-3 text-sm text-gray-600">
                   <i className={`fa ${r.icon} text-orange-400 w-4 text-center`} />

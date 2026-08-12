@@ -2,12 +2,15 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleWishlist } from '../store/wishlistSlice';
 
-export default function TourCard({ _id, id, slug, img, price, days, title, location, features, rating = 4, reviews = 24, rank = 99 }) {
+export default function TourCard({ _id, id, slug, img, price, days, title, location, features, rating = 4.5, reviews = 24, rank = 99 }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const cardId = _id || id;
   const isWishlisted = useSelector(s => s.wishlist.ids.includes(cardId));
   const isPopular = rank < 3;
+
+  const fullStars = Math.floor(rating);
+  const hasHalf = rating - fullStars >= 0.5;
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
@@ -33,9 +36,14 @@ export default function TourCard({ _id, id, slug, img, price, days, title, locat
         <p className="text-xs text-gray-400 mb-2"><i className="fa fa-map-marker text-orange-400 mr-1" />{location}</p>
         <div className="flex items-center gap-1 mb-3">
           {[...Array(5)].map((_, i) => (
-            <i key={i} className={`fa fa-star text-xs ${i < rating ? 'text-yellow-400' : 'text-gray-200'}`} />
+            <i key={i} className={`fa ${
+              i < fullStars ? 'fa-star text-yellow-400' :
+              i === fullStars && hasHalf ? 'fa-star-half-o text-yellow-400' :
+              'fa-star text-gray-200'
+            } text-xs`} />
           ))}
-          <span className="text-[11px] text-gray-400 ml-1">({reviews})</span>
+          <span className="text-[11px] font-semibold text-yellow-500 ml-1">{rating}</span>
+          <span className="text-[11px] text-gray-400">({reviews})</span>
         </div>
         <div className="flex flex-wrap gap-1 mb-4">
           {features.slice(0, 3).map((f, i) => (

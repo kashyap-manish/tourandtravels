@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import PageHero from '../components/PageHero';
+import { Link } from 'react-router-dom';
 
 const faqs = [
   { q: 'How do I book a tour?', a: 'You can book a tour by filling out our Online Enquiry form or by contacting us directly via phone or email. Our team will confirm availability and send you a booking confirmation within 24 hours.' },
@@ -9,42 +11,91 @@ const faqs = [
   { q: 'What languages do your guides speak?', a: 'Our guides are fluent in English and the local language of each destination. For other language requirements, please contact us in advance and we will do our best to accommodate.' },
 ];
 
+const highlights = [
+  { icon: 'fa-comments', title: 'Quick Answers', desc: 'Most questions answered instantly' },
+  { icon: 'fa-users', title: 'Expert Team', desc: 'Specialists ready to assist you' },
+  { icon: 'fa-clock-o', title: 'Fast Support', desc: 'Response within one business day' },
+];
+
+function FAQItem({ q, a }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div
+      style={{ border: `1.5px solid ${open ? '#f97316' : '#e5e7eb'}`, borderRadius: 14, overflow: 'hidden', transition: 'border-color 0.2s', background: '#fff' }}
+    >
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', gap: 16 }}
+      >
+        <span style={{ fontSize: 14, fontWeight: 700, color: open ? '#f97316' : '#111827' }}>{q}</span>
+        <i className={`fa fa-chevron-${open ? 'up' : 'down'}`} style={{ color: '#f97316', fontSize: 11, flexShrink: 0 }} />
+      </button>
+      {open && (
+        <div style={{ padding: '0 22px 18px', fontSize: 14, color: '#6b7280', lineHeight: 1.8, borderTop: '1px solid #f3f4f6' }}>
+          <div style={{ paddingTop: 14 }}>{a}</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function GeneralEnquiries() {
   return (
     <>
-      <PageHero title="General Enquiries" breadcrumb="General Enquiries" />
+      <PageHero title="General Enquiries" breadcrumb="General Enquiries" bgImage="/images/bg_2.jpg" />
 
-      <section className="py-20">
-        <div className="max-w-3xl mx-auto px-6">
-          <span className="text-orange-500 font-semibold tracking-widest uppercase text-xs">FAQ</span>
-          <h2 className="text-3xl font-extrabold text-gray-900 mt-2 mb-3">Frequently Asked Questions</h2>
-          <p className="text-gray-500 mb-10">Can't find what you're looking for? <a href="/contact" className="text-orange-500 hover:underline">Contact us</a> and we'll be happy to help.</p>
+      <section style={{ padding: '80px 0' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 56, alignItems: 'start' }}>
 
-          <div className="space-y-4">
-            {faqs.map((f, i) => (
-              <details key={i} className="group border border-gray-200 rounded-xl overflow-hidden">
-                <summary className="flex items-center justify-between px-6 py-4 cursor-pointer font-semibold text-gray-800 text-sm list-none hover:bg-gray-50 transition-colors">
-                  {f.q}
-                  <i className="fa fa-chevron-down text-orange-500 text-xs transition-transform group-open:rotate-180" />
-                </summary>
-                <div className="px-6 pb-5 text-sm text-gray-500 leading-relaxed border-t border-gray-100 pt-4">
-                  {f.a}
+          {/* Left panel */}
+          <div style={{ position: 'sticky', top: 100 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>FAQ</p>
+            <h2 style={{ fontSize: 32, fontWeight: 800, color: '#111827', lineHeight: 1.25, marginBottom: 16 }}>Frequently Asked<br />Questions</h2>
+            <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.8, marginBottom: 36 }}>
+              Can't find what you're looking for? Reach out and our team will be happy to help.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 40 }}>
+              {highlights.map(h => (
+                <div key={h.title} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 14, border: '1.5px solid #f0f0f0', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <i className={`fa ${h.icon}`} style={{ color: '#f97316', fontSize: 18 }} />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 2 }}>{h.title}</p>
+                    <p style={{ fontSize: 12, color: '#9ca3af' }}>{h.desc}</p>
+                  </div>
                 </div>
-              </details>
-            ))}
+              ))}
+            </div>
+
+            <div style={{ background: '#fff7ed', border: '1.5px solid #fed7aa', borderRadius: 16, padding: '24px 22px', textAlign: 'center' }}>
+              <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+                <i className="fa fa-envelope" style={{ color: '#fff', fontSize: 18 }} />
+              </div>
+              <p style={{ fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 6 }}>Still have questions?</p>
+              <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 16 }}>Our team is available Mon–Fri, 9am–6pm.</p>
+              <a href="mailto:info@yourdomain.com" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#f97316', color: '#fff', fontWeight: 700, fontSize: 13, padding: '10px 22px', borderRadius: 10, textDecoration: 'none' }}>
+                <i className="fa fa-paper-plane" style={{ fontSize: 11 }} /> Email Us
+              </a>
+            </div>
           </div>
 
-          <div className="mt-14 bg-orange-50 border border-orange-100 rounded-2xl p-8 text-center">
-            <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="fa fa-envelope text-white" />
+          {/* Right — FAQ card */}
+          <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0f0f0', boxShadow: '0 8px 40px rgba(0,0,0,0.07)', padding: '44px 40px' }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>Help Centre</p>
+            <h3 style={{ fontSize: 20, fontWeight: 800, color: '#111827', marginBottom: 28 }}>Common Questions</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {faqs.map((f, i) => <FAQItem key={i} {...f} />)}
             </div>
-            <h3 className="font-bold text-gray-900 text-lg mb-2">Still have questions?</h3>
-            <p className="text-gray-500 text-sm mb-5">Our team is available Monday–Friday, 9am–6pm.</p>
-            <a href="mailto:info@yourdomain.com" className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-6 py-3 rounded-full transition-colors">
-              <i className="fa fa-paper-plane text-xs" />
-              Email Us
-            </a>
+            <div style={{ marginTop: 32, paddingTop: 24, borderTop: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+              <p style={{ fontSize: 13, color: '#6b7280' }}>Need more help?</p>
+              <Link to="/online-enquiry" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#f97316', color: '#fff', fontWeight: 700, fontSize: 13, padding: '10px 22px', borderRadius: 10, textDecoration: 'none' }}>
+                Send an Enquiry →
+              </Link>
+            </div>
           </div>
+
         </div>
       </section>
     </>

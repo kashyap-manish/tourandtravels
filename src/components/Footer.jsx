@@ -3,20 +3,20 @@ import { Link } from 'react-router-dom';
 import { subscribeNewsletter } from '../services/api';
 
 const information = [
-  { label: 'Online Enquiry', to: '/online-enquiry' },
-  { label: 'General Enquiries', to: '/general-enquiries' },
-  { label: 'Booking Conditions', to: '/booking-conditions' },
-  { label: 'Privacy and Policy', to: '/privacy-policy' },
-  { label: 'Refund Policy', to: '/refund-policy' },
-  { label: 'Call Us', to: '/call-us' },
+  { label: 'Online Enquiry', to: '/online-enquiry', icon: 'fa-paper-plane', desc: 'Send us a message online' },
+  { label: 'General Enquiries', to: '/general-enquiries', icon: 'fa-question-circle', desc: 'Got a question? Ask away' },
+  { label: 'Booking Conditions', to: '/booking-conditions', icon: 'fa-file-text-o', desc: 'Terms for your booking' },
+  { label: 'Privacy and Policy', to: '/privacy-policy', icon: 'fa-shield', desc: 'How we protect your data' },
+  { label: 'Refund Policy', to: '/refund-policy', icon: 'fa-rotate-left', desc: 'Cancellation & refunds' },
+  { label: 'Call Us', to: '/call-us', icon: 'fa-phone', desc: 'Speak to our team' },
 ];
 const experiences = [
-  { label: 'Adventure', to: '/experience/adventure' },
-  { label: 'Hotel and Restaurant', to: '/experience/hotel-restaurant' },
-  { label: 'Beach', to: '/experience/beach' },
-  { label: 'Nature', to: '/experience/nature' },
-  { label: 'Camping', to: '/experience/camping' },
-  { label: 'Party', to: '/experience/party' },
+  { label: 'Adventure', to: '/experience/adventure', icon: 'fa-bolt', desc: 'Thrilling outdoor activities' },
+  { label: 'Hotel and Restaurant', to: '/experience/hotel-restaurant', icon: 'fa-cutlery', desc: 'Stay & dine in style' },
+  { label: 'Beach', to: '/experience/beach', icon: 'fa-umbrella', desc: 'Sun, sand & sea escapes' },
+  { label: 'Nature', to: '/experience/nature', icon: 'fa-leaf', desc: 'Explore the great outdoors' },
+  { label: 'Camping', to: '/experience/camping', icon: 'fa-fire', desc: 'Sleep under the stars' },
+  { label: 'Party', to: '/experience/party', icon: 'fa-music', desc: 'Celebrate & have fun' },
 ];
 
 const socials = [
@@ -142,7 +142,7 @@ export default function Footer() {
       <div className="container-grid py-16 row">
 
         {/* Brand */}
-        <div>
+        <div className="col-12 col-md-3">
           <Link to="/" className="flex flex-col leading-none mb-5">
             <span className="text-white text-2xl font-extrabold tracking-tight">Pacific</span>
             <span className="text-orange-500 text-[0.55rem] font-semibold tracking-[4px] uppercase">Travel Agency</span>
@@ -156,14 +156,26 @@ export default function Footer() {
         </div>
 
         {/* Information */}
-        <div>
+        <div className="col-12 col-md-3">
           <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-5">Information</h4>
-          <ul className="space-y-2.5">
+          <ul className="space-y-2">
             {information.map(item => (
               <li key={item.label}>
-                <Link to={item.to} className="group flex items-center gap-2 text-sm text-gray-400 hover:text-orange-400 transition-colors">
-                  <i className="fa fa-chevron-right text-[10px] text-orange-500/50 group-hover:text-orange-500 transition-colors" />
-                  {item.label}
+                <Link
+                  to={item.to}
+                  className="group flex items-center gap-3 px-3 py-2.5 rounded-xl border border-white/5 hover:border-orange-500/30 hover:bg-orange-500/5 transition-all"
+                  style={{ borderLeft: '3px solid #f9731620' }}
+                  onMouseEnter={e => e.currentTarget.style.borderLeftColor = '#f97316'}
+                  onMouseLeave={e => e.currentTarget.style.borderLeftColor = '#f9731620'}
+                >
+                  <div className="w-7 h-7 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-orange-500/20 transition-colors">
+                    <i className={`fa ${item.icon} text-orange-400`} style={{ fontSize: 11 }} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-gray-300 group-hover:text-orange-400 transition-colors leading-tight truncate">{item.label}</p>
+                    <p className="text-xs text-gray-600 mt-0.5 truncate">{item.desc}</p>
+                  </div>
+                  <i className="fa fa-chevron-right text-gray-700 group-hover:text-orange-500 transition-colors ml-auto flex-shrink-0" style={{ fontSize: 9 }} />
                 </Link>
               </li>
             ))}
@@ -171,14 +183,19 @@ export default function Footer() {
         </div>
 
         {/* Experience */}
-        <div>
+        <div className="col-12 col-md-3">
           <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-5">Experience</h4>
-          <ul className="space-y-2.5">
+          <ul className="space-y-3">
             {experiences.map(item => (
               <li key={item.label}>
-                <Link to={item.to} className="group flex items-center gap-2 text-sm text-gray-400 hover:text-orange-400 transition-colors">
-                  <i className="fa fa-chevron-right text-[10px] text-orange-500/50 group-hover:text-orange-500 transition-colors" />
-                  {item.label}
+                <Link to={item.to} className="group flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/5 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-orange-500/20 transition-colors">
+                    <i className={`fa ${item.icon} text-orange-400 text-xs`} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-300 group-hover:text-orange-400 transition-colors leading-tight">{item.label}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+                  </div>
                 </Link>
               </li>
             ))}
@@ -186,7 +203,7 @@ export default function Footer() {
         </div>
 
         {/* Contact */}
-        <div>
+        <div className="col-12 col-md-3">
           <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-5">Contact Us</h4>
           <ul className="space-y-4">
             <li className="flex gap-3 items-start">

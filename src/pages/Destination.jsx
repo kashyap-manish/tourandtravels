@@ -7,11 +7,11 @@ import CallToAction from '../components/CallToAction';
 import { Link, useSearchParams } from 'react-router-dom';
 
 const featured = [
-  { img: '/images/destination-1.jpg', name: 'Goa',       country: 'India', tours: 14, tag: 'Trending',  desc: 'Sun-soaked beaches, vibrant nightlife and Portuguese heritage.' },
-  { img: '/images/destination-2.jpg', name: 'Manali',    country: 'India', tours: 9,  tag: 'Adventure', desc: 'Snow-capped peaks, river rafting and mountain serenity.' },
-  { img: '/images/destination-3.jpg', name: 'Kerala',    country: 'India', tours: 11, tag: 'Nature',    desc: 'Backwaters, spice gardens and tranquil houseboat stays.' },
-  { img: '/images/destination-4.jpg', name: 'Rajasthan', country: 'India', tours: 16, tag: 'Culture',   desc: 'Royal palaces, desert safaris and timeless Rajput heritage.' },
-  { img: '/images/destination-5.jpg', name: 'Andaman',   country: 'India', tours: 7,  tag: 'Beach',     desc: 'Crystal-clear waters, coral reefs and untouched island life.' },
+  { img: '/images/destination-1.jpg', name: 'Goa',       country: 'India', tours: 14, tag: 'Trending',  slug: 'goa-beach-getaway',        desc: 'Sun-soaked beaches, vibrant nightlife and Portuguese heritage.' },
+  { img: '/images/destination-2.jpg', name: 'Manali',    country: 'India', tours: 9,  tag: 'Adventure', slug: 'manali-snow-escape',        desc: 'Snow-capped peaks, river rafting and mountain serenity.' },
+  { img: '/images/destination-3.jpg', name: 'Kerala',    country: 'India', tours: 11, tag: 'Nature',    slug: 'kerala-backwaters',         desc: 'Backwaters, spice gardens and tranquil houseboat stays.' },
+  { img: '/images/destination-4.jpg', name: 'Rajasthan', country: 'India', tours: 16, tag: 'Culture',   slug: 'rajasthan-desert-safari',   desc: 'Royal palaces, desert safaris and timeless Rajput heritage.' },
+  { img: '/images/destination-5.jpg', name: 'Andaman',   country: 'India', tours: 7,  tag: 'Beach',     slug: 'andaman-islands',           desc: 'Crystal-clear waters, coral reefs and untouched island life.' },
 ];
 
 const tagColors = {
@@ -33,7 +33,7 @@ const moods = [
   { icon: 'fa-snowflake-o',label: 'Winter Trips',  color: 'bg-sky-50     text-sky-600     border-sky-200'     },
 ];
 
-function FeaturedCard({ img, name, country, tours, tag, desc, className = '' }) {
+function FeaturedCard({ img, name, country, tours, tag, desc, slug, className = '' }) {
   return (
     <div className={`relative overflow-hidden rounded-2xl cursor-pointer group ${className}`}>
       {/* Image */}
@@ -46,9 +46,12 @@ function FeaturedCard({ img, name, country, tours, tag, desc, className = '' }) 
       {/* Hover reveal panel */}
       <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out bg-black/70 backdrop-blur-sm p-4">
         <p className="text-white text-xs leading-relaxed mb-3">{desc}</p>
-        <button className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-full transition-colors">
+        <Link
+          to={`/destination/${slug}`}
+          className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-full transition-colors"
+        >
           Explore <i className="fa fa-arrow-right" />
-        </button>
+        </Link>
       </div>
       {/* Static bottom info */}
       <div className="absolute bottom-0 left-0 p-4 group-hover:opacity-0 transition-opacity duration-300">
@@ -116,10 +119,19 @@ export default function Destination() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [searchParams] = useSearchParams();
   const country = searchParams.get('country');
+  const [searchFilters, setSearchFilters] = useState({ destination: '', maxBudget: Infinity });
 
   useEffect(() => { dispatch(loadDestinations(country || 'India')); }, [dispatch, country]);
 
-  const filtered = destinations.filter(t => activeCategory === 'All' || t.category === activeCategory);
+  const filtered = destinations.filter(t => {
+    const matchCategory = activeCategory === 'All' || t.category === activeCategory;
+    const matchDestination = !searchFilters.destination ||
+      t.title.toLowerCase().includes(searchFilters.destination.toLowerCase()) ||
+      t.location.toLowerCase().includes(searchFilters.destination.toLowerCase());
+    const price = parseInt(t.price.replace(/[^0-9]/g, ''));
+    const matchBudget = price <= searchFilters.maxBudget;
+    return matchCategory && matchDestination && matchBudget;
+  });
   const sorted = [...filtered].sort((a, b) => {
     const pA = parseInt(a.price.replace(/\D/g, ''));
     const pB = parseInt(b.price.replace(/\D/g, ''));
@@ -181,7 +193,10 @@ export default function Destination() {
       {/* ── Search ── */}
       <section className="bg-white py-8 shadow-sm">
         <div className="container-grid">
-          <SearchForm tourOnly />
+          <SearchForm tourOnly onTourSearch={({ destination, maxBudget }) => {
+            setSearchFilters({ destination, maxBudget });
+            dispatch(setPage(1));
+          }} />
         </div>
       </section>
 
@@ -199,16 +214,16 @@ export default function Destination() {
           </div>
 
           {/* Bento grid — asymmetric 3-col layout */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="row">
             {/* Row 1: tall hero left + 2 stacked right */}
-            <div className="row-span-2 h-[480px] md:h-auto">
+            <div className="col-6 row-span-2 h-[480px] md:h-auto">
               <FeaturedCard {...featured[0]} className="h-full min-h-[480px]" />
             </div>
-            <FeaturedCard {...featured[1]} className="h-[230px]" />
-            <FeaturedCard {...featured[2]} className="h-[230px]" />
+            <FeaturedCard {...featured[1]} className="col-6 col-md-4 h-[230px]" />
+            <FeaturedCard {...featured[2]} className="col-6 col-md-4 h-[230px]" />
             {/* Row 2: 2 wide cards */}
-            <FeaturedCard {...featured[3]} className="h-[230px]" />
-            <FeaturedCard {...featured[4]} className="h-[230px]" />
+            <FeaturedCard {...featured[3]} className="col-6 col-md-4 h-[230px]" />
+            <FeaturedCard {...featured[4]} className="col-6 col-md-4 h-[230px]" />
           </div>
         </div>
       </section>
@@ -320,8 +335,10 @@ export default function Destination() {
               )}
 
               {loading && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
+                <div className="row">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="col-12 col-sm-6 col-lg-4"><SkeletonCard /></div>
+                  ))}
                 </div>
               )}
 
@@ -334,8 +351,12 @@ export default function Destination() {
               )}
 
               {!loading && !error && paginated.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {paginated.map((t, i) => <TourCard key={t._id || i} {...t} rank={i} />)}
+                <div className="row">
+                  {paginated.map((t, i) => (
+                    <div key={t._id || i} className="col-12 col-sm-6 col-lg-4">
+                      <TourCard {...t} rank={i} />
+                    </div>
+                  ))}
                 </div>
               )}
 

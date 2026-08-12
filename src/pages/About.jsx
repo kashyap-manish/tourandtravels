@@ -56,9 +56,9 @@ export default function About() {
 
       {/* Stats Bar */}
       <section className="bg-orange-500">
-        <div className="container-grid grid grid-cols-2 md:grid-cols-4 divide-x divide-orange-400">
+        <div className="container-grid row divide-x divide-orange-400">
           {stats.map(s => (
-            <div key={s.label} className="py-6 md:py-8 text-center text-white">
+            <div key={s.label} className="col-6 col-md-3 py-6 md:py-8 text-center text-white">
               <RevealText text={s.value} filterId={2} as="p" className="text-2xl md:text-3xl font-extrabold" />
               <RevealText text={s.label} filterId={0} as="p" className="text-xs md:text-sm font-medium text-orange-100 mt-1" />
             </div>
@@ -69,9 +69,9 @@ export default function About() {
       {/* Our Story */}
       <section className="py-16 md:py-24">
         <div className="container-grid">
-          <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+          <div className="row items-center">
             {/* Images collage */}
-            <div className="relative h-72 sm:h-96 md:h-[480px]">
+            <div className="col-12 col-md-6 relative h-72 sm:h-96 md:h-[480px]">
               <div className="absolute top-0 left-0 w-3/4 h-3/4 rounded-2xl bg-cover bg-center shadow-xl" style={{ backgroundImage: "url('/images/about.jpg')" }} />
               <div className="absolute bottom-0 right-0 w-2/3 h-2/3 rounded-2xl bg-cover bg-center shadow-xl border-4 border-white" style={{ backgroundImage: "url('/images/about-1.jpg')" }} />
               <div className="absolute bottom-8 left-4 bg-white rounded-xl shadow-lg px-5 py-4 flex items-center gap-3">
@@ -86,7 +86,7 @@ export default function About() {
             </div>
 
             {/* Text */}
-            <div>
+            <div className="col-12 col-md-6">
               <RevealText text="Our Story" filterId={5} as="span" className="text-orange-500 font-semibold tracking-widest uppercase text-xs" />
               <RevealText text="We Turn Your Travel Dreams Into Reality" filterId={3} as="h2" className="text-3xl md:text-4xl font-extrabold mt-3 mb-6 leading-tight text-gray-900" />
               <RevealText
@@ -119,12 +119,12 @@ export default function About() {
             <RevealText text="What We Offer" filterId={5} as="span" className="text-orange-500 font-semibold tracking-widest uppercase text-xs" />
             <RevealText text="Our Services" filterId={4} as="h2" className="text-3xl md:text-4xl font-extrabold mt-3 text-gray-900" />
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          <div className="row">
             {services.map((s, i) => (
               <Link
                 key={s.title}
                 to={s.to}
-                className="group relative rounded-2xl overflow-hidden bg-cover bg-center h-72 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+                className="col-6 col-lg-4 group relative rounded-2xl overflow-hidden bg-cover bg-center h-72 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
                 style={{ backgroundImage: `url('${s.img}')` }}
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent group-hover:from-orange-900/90 group-hover:via-black/50 transition-all duration-500" />
@@ -171,9 +171,9 @@ export default function About() {
             <RevealText text="The People Behind Pacific" filterId={5} as="span" className="text-orange-500 font-semibold tracking-widest uppercase text-xs" />
             <RevealText text="Meet Our Team" filterId={1} as="h2" className="text-3xl md:text-4xl font-extrabold mt-3 text-gray-900" />
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          <div className="row">
             {team.map((m, i) => (
-              <div key={i} className="group text-center">
+              <div key={i} className="col-6 col-lg-3 group text-center">
                 <div className="relative mx-auto w-40 h-40 rounded-2xl overflow-hidden mb-4 shadow-md group-hover:shadow-xl transition-shadow">
                   <div className="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: `url('${m.img}')` }} />
                   <div className="absolute inset-0 bg-orange-500/0 group-hover:bg-orange-500/10 transition-colors duration-300" />
@@ -202,9 +202,9 @@ export default function About() {
             <RevealText text="Testimonials" filterId={5} as="span" className="text-orange-400 font-semibold tracking-widest uppercase text-xs" />
             <RevealText text="What Our Travelers Say" filterId={6} as="h2" className="text-3xl md:text-4xl font-extrabold mt-3 text-white" />
           </div>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="row">
             {testimonials.map((t, i) => (
-              <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-7 hover:border-orange-500/40 transition-colors">
+              <div key={i} className="col-12 col-sm-6 col-md-4 bg-white/5 border border-white/10 rounded-2xl p-7 hover:border-orange-500/40 transition-colors">
                 <div className="flex gap-0.5 mb-4">
                   {[...Array(5)].map((_, j) => (
                     <i key={j} className={`fa fa-star text-sm ${j < t.rating ? 'text-yellow-400' : 'text-gray-600'}`} />

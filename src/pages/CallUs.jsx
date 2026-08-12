@@ -19,86 +19,150 @@ const offices = [
   },
 ];
 
+const contacts = [
+  { icon: 'fa-phone', label: 'Call Us Anytime', value: '+1 392 3929 210', sub: 'Available Mon–Fri, 9am–6pm', href: 'tel:+13923929210', accent: '#f97316' },
+  { icon: 'fa-envelope', label: 'Send an Email', value: 'info@yourdomain.com', sub: 'We reply within 24 hours', href: 'mailto:info@yourdomain.com', accent: '#3b82f6' },
+  { icon: 'fa-whatsapp', label: 'WhatsApp Us', value: '+1 392 3929 210', sub: 'Chat with us instantly', href: 'https://wa.me/13923929210', accent: '#22c55e' },
+];
+
 export default function CallUs() {
   return (
     <>
-      <PageHero title="Call Us" breadcrumb="Call Us" />
+      <PageHero title="Get In Touch" breadcrumb="Call Us" bgImage="/images/bg_3.jpg" />
 
-      <section className="py-20">
-        <div className="max-w-5xl mx-auto px-6">
+      <section style={{ padding: '80px 0 0' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
 
-          {/* Top contact strip */}
-          <div className="grid sm:grid-cols-3 gap-6 mb-16">
-            {[
-              { icon: 'fa-phone', label: 'Phone', value: '+1 392 3929 210', href: 'tel:+13923929210', color: 'bg-blue-500/10 text-blue-500' },
-              { icon: 'fa-envelope', label: 'Email', value: 'info@yourdomain.com', href: 'mailto:info@yourdomain.com', color: 'bg-orange-500/10 text-orange-500' },
-              { icon: 'fa-whatsapp', label: 'WhatsApp', value: '+1 392 3929 210', href: 'https://wa.me/13923929210', color: 'bg-green-500/10 text-green-500' },
-            ].map(c => (
-              <a key={c.label} href={c.href} className="flex flex-col items-center text-center p-7 border border-gray-100 rounded-2xl hover:border-orange-200 hover:shadow-md transition-all group">
-                <div className={`w-12 h-12 rounded-xl ${c.color} flex items-center justify-center mb-4`}>
-                  <i className={`fa ${c.icon} text-lg`} />
+          {/* Contact cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, marginBottom: 72 }}>
+            {contacts.map(c => (
+              <a
+                key={c.label}
+                href={c.href}
+                style={{ display: 'flex', alignItems: 'flex-start', gap: 20, padding: '28px 28px', background: '#fff', borderRadius: 16, border: '1px solid #f0f0f0', borderLeft: `4px solid ${c.accent}`, boxShadow: '0 2px 12px rgba(0,0,0,0.05)', textDecoration: 'none', transition: 'box-shadow 0.2s, transform 0.2s' }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.10)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.05)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+              >
+                <div style={{ width: 48, height: 48, borderRadius: 12, background: c.accent + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <i className={`fa ${c.icon}`} style={{ fontSize: 20, color: c.accent }} />
                 </div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{c.label}</p>
-                <p className="font-semibold text-gray-800 text-sm group-hover:text-orange-500 transition-colors">{c.value}</p>
+                <div>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>{c.label}</p>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 3 }}>{c.value}</p>
+                  <p style={{ fontSize: 12, color: '#9ca3af' }}>{c.sub}</p>
+                </div>
               </a>
             ))}
           </div>
 
           {/* Offices */}
-          <h3 className="font-extrabold text-gray-900 text-2xl mb-6">Our Offices</h3>
-          <div className="grid md:grid-cols-2 gap-6 mb-16">
-            {offices.map(o => (
-              <div key={o.city} className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                <div className="h-44 bg-cover bg-center" style={{ backgroundImage: `url('${o.img}')` }} />
-                <div className="p-6">
-                  <h4 className="font-bold text-gray-900 text-lg mb-4">{o.city} Office</h4>
-                  <ul className="space-y-3">
-                    <li className="flex items-start gap-3 text-sm text-gray-500">
-                      <i className="fa fa-map-marker text-orange-400 mt-0.5 w-4 text-center" />
-                      {o.address}
-                    </li>
-                    <li className="flex items-center gap-3 text-sm text-gray-500">
-                      <i className="fa fa-phone text-orange-400 w-4 text-center" />
-                      <a href={`tel:${o.phone.replace(/\s/g, '')}`} className="hover:text-orange-500 transition-colors">{o.phone}</a>
-                    </li>
-                    <li className="flex items-center gap-3 text-sm text-gray-500">
-                      <i className="fa fa-envelope text-orange-400 w-4 text-center" />
-                      <a href={`mailto:${o.email}`} className="hover:text-orange-500 transition-colors">{o.email}</a>
-                    </li>
-                    <li className="flex items-center gap-3 text-sm text-gray-500">
-                      <i className="fa fa-clock-o text-orange-400 w-4 text-center" />
-                      {o.hours}
-                    </li>
-                  </ul>
+          <div style={{ marginBottom: 72 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Find Us</p>
+            <h2 style={{ fontSize: 28, fontWeight: 800, color: '#111827', marginBottom: 32 }}>Our Offices</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 28 }}>
+              {offices.map(o => (
+                <div key={o.city} style={{ borderRadius: 20, overflow: 'hidden', border: '1px solid #f0f0f0', boxShadow: '0 2px 16px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ position: 'relative', height: 200 }}>
+                    <img src={o.img} alt={o.city} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 60%)' }} />
+                    <h4 style={{ position: 'absolute', bottom: 18, left: 22, color: '#fff', fontSize: 20, fontWeight: 800, margin: 0 }}>{o.city}</h4>
+                  </div>
+                  <div style={{ padding: '24px 24px', background: '#fff', flexGrow: 1 }}>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+                      {[
+                        { icon: 'fa-map-marker', text: o.address },
+                        { icon: 'fa-phone', text: <a href={`tel:${o.phone.replace(/\s/g, '')}`} style={{ color: 'inherit', textDecoration: 'none' }}>{o.phone}</a> },
+                        { icon: 'fa-envelope', text: <a href={`mailto:${o.email}`} style={{ color: 'inherit', textDecoration: 'none' }}>{o.email}</a> },
+                        { icon: 'fa-clock-o', text: o.hours },
+                      ].map((item, i) => (
+                        <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, fontSize: 13, color: '#6b7280' }}>
+                          <span style={{ width: 28, height: 28, borderRadius: 8, background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <i className={`fa ${item.icon}`} style={{ color: '#f97316', fontSize: 12 }} />
+                          </span>
+                          <span style={{ paddingTop: 5 }}>{item.text}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Quick message form */}
-          <div className="bg-gray-950 rounded-2xl p-10 text-white">
-            <span className="text-orange-400 font-semibold tracking-widest uppercase text-xs">Quick Message</span>
-            <h3 className="text-2xl font-extrabold mt-2 mb-8">Prefer to write? We'll call you back.</h3>
-            <form className="grid sm:grid-cols-2 gap-5" onSubmit={e => e.preventDefault()}>
-              <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Your Name</label>
-                <input type="text" placeholder="John Doe" className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-orange-500 transition-colors" />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Phone Number</label>
-                <input type="tel" placeholder="+1 234 567 890" className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-orange-500 transition-colors" />
-              </div>
-              <div className="sm:col-span-2">
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Message</label>
-                <textarea rows="4" placeholder="What can we help you with?" className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-orange-500 transition-colors resize-none" />
-              </div>
-              <div className="sm:col-span-2">
-                <button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3.5 rounded-xl transition-colors shadow-lg shadow-orange-500/20">
-                  Request a Callback
-                </button>
-              </div>
-            </form>
+        </div>
+      </section>
+
+      {/* Full-width dark CTA + form */}
+      <section style={{ background: '#0a0a0a', padding: '80px 0' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 64, alignItems: 'center' }}>
+
+          {/* Left pitch */}
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 12 }}>Request a Callback</p>
+            <h2 style={{ fontSize: 32, fontWeight: 800, color: '#fff', lineHeight: 1.25, marginBottom: 16 }}>Prefer to write?<br />We'll call you back.</h2>
+            <p style={{ fontSize: 14, color: '#9ca3af', lineHeight: 1.8, marginBottom: 36 }}>
+              Fill in the form and one of our travel experts will reach out to you within one business day to discuss your trip.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {[
+                { icon: 'fa-check-circle', text: 'No commitment required' },
+                { icon: 'fa-check-circle', text: 'Personalised travel advice' },
+                { icon: 'fa-check-circle', text: 'Best price guarantee' },
+              ].map(item => (
+                <div key={item.text} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <i className={`fa ${item.icon}`} style={{ color: '#f97316', fontSize: 16 }} />
+                  <span style={{ fontSize: 14, color: '#d1d5db' }}>{item.text}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 12, marginTop: 40 }}>
+              {[
+                { icon: 'fa-facebook', href: '#' },
+                { icon: 'fa-instagram', href: '#' },
+                { icon: 'fa-twitter', href: '#' },
+              ].map(s => (
+                <a key={s.icon} href={s.href} style={{ width: 40, height: 40, borderRadius: 10, border: '1px solid #ffffff18', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', textDecoration: 'none', transition: 'border-color 0.2s, color 0.2s' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#f97316'; e.currentTarget.style.color = '#f97316'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#ffffff18'; e.currentTarget.style.color = '#9ca3af'; }}>
+                  <i className={`fa ${s.icon}`} />
+                </a>
+              ))}
+            </div>
           </div>
+
+          {/* Right form */}
+          <form onSubmit={e => e.preventDefault()} style={{ background: '#161616', borderRadius: 20, padding: '40px 36px', border: '1px solid #ffffff0d' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+              {[
+                { label: 'Your Name', type: 'text', placeholder: 'John Doe', span: 1 },
+                { label: 'Phone Number', type: 'tel', placeholder: '+1 234 567 890', span: 1 },
+              ].map(f => (
+                <div key={f.label}>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>{f.label}</label>
+                  <input type={f.type} placeholder={f.placeholder} style={{ width: '100%', background: '#0a0a0a', border: '1px solid #ffffff12', borderRadius: 10, padding: '12px 14px', fontSize: 13, color: '#fff', outline: 'none', boxSizing: 'border-box' }}
+                    onFocus={e => e.target.style.borderColor = '#f97316'}
+                    onBlur={e => e.target.style.borderColor = '#ffffff12'} />
+                </div>
+              ))}
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Email Address</label>
+              <input type="email" placeholder="john@example.com" style={{ width: '100%', background: '#0a0a0a', border: '1px solid #ffffff12', borderRadius: 10, padding: '12px 14px', fontSize: 13, color: '#fff', outline: 'none', boxSizing: 'border-box' }}
+                onFocus={e => e.target.style.borderColor = '#f97316'}
+                onBlur={e => e.target.style.borderColor = '#ffffff12'} />
+            </div>
+            <div style={{ marginBottom: 24 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Message</label>
+              <textarea rows={4} placeholder="What can we help you with?" style={{ width: '100%', background: '#0a0a0a', border: '1px solid #ffffff12', borderRadius: 10, padding: '12px 14px', fontSize: 13, color: '#fff', outline: 'none', resize: 'none', boxSizing: 'border-box' }}
+                onFocus={e => e.target.style.borderColor = '#f97316'}
+                onBlur={e => e.target.style.borderColor = '#ffffff12'} />
+            </div>
+            <button type="submit" style={{ width: '100%', background: '#f97316', color: '#fff', fontWeight: 700, fontSize: 14, padding: '14px', borderRadius: 12, border: 'none', cursor: 'pointer', letterSpacing: '0.03em', boxShadow: '0 4px 24px rgba(249,115,22,0.3)', transition: 'background 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.background = '#ea6c0a'}
+              onMouseLeave={e => e.currentTarget.style.background = '#f97316'}>
+              Request a Callback →
+            </button>
+          </form>
 
         </div>
       </section>

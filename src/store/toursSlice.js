@@ -1,5 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetchDestinations } from '../services/destinationsApi';
+import { tours as localTours } from '../data/tours';
+
+const ratingMap = Object.fromEntries(localTours.map(t => [t.slug, { rating: t.rating, reviews: t.reviews }]));
 
 export const loadDestinations = createAsyncThunk('tours/loadDestinations', (country) => fetchDestinations(country));
 
@@ -24,7 +27,14 @@ const toursSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(loadDestinations.pending, (state) => { state.loading = true; state.error = null; })
-      .addCase(loadDestinations.fulfilled, (state, action) => { state.loading = false; state.destinations = action.payload; })
+      .addCase(loadDestinations.fulfilled, (state, action) => {
+        state.loading = false;
+        state.destinations = action.payload.map(t => ({
+          ...t,
+          rating:  ratingMap[t.slug]?.rating  ?? t.rating  ?? 4.5,
+          reviews: ratingMap[t.slug]?.reviews ?? t.reviews ?? 24,
+        }));
+      })
       .addCase(loadDestinations.rejected, (state, action) => { state.loading = false; state.error = action.error.message; });
   },
 });

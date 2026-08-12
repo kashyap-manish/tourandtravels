@@ -185,8 +185,10 @@ export default function Blog() {
 
             {/* Loading */}
             {loading && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
+              <div className="row">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="col-12 col-md-6"><SkeletonCard /></div>
+                ))}
               </div>
             )}
 
@@ -205,8 +207,10 @@ export default function Blog() {
                 <FeaturedPost post={featured} />
 
                 {/* Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {rest.map((b, i) => <BlogCard key={i} {...b} />)}
+                <div className="row">
+                  {rest.map((b, i) => (
+                    <div key={i} className="col-12 col-md-6"><BlogCard {...b} /></div>
+                  ))}
                 </div>
               </>
             )}
