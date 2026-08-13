@@ -297,3 +297,4 @@ export default function SlideShow() {
     <div ref={mountRef} className="w-full h-full" style={{ display: 'block', minHeight: '100%' }} />
   );
 }
+

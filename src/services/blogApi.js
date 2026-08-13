@@ -30,3 +30,4 @@ export async function fetchBlogs(category = 'All', search = '') {
       url: a.webUrl,
     }));
 }
+

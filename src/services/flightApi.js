@@ -30,3 +30,4 @@ export const getAirports = (search) => {
     : { access_key: ACCESS_KEY, airport_name: search, limit: 10 };
   return flightApi.get('/airports', { params });
 };
+

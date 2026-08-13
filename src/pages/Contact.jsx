@@ -135,7 +135,7 @@ export default function Contact() {
       </section>
 
       {/* Info Cards */}
-      <section className="container-grid -mt-10 relative z-20">
+      <section className="container -mt-10 relative z-20">
         <div
           ref={ref1}
           className={`row anim-hidden ${inView1 ? 'anim-visible animate-fade-up' : ''}`}
@@ -213,7 +213,7 @@ export default function Contact() {
 
       {/* Form + Map */}
       <section className="py-16 md:py-24">
-        <div className="container-grid row">
+        <div className="container row">
 
           {/* Form — 7 cols */}
           <div
@@ -420,4 +420,5 @@ export default function Contact() {
     </>
   );
 }
+
 

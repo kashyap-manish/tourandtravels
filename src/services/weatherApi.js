@@ -97,3 +97,4 @@ export async function fetchWeather(iata) {
     return fallbackWeather(key);
   }
 }
+

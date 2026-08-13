@@ -3,112 +3,132 @@
 @import url('https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
 @import "tailwindcss";
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════
    GRID SYSTEM
    Breakpoints: sm 640 | md 768 | lg 1024 | xl 1280 | 2xl 1536
    Columns: 12
    Gutter: 24px (1.5rem)
    Container max-width: 1280px
-═══════════════════════════════════════════ */
+═══════════════════════════════════════════════════════ */
 :root {
   --primary:        #f97316;
-  --col-count:      12;
-  --gutter:         1.5rem;      /* 24px — gap between columns */
-  --container-px:   1.5rem;      /* 24px — horizontal padding */
-  --container-max:  80rem;       /* 1280px */
 }
 
-/* ── Container ── */
+/* ── Bootstrap-compatible grid system ── */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+@media (min-width: 768px)  { .container { padding-inline: 2rem; } }
+@media (min-width: 1024px) { .container { padding-inline: 2.5rem; } }
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-inline: -0.75rem;
+  gap: 1.5rem 0;
+}
+
+[class*="col-"] {
+  padding-inline: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* col-N  (out of 12) */
+.col-1  { width: 8.333%; }
+.col-2  { width: 16.666%; }
+.col-3  { width: 25%; }
+.col-4  { width: 33.333%; }
+.col-5  { width: 41.666%; }
+.col-6  { width: 50%; }
+.col-7  { width: 58.333%; }
+.col-8  { width: 66.666%; }
+.col-9  { width: 75%; }
+.col-10 { width: 83.333%; }
+.col-11 { width: 91.666%; }
+.col-12 { width: 100%; }
+
+/* col-sm-N  ≥ 576px */
+@media (min-width: 576px) {
+  .col-sm-1  { width: 8.333%; }
+  .col-sm-2  { width: 16.666%; }
+  .col-sm-3  { width: 25%; }
+  .col-sm-4  { width: 33.333%; }
+  .col-sm-5  { width: 41.666%; }
+  .col-sm-6  { width: 50%; }
+  .col-sm-7  { width: 58.333%; }
+  .col-sm-8  { width: 66.666%; }
+  .col-sm-9  { width: 75%; }
+  .col-sm-10 { width: 83.333%; }
+  .col-sm-11 { width: 91.666%; }
+  .col-sm-12 { width: 100%; }
+}
+
+/* col-md-N  ≥ 768px */
+@media (min-width: 768px) {
+  .col-md-1  { width: 8.333%; }
+  .col-md-2  { width: 16.666%; }
+  .col-md-3  { width: 25%; }
+  .col-md-4  { width: 33.333%; }
+  .col-md-5  { width: 41.666%; }
+  .col-md-6  { width: 50%; }
+  .col-md-7  { width: 58.333%; }
+  .col-md-8  { width: 66.666%; }
+  .col-md-9  { width: 75%; }
+  .col-md-10 { width: 83.333%; }
+  .col-md-11 { width: 91.666%; }
+  .col-md-12 { width: 100%; }
+}
+
+/* col-lg-N  ≥ 1024px */
+@media (min-width: 1024px) {
+  .col-lg-1  { width: 8.333%; }
+  .col-lg-2  { width: 16.666%; }
+  .col-lg-3  { width: 25%; }
+  .col-lg-4  { width: 33.333%; }
+  .col-lg-5  { width: 41.666%; }
+  .col-lg-6  { width: 50%; }
+  .col-lg-7  { width: 58.333%; }
+  .col-lg-8  { width: 66.666%; }
+  .col-lg-9  { width: 75%; }
+  .col-lg-10 { width: 83.333%; }
+  .col-lg-11 { width: 91.666%; }
+  .col-lg-12 { width: 100%; }
+}
+
+/* col-xl-N  ≥ 1280px */
+@media (min-width: 1280px) {
+  .col-xl-1  { width: 8.333%; }
+  .col-xl-2  { width: 16.666%; }
+  .col-xl-3  { width: 25%; }
+  .col-xl-4  { width: 33.333%; }
+  .col-xl-5  { width: 41.666%; }
+  .col-xl-6  { width: 50%; }
+  .col-xl-7  { width: 58.333%; }
+  .col-xl-8  { width: 66.666%; }
+  .col-xl-9  { width: 75%; }
+  .col-xl-10 { width: 83.333%; }
+  .col-xl-11 { width: 91.666%; }
+  .col-xl-12 { width: 100%; }
+}
+
+/* Bootstrap container override — match project max-width */
 .container-grid {
   width: 100%;
-  max-width: var(--container-max);
+  max-width: 1280px;
   margin-inline: auto;
-  padding-inline: var(--container-px);
+  padding-inline: 1.5rem;
 }
 
-/* ── Row ── */
-.row {
-  display: grid;
-  grid-template-columns: repeat(var(--col-count), 1fr);
-  gap: var(--gutter);
-}
-
-/* ── Columns (mobile-first, 12-col) ── */
-.col-1  { grid-column: span 1; }
-.col-2  { grid-column: span 2; }
-.col-3  { grid-column: span 3; }
-.col-4  { grid-column: span 4; }
-.col-5  { grid-column: span 5; }
-.col-6  { grid-column: span 6; }
-.col-7  { grid-column: span 7; }
-.col-8  { grid-column: span 8; }
-.col-9  { grid-column: span 9; }
-.col-10 { grid-column: span 10; }
-.col-11 { grid-column: span 11; }
-.col-12 { grid-column: span 12; }
-
-/* sm ≥ 640px */
-@media (min-width: 640px) {
-  .col-sm-1  { grid-column: span 1; }
-  .col-sm-2  { grid-column: span 2; }
-  .col-sm-3  { grid-column: span 3; }
-  .col-sm-4  { grid-column: span 4; }
-  .col-sm-6  { grid-column: span 6; }
-  .col-sm-8  { grid-column: span 8; }
-  .col-sm-12 { grid-column: span 12; }
-}
-
-/* md ≥ 768px */
 @media (min-width: 768px) {
-  :root { --container-px: 2rem; }
-  .col-md-1  { grid-column: span 1; }
-  .col-md-2  { grid-column: span 2; }
-  .col-md-3  { grid-column: span 3; }
-  .col-md-4  { grid-column: span 4; }
-  .col-md-5  { grid-column: span 5; }
-  .col-md-6  { grid-column: span 6; }
-  .col-md-7  { grid-column: span 7; }
-  .col-md-8  { grid-column: span 8; }
-  .col-md-9  { grid-column: span 9; }
-  .col-md-10 { grid-column: span 10; }
-  .col-md-12 { grid-column: span 12; }
+  .container-grid { padding-inline: 2rem; }
 }
-
-/* lg ≥ 1024px */
 @media (min-width: 1024px) {
-  :root { --container-px: 2.5rem; }
-  .col-lg-1  { grid-column: span 1; }
-  .col-lg-2  { grid-column: span 2; }
-  .col-lg-3  { grid-column: span 3; }
-  .col-lg-4  { grid-column: span 4; }
-  .col-lg-5  { grid-column: span 5; }
-  .col-lg-6  { grid-column: span 6; }
-  .col-lg-7  { grid-column: span 7; }
-  .col-lg-8  { grid-column: span 8; }
-  .col-lg-9  { grid-column: span 9; }
-  .col-lg-10 { grid-column: span 10; }
-  .col-lg-12 { grid-column: span 12; }
+  .container-grid { padding-inline: 2.5rem; }
 }
-
-/* xl ≥ 1280px */
-@media (min-width: 1280px) {
-  .col-xl-3  { grid-column: span 3; }
-  .col-xl-4  { grid-column: span 4; }
-  .col-xl-6  { grid-column: span 6; }
-  .col-xl-8  { grid-column: span 8; }
-  .col-xl-9  { grid-column: span 9; }
-}
-
-/* ── Shorthand row variants ── */
-.row-2  { grid-template-columns: repeat(2,  1fr); }
-.row-3  { grid-template-columns: repeat(3,  1fr); }
-.row-4  { grid-template-columns: repeat(4,  1fr); }
-
-/* ── Gap utilities ── */
-.gap-grid  { gap: var(--gutter); }
-.gap-grid-sm { gap: calc(var(--gutter) * 0.5); }
-.gap-grid-lg { gap: calc(var(--gutter) * 2); }
-
 
 body {
   font-family: 'Poppins', sans-serif;

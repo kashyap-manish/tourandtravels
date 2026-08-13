@@ -44,3 +44,4 @@ export async function fetchHeroSlides() {
   const data = await res.json();
   return data.photos.map(p => p.src.landscape || p.src.large2x);
 }
+

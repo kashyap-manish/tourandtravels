@@ -41,3 +41,4 @@ const toursSlice = createSlice({
 
 export const { setCategory, setSortBy, setPage } = toursSlice.actions;
 export default toursSlice.reducer;
+

@@ -3,20 +3,20 @@ import { Link } from 'react-router-dom';
 import { subscribeNewsletter } from '../services/api';
 
 const information = [
-  { label: 'Online Enquiry', to: '/online-enquiry', icon: 'fa-paper-plane', desc: 'Send us a message online' },
-  { label: 'General Enquiries', to: '/general-enquiries', icon: 'fa-question-circle', desc: 'Got a question? Ask away' },
-  { label: 'Booking Conditions', to: '/booking-conditions', icon: 'fa-file-text-o', desc: 'Terms for your booking' },
-  { label: 'Privacy and Policy', to: '/privacy-policy', icon: 'fa-shield', desc: 'How we protect your data' },
-  { label: 'Refund Policy', to: '/refund-policy', icon: 'fa-rotate-left', desc: 'Cancellation & refunds' },
-  { label: 'Call Us', to: '/call-us', icon: 'fa-phone', desc: 'Speak to our team' },
+  { label: 'Online Enquiry', to: '/online-enquiry' },
+  { label: 'General Enquiries', to: '/general-enquiries' },
+  { label: 'Booking Conditions', to: '/booking-conditions' },
+  { label: 'Privacy and Policy', to: '/privacy-policy' },
+  { label: 'Refund Policy', to: '/refund-policy' },
+  { label: 'Call Us', to: '/call-us' },
 ];
 const experiences = [
-  { label: 'Adventure', to: '/experience/adventure', icon: 'fa-bolt', desc: 'Thrilling outdoor activities' },
-  { label: 'Hotel and Restaurant', to: '/experience/hotel-restaurant', icon: 'fa-cutlery', desc: 'Stay & dine in style' },
-  { label: 'Beach', to: '/experience/beach', icon: 'fa-umbrella', desc: 'Sun, sand & sea escapes' },
-  { label: 'Nature', to: '/experience/nature', icon: 'fa-leaf', desc: 'Explore the great outdoors' },
-  { label: 'Camping', to: '/experience/camping', icon: 'fa-fire', desc: 'Sleep under the stars' },
-  { label: 'Party', to: '/experience/party', icon: 'fa-music', desc: 'Celebrate & have fun' },
+  { label: 'Adventure', to: '/experience/adventure' },
+  { label: 'Hotel and Restaurant', to: '/experience/hotel-restaurant' },
+  { label: 'Beach', to: '/experience/beach' },
+  { label: 'Nature', to: '/experience/nature' },
+  { label: 'Camping', to: '/experience/camping' },
+  { label: 'Party', to: '/experience/party' },
 ];
 
 const socials = [
@@ -129,102 +129,79 @@ export default function Footer() {
 
       {/* Newsletter Banner */}
       <div className="border-b border-white/10">
-        <div className="container-grid py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="container-grid py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <p className="text-orange-400 text-xs font-semibold tracking-widest uppercase mb-1">Stay Updated</p>
-            <h3 className="text-xl font-bold text-white">Subscribe to our newsletter</h3>
+            <p className="text-orange-400 text-xs font-semibold tracking-widest uppercase mb-0.5">Stay Updated</p>
+            <h3 className="text-base font-bold text-white">Subscribe to our newsletter</h3>
           </div>
-<NewsletterForm />
+          <NewsletterForm />
         </div>
       </div>
 
       {/* Main Grid */}
-      <div className="container-grid py-16 row">
+      <div className="container-grid py-10">
+        <div className="grid grid-cols-12 gap-8">
 
-        {/* Brand */}
-        <div className="col-12 col-md-3">
-          <Link to="/" className="flex flex-col leading-none mb-5">
-            <span className="text-white text-2xl font-extrabold tracking-tight">Pacific</span>
-            <span className="text-orange-500 text-[0.55rem] font-semibold tracking-[4px] uppercase">Travel Agency</span>
-          </Link>
-          <p className="text-gray-400 text-sm leading-relaxed mb-6">
-            Crafting extraordinary journeys since 2012. We turn your travel dreams into unforgettable memories.
-          </p>
-          <div className="flex gap-2">
-            {socials.map(s => <SocialIcon key={s.label} {...s} />)}
+          {/* Brand */}
+          <div className="col-span-12 md:col-span-4">
+            <Link to="/" className="flex flex-col leading-none mb-4">
+              <span className="text-white text-2xl font-extrabold tracking-tight">Pacific</span>
+              <span className="text-orange-500 text-[0.55rem] font-semibold tracking-[4px] uppercase">Travel Agency</span>
+            </Link>
+            <p className="text-gray-400 text-sm leading-relaxed mb-4">
+              Crafting extraordinary journeys since 2012.
+            </p>
+            <div className="flex gap-2">
+              {socials.map(s => <SocialIcon key={s.label} {...s} />)}
+            </div>
           </div>
-        </div>
 
-        {/* Information */}
-        <div className="col-12 col-md-3">
-          <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-5">Information</h4>
-          <ul className="space-y-2">
-            {information.map(item => (
-              <li key={item.label}>
-                <Link
-                  to={item.to}
-                  className="group flex items-center gap-3 px-3 py-2.5 rounded-xl border border-white/5 hover:border-orange-500/30 hover:bg-orange-500/5 transition-all"
-                  style={{ borderLeft: '3px solid #f9731620' }}
-                  onMouseEnter={e => e.currentTarget.style.borderLeftColor = '#f97316'}
-                  onMouseLeave={e => e.currentTarget.style.borderLeftColor = '#f9731620'}
-                >
-                  <div className="w-7 h-7 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-orange-500/20 transition-colors">
-                    <i className={`fa ${item.icon} text-orange-400`} style={{ fontSize: 11 }} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-gray-300 group-hover:text-orange-400 transition-colors leading-tight truncate">{item.label}</p>
-                    <p className="text-xs text-gray-600 mt-0.5 truncate">{item.desc}</p>
-                  </div>
-                  <i className="fa fa-chevron-right text-gray-700 group-hover:text-orange-500 transition-colors ml-auto flex-shrink-0" style={{ fontSize: 9 }} />
-                </Link>
+          {/* Information */}
+          <div className="col-span-6 md:col-span-2">
+            <ul className="space-y-2">
+              {information.map(item => (
+                <li key={item.label}>
+                  <Link to={item.to} className="group flex items-center gap-2 text-sm text-gray-400 hover:text-orange-400 transition-colors">
+                    <i className="fa fa-chevron-right text-[10px] text-orange-500/50 group-hover:text-orange-500" />
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Experience */}
+          <div className="col-span-6 md:col-span-2">
+            <ul className="space-y-2">
+              {experiences.map(item => (
+                <li key={item.label}>
+                  <Link to={item.to} className="group flex items-center gap-2 text-sm text-gray-400 hover:text-orange-400 transition-colors">
+                    <i className="fa fa-chevron-right text-[10px] text-orange-500/50 group-hover:text-orange-500" />
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div className="col-span-12 md:col-span-4">
+            <ul className="space-y-3">
+              <li className="flex gap-3 items-start">
+                <i className="fa fa-map-marker text-orange-400 mt-1" />
+                <a href="https://maps.google.com/?q=198+West+21st+Street+New+York+NY+10016" className="text-gray-400 text-sm leading-relaxed hover:text-orange-400 transition-colors">203 Fake St. Mountain View, San Francisco, USA</a>
               </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Experience */}
-        <div className="col-12 col-md-3">
-          <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-5">Experience</h4>
-          <ul className="space-y-3">
-            {experiences.map(item => (
-              <li key={item.label}>
-                <Link to={item.to} className="group flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/5 transition-colors">
-                  <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-orange-500/20 transition-colors">
-                    <i className={`fa ${item.icon} text-orange-400 text-xs`} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-300 group-hover:text-orange-400 transition-colors leading-tight">{item.label}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
-                  </div>
-                </Link>
+              <li className="flex gap-3 items-center">
+                <i className="fa fa-phone text-orange-400" />
+                <a href="tel:+23923929210" className="text-gray-400 text-sm hover:text-orange-400 transition-colors">+2 392 3929 210</a>
               </li>
-            ))}
-          </ul>
-        </div>
+              <li className="flex gap-3 items-center">
+                <i className="fa fa-envelope text-orange-400" />
+                <a href="mailto:info@yourdomain.com" className="text-gray-400 text-sm hover:text-orange-400 transition-colors">info@yourdomain.com</a>
+              </li>
+            </ul>
+          </div>
 
-        {/* Contact */}
-        <div className="col-12 col-md-3">
-          <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-5">Contact Us</h4>
-          <ul className="space-y-4">
-            <li className="flex gap-3 items-start">
-              <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <i className="fa fa-map-marker text-orange-400 text-sm" />
-              </div>
-              <a href= "https://maps.google.com/?q=198+West+21st+Street+New+York+NY+10016" className="text-gray-400 text-sm leading-relaxed">203 Fake St. Mountain View, San Francisco, California, USA</a>
-            </li>
-            <li className="flex gap-3 items-center">
-              <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0">
-                <i className="fa fa-phone text-orange-400 text-sm" />
-              </div>
-              <a href="tel:+23923929210" className="text-gray-400 text-sm hover:text-orange-400 transition-colors">+2 392 3929 210</a>
-            </li>
-            <li className="flex gap-3 items-center">
-              <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0">
-                <i className="fa fa-envelope text-orange-400 text-sm" />
-              </div>
-              <a href="mailto:info@yourdomain.com" className="text-gray-400 text-sm hover:text-orange-400 transition-colors">info@yourdomain.com</a>
-            </li>
-          </ul>
         </div>
       </div>
 
@@ -245,3 +222,4 @@ export default function Footer() {
     </footer>
   );
 }
+

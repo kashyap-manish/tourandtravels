@@ -166,3 +166,4 @@ function WishlistCard({ item, onRemove, onView }) {
     </div>
   );
 }
+

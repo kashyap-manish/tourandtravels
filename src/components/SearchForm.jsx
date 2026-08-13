@@ -125,3 +125,4 @@ export default function SearchForm({ onHotelSearch, hotelOnly, tourOnly, onTourS
     </div>
   );
 }
+

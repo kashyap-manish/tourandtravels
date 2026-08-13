@@ -55,3 +55,4 @@ export const verifyPayment = (data) => api.post('/payment/verify', data);
 export const subscribeNewsletter = (email) => api.post('/newsletter', { email });
 
 export default api;
+

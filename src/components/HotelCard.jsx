@@ -50,3 +50,4 @@ export default function HotelCard({ img, name, location, stars, price, tag, amen
     </div>
   );
 }
+

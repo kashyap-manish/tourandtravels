@@ -73,3 +73,4 @@ export default function RevealText({ text, filterId = 0, as: Tag = 'p', classNam
     </Tag>
   );
 }
+

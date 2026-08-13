@@ -17,3 +17,4 @@ export default function useInView(options = { threshold: 0.15 }) {
 
   return [ref, inView];
 }
+

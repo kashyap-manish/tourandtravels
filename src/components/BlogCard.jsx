@@ -46,3 +46,4 @@ export default function BlogCard({ img, date, category, title, excerpt, author, 
     </a>
   );
 }
+

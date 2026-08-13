@@ -236,3 +236,4 @@ export default function LiveTrackingMap({ flight }) {
     </div>
   );
 }
+
