@@ -156,6 +156,100 @@ function HeroSlider() {
   );
 }
 
+const trendingDestinations = [
+  { name: 'Hyderabad',  img: 'https://images.unsplash.com/photo-1588416936097-41850ab3d86d?w=600&q=80', slug: 'hyderabad' },
+  { name: 'New Delhi',  img: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=600&q=80', slug: 'new-delhi' },
+  { name: 'Goa',        img: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=600&q=80', slug: 'goa' },
+  { name: 'Bengaluru',  img: 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=600&q=80', slug: 'bengaluru' },
+  { name: 'Mumbai',     img: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=600&q=80', slug: 'mumbai' },
+  { name: 'Jaipur',     img: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?w=600&q=80', slug: 'jaipur' },
+  { name: 'Kerala',     img: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=600&q=80', slug: 'kerala' },
+  { name: 'Ladakh',     img: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=600&q=80', slug: 'ladakh' },
+];
+
+function TrendingDestinations() {
+  const scrollRef = useRef(null);
+  const [canLeft, setCanLeft]   = useState(false);
+  const [canRight, setCanRight] = useState(true);
+
+  const CARD_W = 300;
+
+  const checkScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanLeft(el.scrollLeft > 0);
+    setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  };
+
+  const scroll = (dir) => {
+    scrollRef.current?.scrollBy({ left: dir * CARD_W, behavior: 'smooth' });
+  };
+
+  return (
+    <section className="py-16 md:py-20">
+      <div className="container-grid">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Trending destinations for Indian travelers</h2>
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <Link
+              to="/destination"
+              className="text-xs font-bold tracking-widest uppercase border border-gray-300 hover:border-orange-500 hover:text-orange-500 px-4 py-2 rounded-full transition-colors"
+            >
+              See More
+            </Link>
+            <button
+              onClick={() => scroll(-1)}
+              disabled={!canLeft}
+              className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center hover:border-orange-500 hover:text-orange-500 disabled:opacity-30 transition-colors"
+            >
+              <i className="fa fa-chevron-left text-xs" />
+            </button>
+            <button
+              onClick={() => scroll(1)}
+              disabled={!canRight}
+              className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center hover:border-orange-500 hover:text-orange-500 disabled:opacity-30 transition-colors"
+            >
+              <i className="fa fa-chevron-right text-xs" />
+            </button>
+          </div>
+        </div>
+
+        {/* Scrollable row */}
+        <div
+          ref={scrollRef}
+          onScroll={checkScroll}
+          className="flex gap-4 overflow-x-auto pb-2"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {trendingDestinations.map((d) => (
+            <Link
+              key={d.name}
+              to={`/city/${d.slug}`}
+              className="flex-shrink-0 relative rounded-2xl overflow-hidden group"
+              style={{ width: CARD_W, height: 380 }}
+            >
+              <img
+                src={d.img}
+                alt={d.name}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              {/* subtle bottom gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+              {/* Name pill */}
+              <div className="absolute bottom-4 left-4">
+                <span className="bg-white text-gray-900 font-bold text-sm px-4 py-2 rounded-full shadow-md">
+                  {d.name}
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 const services = [
   { img: '/images/services-1.jpg', icon: 'fa-paper-plane', title: 'Activities', color: 'bg-orange-500/80' },
   { img: '/images/services-2.jpg', icon: 'fa-road', title: 'Travel Arrangements', color: 'bg-blue-500/80' },
@@ -254,6 +348,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Trending Destinations */}
+      <TrendingDestinations />
 
       {/* Lottie Globe Feature Strip */}
       <section className="py-10 bg-orange-50">

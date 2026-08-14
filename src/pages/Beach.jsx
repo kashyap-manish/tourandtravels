@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
 import TourCard from '../components/TourCard';
 import api from '../services/api';
+import { mergeRatings } from '../utils/mergeRatings';
 
 const highlights = [
   { icon: 'fa-umbrella', title: 'Beach Relaxation', desc: 'Unwind on pristine white sand beaches with crystal clear waters.' },
@@ -19,7 +20,7 @@ export default function Beach() {
 
   useEffect(() => {
     api.get('/tours', { params: { category: 'Beach' } })
-      .then(r => setTours(r.data))
+      .then(r => setTours(mergeRatings(r.data)))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

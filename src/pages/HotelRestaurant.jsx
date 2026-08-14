@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
 import TourCard from '../components/TourCard';
 import api from '../services/api';
+import { mergeRatings } from '../utils/mergeRatings';
 
 const highlights = [
   { icon: 'fa-bed', title: 'Luxury Hotels', desc: 'Stay in world-class hotels with exceptional service and amenities.' },
@@ -19,7 +20,7 @@ export default function HotelRestaurant() {
 
   useEffect(() => {
     api.get('/tours')
-      .then(r => setTours(r.data))
+      .then(r => setTours(mergeRatings(r.data)))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

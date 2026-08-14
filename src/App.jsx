@@ -39,6 +39,7 @@ import TermsOfService from './pages/TermsOfService';
 import Sitemap from './pages/Sitemap';
 import Gallery from './pages/Gallery';
 import Wishlist from './pages/Wishlist';
+import CityDestination from './pages/CityDestination';
 
 export default function App() {
   return (
@@ -83,6 +84,7 @@ export default function App() {
                 <Route path="/sitemap" element={<Sitemap />} />
                 <Route path="/gallery" element={<Gallery />} />
                 <Route path="/wishlist" element={<Wishlist />} />
+                <Route path="/city/:slug" element={<CityDestination />} />
               </Routes>
             </main>
             <Footer />

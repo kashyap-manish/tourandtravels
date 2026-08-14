@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
 import TourCard from '../components/TourCard';
 import api from '../services/api';
+import { mergeRatings } from '../utils/mergeRatings';
 
 const highlights = [
   { icon: 'fa-fire', title: 'Campfire Nights', desc: 'Gather around crackling fires under a canopy of stars.' },
@@ -19,7 +20,7 @@ export default function Camping() {
 
   useEffect(() => {
     api.get('/tours', { params: { category: 'Adventure' } })
-      .then(r => setTours(r.data))
+      .then(r => setTours(mergeRatings(r.data)))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

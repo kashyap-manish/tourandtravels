@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
 import TourCard from '../components/TourCard';
 import api from '../services/api';
+import { mergeRatings } from '../utils/mergeRatings';
 
 const highlights = [
   { icon: 'fa-music', title: 'Music Festivals', desc: 'Dance to world-class artists at iconic global music festivals.' },
@@ -19,7 +20,7 @@ export default function Party() {
 
   useEffect(() => {
     api.get('/tours', { params: { category: 'Culture' } })
-      .then(r => setTours(r.data))
+      .then(r => setTours(mergeRatings(r.data)))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

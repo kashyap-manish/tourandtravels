@@ -75,8 +75,9 @@ function NewsletterForm() {
       await subscribeNewsletter(email);
       setStatus('success');
       setEmail('');
-    } catch {
-      setStatus('error');
+    } catch (err) {
+      if (err?.response?.status === 409) setStatus('already');
+      else setStatus('error');
     }
   }
 
@@ -98,6 +99,7 @@ function NewsletterForm() {
         {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
       </button>
       {status === 'success' && <p className="w-full text-green-400 text-xs mt-2 sm:mt-1 sm:ml-3 self-center">✓ Subscribed successfully!</p>}
+      {status === 'already' && <p className="w-full text-yellow-400 text-xs mt-2 sm:mt-1 sm:ml-3 self-center">✓ You're already subscribed!</p>}
       {status === 'error' && <p className="w-full text-red-400 text-xs mt-2 sm:mt-1 sm:ml-3 self-center">Something went wrong, try again.</p>}
     </form>
   );
