@@ -206,36 +206,63 @@ export default function CityDestination() {
 
   return (
     <>
-      {/* Split Hero */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: 340 }}>
-        {/* Left — dark info panel */}
-        <div style={{ background: '#1f2937', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '48px 48px' }}>
-          {/* Breadcrumb */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#9ca3af', marginBottom: 20, flexWrap: 'wrap' }}>
-            <Link to="/" style={{ color: '#9ca3af', textDecoration: 'none' }}>Home</Link>
-            <i className="fa fa-chevron-right" style={{ fontSize: 9 }} />
-            <Link to="/destination" style={{ color: '#9ca3af', textDecoration: 'none' }}>Destinations</Link>
-            <i className="fa fa-chevron-right" style={{ fontSize: 9 }} />
-            <span style={{ color: '#9ca3af' }}>India</span>
-            <i className="fa fa-chevron-right" style={{ fontSize: 9 }} />
-            <span style={{ color: '#fff', fontWeight: 600 }}>{city.name}</span>
-          </div>
-          <h1 style={{ fontSize: 40, fontWeight: 800, color: '#fff', marginBottom: 16, lineHeight: 1.2 }}>{city.name}</h1>
-          <p style={{ fontSize: 15, color: '#d1d5db', lineHeight: 1.8, maxWidth: 420 }}>{city.desc}</p>
+      {/* Cinematic Hero */}
+      <section className="relative flex flex-col justify-end bg-cover bg-center" style={{ backgroundImage: `url('${city.img}')`, minHeight: '70vh' }}>
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
+
+        {/* Breadcrumb */}
+        <div className="relative z-10 max-w-6xl mx-auto w-full px-6 pb-2">
+          <p className="text-xs flex items-center gap-2 text-gray-400 uppercase tracking-widest">
+            <Link to="/" className="hover:text-orange-400 transition-colors">Home</Link>
+            <i className="fa fa-chevron-right text-[9px] text-orange-500" />
+            <Link to="/destination" className="hover:text-orange-400 transition-colors">Destinations</Link>
+            <i className="fa fa-chevron-right text-[9px] text-orange-500" />
+            <span className="text-white font-semibold">{city.name}</span>
+          </p>
         </div>
 
-        {/* Right — full image */}
-        <div style={{ position: 'relative', overflow: 'hidden' }}>
-          <img
-            src={city.img}
-            alt={city.name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-          />
+        {/* Main content */}
+        <div className="relative z-10 max-w-6xl mx-auto w-full px-6 pb-14">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="max-w-2xl">
+              <span className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/40 text-orange-400 text-xs font-bold px-3 py-1 rounded-full mb-4 uppercase tracking-widest">
+                <i className="fa fa-map-marker" /> India
+              </span>
+              <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight leading-none mb-4">
+                {city.name}
+              </h1>
+              <p className="text-gray-300 text-base leading-relaxed max-w-xl">{city.desc}</p>
+            </div>
+
+            {/* Stats card */}
+            <div className="flex gap-px bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden shrink-0">
+              {[
+                { icon: 'fa-building', val: `${(cityHotels[slug] || []).length}+`, label: 'Hotels' },
+                { icon: 'fa-map-marker', val: `${tours.length || '10'}+`, label: 'Tours' },
+                { icon: 'fa-star', val: '4.8★', label: 'Rating' },
+              ].map(({ icon, val, label }) => (
+                <div key={label} className="flex flex-col items-center justify-center px-6 py-4 gap-1">
+                  <i className={`fa ${icon} text-orange-400 text-lg`} />
+                  <span className="text-white font-extrabold text-xl leading-none">{val}</span>
+                  <span className="text-gray-400 text-xs">{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+
+        {/* Bottom wave */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 1440 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 40 C360 0 1080 0 1440 40 L1440 40 L0 40Z" fill="#f9fafb" />
+          </svg>
+        </div>
+      </section>
 
       {/* Tours section */}
-      <section style={{ padding: '56px 0 80px' }}>
+      <section style={{ padding: '32px 0 80px', background: '#f9fafb' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
 
           {/* Section header */}
@@ -450,77 +477,80 @@ export default function CityDestination() {
           )}
 
           {/* Hotel cards grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 24 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {hotels.map((h, i) => (
-              <div key={i} style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', border: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column' }}>
+              <div key={i} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 flex flex-col transition-all duration-300 hover:-translate-y-1">
 
                 {/* Image */}
-                <div style={{ position: 'relative', height: 200, overflow: 'hidden' }}>
-                  <img src={h.img} alt={h.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  {/* Badge */}
-                  <div style={{ position: 'absolute', top: 12, right: 12, width: 38, height: 38, borderRadius: '50%', background: h.badgeBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ color: '#fff', fontSize: 9, fontWeight: 800, letterSpacing: '0.03em', textAlign: 'center', lineHeight: 1.1 }}>{h.badge}</span>
+                <div className="relative h-52 overflow-hidden shrink-0">
+                  <img
+                    src={h.img} alt={h.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+
+                  {/* Star rating overlay */}
+                  <div className="absolute top-3 left-3 flex items-center gap-1 bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full">
+                    <i className="fa fa-star text-yellow-400 text-xs" />
+                    <span className="text-white text-xs font-bold">{h.stars}.0</span>
+                  </div>
+
+                  {/* Brand badge */}
+                  <div
+                    className="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center shadow-lg"
+                    style={{ background: h.badgeBg }}
+                  >
+                    <span className="text-white font-black text-[9px] text-center leading-tight">{h.badge}</span>
+                  </div>
+
+                  {/* Price on image bottom */}
+                  <div className="absolute bottom-3 left-3">
+                    <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                      {h.price}<span className="font-normal opacity-80">/night</span>
+                    </span>
                   </div>
                 </div>
 
                 {/* Body */}
-                <div style={{ padding: '16px 16px 20px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 8, lineHeight: 1.4 }}>{h.name}</h3>
+                <div className="p-4 flex flex-col flex-1">
+                  <h3 className="font-bold text-gray-900 text-sm leading-snug mb-2 line-clamp-2 group-hover:text-orange-500 transition-colors">
+                    {h.name}
+                  </h3>
 
-                  {/* Stars + reviews */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                    <div style={{ display: 'flex', gap: 2 }}>
+                  {/* Stars row */}
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <div className="flex gap-0.5">
                       {[...Array(5)].map((_, j) => (
-                        <i key={j} className={`fa fa-star`} style={{ fontSize: 11, color: j < h.stars ? '#f59e0b' : '#e5e7eb' }} />
+                        <i key={j} className={`fa fa-star text-[10px] ${j < h.stars ? 'text-yellow-400' : 'text-gray-200'}`} />
                       ))}
                     </div>
-                    <span style={{ width: 1, height: 12, background: '#d1d5db' }} />
-                    <div style={{ display: 'flex', gap: 2 }}>
-                      {[...Array(5)].map((_, j) => (
-                        <span key={j} style={{ width: 10, height: 10, borderRadius: '50%', background: j < 4 ? '#22c55e' : '#e5e7eb', display: 'inline-block' }} />
-                      ))}
-                    </div>
-                    <span style={{ fontSize: 12, color: '#6b7280' }}>{h.reviews.toLocaleString()} reviews</span>
+                    <span className="text-xs text-gray-400">({h.reviews.toLocaleString()})</span>
                   </div>
 
                   {/* Distance */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 5, fontSize: 12, color: '#6b7280', marginBottom: 10 }}>
-                    <i className="fa fa-map-marker" style={{ color: '#9ca3af', marginTop: 2, flexShrink: 0 }} />
-                    <span>{h.distance}</span>
-                  </div>
+                  <p className="text-xs text-gray-400 flex items-start gap-1 mb-3">
+                    <i className="fa fa-map-marker text-orange-400 mt-0.5 shrink-0" />
+                    <span className="line-clamp-2">{h.distance}</span>
+                  </p>
 
                   {/* Tags */}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
+                  <div className="flex flex-wrap gap-1.5 mb-4">
                     {h.tags.map(tag => (
-                      <span key={tag} style={{ fontSize: 11, border: '1px solid #d1d5db', borderRadius: 999, padding: '3px 10px', color: '#374151', fontWeight: 500 }}>{tag}</span>
+                      <span key={tag} className="text-[10px] bg-orange-50 text-orange-600 border border-orange-100 px-2.5 py-0.5 rounded-full font-medium">
+                        {tag}
+                      </span>
                     ))}
                   </div>
 
-                  {/* See Hotel link */}
-                  <a href="#" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: '#dc2626', textDecoration: 'none', marginBottom: 12, letterSpacing: '0.05em' }}
-                    onMouseEnter={e => e.currentTarget.style.gap = '10px'}
-                    onMouseLeave={e => e.currentTarget.style.gap = '6px'}
-                  >
-                    SEE HOTEL <i className="fa fa-arrow-right" style={{ fontSize: 11 }} />
-                  </a>
-
-                  {/* Price */}
-                  <div style={{ marginBottom: 14 }}>
-                    <p style={{ fontSize: 13, color: '#374151' }}>
-                      From <strong style={{ fontSize: 20, fontWeight: 800, color: '#111827' }}>{h.price}</strong>
-                      <span style={{ fontSize: 13, color: '#6b7280' }}> /night</span>
-                    </p>
-                    <p style={{ fontSize: 11, color: '#9ca3af' }}>Excludes taxes and fees</p>
-                  </div>
-
                   {/* Book Now */}
-                  <button
-                    style={{ width: '100%', background: '#dc2626', color: '#fff', fontWeight: 800, fontSize: 13, padding: '13px', borderRadius: 999, border: 'none', cursor: 'pointer', letterSpacing: '0.08em', marginTop: 'auto', transition: 'background 0.2s' }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#b91c1c'}
-                    onMouseLeave={e => e.currentTarget.style.background = '#dc2626'}
+                  <a
+                    href={`https://www.google.com/maps/search/${encodeURIComponent(h.name + ' ' + city.name)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-auto w-full flex items-center justify-center gap-2 bg-gray-950 hover:bg-orange-500 text-white text-xs font-bold py-2.5 rounded-xl transition-colors duration-200"
                   >
-                    BOOK NOW
-                  </button>
+                    <i className="fa fa-calendar-check-o" /> Book Now
+                  </a>
                 </div>
               </div>
             ))}

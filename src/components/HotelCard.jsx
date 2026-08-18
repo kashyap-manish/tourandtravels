@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleWishlist } from '../store/wishlistSlice';
+import { toggleWishlistAsync } from '../store/wishlistSlice';
 
 export default function HotelCard({ img, name, location, stars, price, tag, amenities, website }) {
   const dispatch = useDispatch();
@@ -16,7 +16,7 @@ export default function HotelCard({ img, name, location, stars, price, tag, amen
         <span className="absolute top-3 left-3 bg-black/50 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">{tag || 'Hotel'}</span>
         <button
           className="absolute top-3 right-3 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors"
-          onClick={e => { e.stopPropagation(); dispatch(toggleWishlist({ id: cardId, type: 'hotel', title: name, img: photo, price, location, stars, website })); }}
+          onClick={e => { e.stopPropagation(); dispatch(toggleWishlistAsync({ id: cardId, type: 'hotel', title: name, img: photo, price, location, stars, website })); }}
         >
           <i className={`fa ${isWishlisted ? 'fa-heart text-red-500' : 'fa-heart-o text-gray-400'} text-sm`} />
         </button>

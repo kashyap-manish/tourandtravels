@@ -35,6 +35,7 @@ export const addReview = (tourId, data) => api.post(`/reviews/${tourId}`, data);
 // Wishlist
 export const getWishlist = () => api.get('/wishlist');
 export const toggleWishlist = (tourId) => api.post(`/wishlist/toggle/${tourId}`);
+export const toggleWishlistHotel = (data) => api.post('/wishlist/toggle-hotel', data);
 
 // Contact
 export const sendContact = (data) => api.post('/contact', data);

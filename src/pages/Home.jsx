@@ -149,9 +149,9 @@ function HeroSlider() {
       </button>
 
       {/* Slide counter */}
-      <div className="absolute bottom-8 right-8 z-30 text-white/50 text-xs font-semibold tracking-widest">
+      {/* <div className="absolute bottom-8 right-8 z-30 text-white/50 text-xs font-semibold tracking-widest">
         {String(current + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
-      </div>
+      </div> */}
     </section>
   );
 }

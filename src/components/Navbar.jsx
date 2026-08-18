@@ -145,7 +145,7 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-      <div className={`md:hidden overflow-hidden transition-all duration-300 ${open ? 'max-h-96 border-t border-white/10' : 'max-h-0'}`}>
+      <div className={`md:hidden overflow-hidden transition-all duration-300 ${open ? 'max-h-[600px] border-t border-white/10' : 'max-h-0'}`}>
         <ul className="px-6 py-4 flex flex-col gap-1 bg-gray-950">
           {links.map(({ to, label }) => (
             <li key={to}>

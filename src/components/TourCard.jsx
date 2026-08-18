@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleWishlist } from '../store/wishlistSlice';
+import { toggleWishlistAsync } from '../store/wishlistSlice';
 
 export default function TourCard({ _id, id, slug, img, price, days, title, location, features, rating = 4.5, reviews = 24, rank = 99 }) {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ export default function TourCard({ _id, id, slug, img, price, days, title, locat
         )}
         <button
           className="absolute top-3 right-3 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors"
-          onClick={e => { e.stopPropagation(); dispatch(toggleWishlist({ id: cardId, type: 'tour', title, img, price, location, slug })); }}
+          onClick={e => { e.stopPropagation(); dispatch(toggleWishlistAsync({ id: cardId, type: 'tour', title, img, price, location, slug })); }}
         >
           <i className={`fa ${isWishlisted ? 'fa-heart text-red-500' : 'fa-heart-o text-gray-400'} text-sm`} />
         </button>
