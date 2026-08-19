@@ -24,7 +24,7 @@ const slides = [
     sub: 'From mountain peaks to tropical shores — your journey starts here',
   },
   {
-    img: '/images/bg_3.jpg',
+    img: '/images/bg_2.jpg',
     tag: 'Handpicked Tours',
     heading: 'Unforgettable Experiences, Every Trip',
     sub: 'Expert-curated tours designed to create memories that last a lifetime',
@@ -82,71 +82,79 @@ function HeroSlider() {
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-yellow-400 to-orange-500 z-30" />
 
       {/* Content */}
-      <div className="container-grid relative z-20 w-full flex flex-col lg:flex-row items-center justify-between gap-8" style={{ minHeight: '100vh' }}>
-        <div className="max-w-2xl text-white" key={animKey}>
-          <span className="hero-line-1 inline-block text-orange-400 font-semibold tracking-widest uppercase text-sm border border-orange-400/40 px-3 py-1 rounded-full mb-4">
-            {slide.tag}
-          </span>
-          <h1 className="hero-line-2 text-4xl sm:text-5xl md:text-7xl font-bold mt-3 mb-5 leading-tight">
-            {slide.heading.split(' ').map((word, i, arr) =>
-              i === arr.length - 2
-                ? <span key={i} className="text-orange-400">{word} </span>
-                : word + ' '
-            )}
-          </h1>
-          <p className="hero-line-3 text-gray-200 text-base md:text-xl mb-8">{slide.sub}</p>
-          <div className="hero-line-4 flex items-center gap-5 flex-wrap">
-            <a
-              href="#tours"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full font-semibold transition-all hover:shadow-lg hover:shadow-orange-500/40 hover:-translate-y-0.5"
-            >
-              Explore Tours
-            </a>
-            <a
-              href="https://vimeo.com/45830194"
-              target="_blank"
-              rel="noreferrer"
-              className="play-btn-pulse w-14 h-14 rounded-full border-2 border-white flex items-center justify-center hover:bg-orange-500 hover:border-orange-500 transition-colors"
-            >
-              <i className="fa fa-play text-white ml-1" />
-            </a>
-            <span className="text-gray-300 text-sm">Watch our story</span>
-          </div>
-        </div>
-        {/* Lottie plane */}
-        <div className="w-48 h-48 sm:w-64 sm:h-64 lg:w-80 xl:w-96 flex-shrink-0 hero-line-4 mx-auto lg:mx-0">
-          <LottieURL url={LOTTIE_PLANE} className="w-full" />
-        </div>
-      </div>
-
-      {/* Dot indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
-        {slides.map((_, i) => (
+      <div className="relative z-20 w-full flex flex-col" style={{ minHeight: '100vh' }}>
+        {/* Arrow + content row */}
+        <div className="flex items-center flex-1" style={{ minHeight: '100vh' }}>
+          {/* Left arrow */}
           <button
-            key={i}
-            onClick={() => { clearInterval(timerRef.current); goTo(i); }}
-            className={`transition-all duration-300 rounded-full ${
-              i === current
-                ? 'w-8 h-2.5 bg-orange-500'
-                : 'w-2.5 h-2.5 bg-white/40 hover:bg-white/70'
-            }`}
-          />
-        ))}
-      </div>
+            onClick={() => { clearInterval(timerRef.current); goTo((current - 1 + slides.length) % slides.length); }}
+            className="flex-shrink-0 ml-3 w-9 h-9 rounded-full bg-white/10 hover:bg-orange-500 border border-white/20 hover:border-orange-500 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200 z-30"
+          >
+            <i className="fa fa-chevron-left text-sm" />
+          </button>
 
-      {/* Arrow controls */}
-      <button
-        onClick={() => { clearInterval(timerRef.current); goTo((current - 1 + slides.length) % slides.length); }}
-        className="absolute left-5 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/10 hover:bg-orange-500 border border-white/20 hover:border-orange-500 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200"
-      >
-        <i className="fa fa-chevron-left text-sm" />
-      </button>
-      <button
-        onClick={() => { clearInterval(timerRef.current); goTo((current + 1) % slides.length); }}
-        className="absolute right-5 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/10 hover:bg-orange-500 border border-white/20 hover:border-orange-500 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200"
-      >
-        <i className="fa fa-chevron-right text-sm" />
-      </button>
+          {/* Text content */}
+          <div className="flex-1 flex flex-col lg:flex-row items-center justify-between gap-8 px-4 lg:px-8 max-w-6xl mx-auto">
+            <div className="max-w-2xl text-white" key={animKey}>
+              <span className="hero-line-1 inline-block text-orange-400 font-semibold tracking-widest uppercase text-sm border border-orange-400/40 px-3 py-1 rounded-full mb-4">
+                {slide.tag}
+              </span>
+              <h1 className="hero-line-2 text-4xl sm:text-5xl md:text-7xl font-bold mt-3 mb-5 leading-tight">
+                {slide.heading.split(' ').map((word, i, arr) =>
+                  i === arr.length - 2
+                    ? <span key={i} className="text-orange-400">{word} </span>
+                    : word + ' '
+                )}
+              </h1>
+              <p className="hero-line-3 text-gray-200 text-base md:text-xl mb-8">{slide.sub}</p>
+              <div className="hero-line-4 flex items-center gap-5 flex-wrap">
+                <a
+                  href="#tours"
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full font-semibold transition-all hover:shadow-lg hover:shadow-orange-500/40 hover:-translate-y-0.5"
+                >
+                  Explore Tours
+                </a>
+                <a
+                  href="https://vimeo.com/45830194"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="play-btn-pulse w-14 h-14 rounded-full border-2 border-white flex items-center justify-center hover:bg-orange-500 hover:border-orange-500 transition-colors"
+                >
+                  <i className="fa fa-play text-white ml-1" />
+                </a>
+                <span className="text-gray-300 text-sm">Watch our story</span>
+              </div>
+            </div>
+            {/* Lottie plane — hidden on mobile */}
+            <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0 hero-line-4">
+              <LottieURL url={LOTTIE_PLANE} className="w-full" />
+            </div>
+          </div>
+
+          {/* Right arrow */}
+          <button
+            onClick={() => { clearInterval(timerRef.current); goTo((current + 1) % slides.length); }}
+            className="flex-shrink-0 mr-3 w-9 h-9 rounded-full bg-white/10 hover:bg-orange-500 border border-white/20 hover:border-orange-500 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200 z-30"
+          >
+            <i className="fa fa-chevron-right text-sm" />
+          </button>
+        </div>
+
+        {/* Dot indicators */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => { clearInterval(timerRef.current); goTo(i); }}
+              className={`transition-all duration-300 rounded-full ${
+                i === current
+                  ? 'w-8 h-2.5 bg-orange-500'
+                  : 'w-2.5 h-2.5 bg-white/40 hover:bg-white/70'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
 
       {/* Slide counter */}
       {/* <div className="absolute bottom-8 right-8 z-30 text-white/50 text-xs font-semibold tracking-widest">

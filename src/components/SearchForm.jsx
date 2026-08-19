@@ -75,6 +75,7 @@ export default function SearchForm({ onHotelSearch, hotelOnly, tourOnly, onTourS
         <Field label="Destination" icon="fa-map-marker">
           <input
             type="text"
+            required
             placeholder="Where to go?"
             value={destination}
             onChange={e => setDestination(e.target.value)}
@@ -85,6 +86,7 @@ export default function SearchForm({ onHotelSearch, hotelOnly, tourOnly, onTourS
         <Field label="Check-in" icon="fa-calendar-o">
           <input
             type="date"
+            required
             value={checkIn}
             min={new Date().toISOString().split('T')[0]}
             onChange={e => setCheckIn(e.target.value)}
@@ -95,6 +97,7 @@ export default function SearchForm({ onHotelSearch, hotelOnly, tourOnly, onTourS
         <Field label="Check-out" icon="fa-calendar-check-o">
           <input
             type="date"
+            required
             value={checkOut}
             min={checkIn || new Date().toISOString().split('T')[0]}
             onChange={e => setCheckOut(e.target.value)}
@@ -105,6 +108,7 @@ export default function SearchForm({ onHotelSearch, hotelOnly, tourOnly, onTourS
         <Field label="Budget" icon="fa-rupee">
           <select
             value={budget}
+            required
             onChange={e => setBudget(Number(e.target.value))}
             className="w-full outline-none text-sm text-gray-600 bg-transparent cursor-pointer"
           >

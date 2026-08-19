@@ -44,10 +44,11 @@ function FeaturedCard({ img, name, country, tours, tag, desc, slug, className = 
       {/* Base gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
       {/* Hover reveal panel */}
-      <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out bg-black/70 backdrop-blur-sm p-4">
+      <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out bg-black/70 backdrop-blur-sm p-4 z-10">
         <p className="text-white text-xs leading-relaxed mb-3">{desc}</p>
         <Link
           to={`/destination/${slug}`}
+          onClick={e => e.stopPropagation()}
           className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-full transition-colors"
         >
           Explore <i className="fa fa-arrow-right" />

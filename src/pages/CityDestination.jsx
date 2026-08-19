@@ -182,14 +182,14 @@ export default function CityDestination() {
           t.location?.toLowerCase().includes(city.search.toLowerCase()) ||
           t.title?.toLowerCase().includes(city.search.toLowerCase())
         );
-        setTours(filtered.length ? filtered : merged.slice(0, 6));
+        setTours(filtered);
       })
       .catch(() => {
         const filtered = localTours.filter(t =>
           t.location?.toLowerCase().includes(city.search.toLowerCase()) ||
           t.title?.toLowerCase().includes(city.search.toLowerCase())
         );
-        setTours(filtered.length ? filtered : localTours.slice(0, 6));
+        setTours(filtered);
       })
       .finally(() => setLoading(false));
   }, [slug]);
@@ -261,116 +261,7 @@ export default function CityDestination() {
         </div>
       </section>
 
-      {/* Tours section */}
-      <section style={{ padding: '32px 0 80px', background: '#f9fafb' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
 
-          {/* Section header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
-            <h2 style={{ fontSize: 26, fontWeight: 800, color: '#111827' }}>Tours in {city.name}</h2>
-
-            {/* List / Map toggle + Filters */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ display: 'flex', background: '#111827', borderRadius: 999, padding: 4, gap: 2 }}>
-                <button
-                  onClick={() => setView('list')}
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', borderRadius: 999, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: view === 'list' ? '#fff' : 'transparent', color: view === 'list' ? '#111827' : '#9ca3af', transition: 'all 0.2s' }}
-                >
-                  <i className="fa fa-list-ul" style={{ fontSize: 11 }} /> LIST
-                </button>
-                <button
-                  onClick={() => setView('map')}
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', borderRadius: 999, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: view === 'map' ? '#fff' : 'transparent', color: view === 'map' ? '#111827' : '#9ca3af', transition: 'all 0.2s' }}
-                >
-                  <i className="fa fa-map-marker" style={{ fontSize: 11 }} /> MAP
-                </button>
-              </div>
-              <button
-                onClick={() => setShowTourFilters(f => !f)}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 18px', borderRadius: 999, border: `1.5px solid ${showTourFilters ? '#f97316' : '#e5e7eb'}`, background: showTourFilters ? '#fff7ed' : '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', color: showTourFilters ? '#f97316' : '#374151', position: 'relative' }}
-              >
-                <i className="fa fa-sliders" /> FILTERS
-                {tourCategory !== 'All' && (
-                  <span style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: '#f97316', color: '#fff', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>1</span>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* Tour Filter Panel */}
-          {showTourFilters && (
-            <div style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb', borderRadius: 16, padding: '20px 24px', marginBottom: 24, display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'flex-end' }}>
-              <div>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Category</p>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {tourCategories.map(cat => (
-                    <button
-                      key={cat}
-                      onClick={() => setTourCategory(cat)}
-                      style={{ padding: '7px 16px', borderRadius: 999, border: `1.5px solid ${tourCategory === cat ? '#f97316' : '#e5e7eb'}`, background: tourCategory === cat ? '#fff7ed' : '#fff', color: tourCategory === cat ? '#f97316' : '#374151', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Sort By</p>
-                <select
-                  value={tourSort}
-                  onChange={e => setTourSort(e.target.value)}
-                  style={{ border: '1.5px solid #e5e7eb', borderRadius: 8, padding: '7px 14px', fontSize: 13, color: '#111827', outline: 'none', cursor: 'pointer', background: '#fff' }}
-                >
-                  <option value="default">Default</option>
-                  <option value="price-asc">Price: Low → High</option>
-                  <option value="price-desc">Price: High → Low</option>
-                </select>
-              </div>
-              {tourCategory !== 'All' && (
-                <button
-                  onClick={() => { setTourCategory('All'); setTourSort('default'); }}
-                  style={{ padding: '7px 16px', borderRadius: 999, border: '1.5px solid #fecaca', background: '#fef2f2', color: '#dc2626', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
-                >
-                  <i className="fa fa-times" style={{ marginRight: 6 }} />Clear
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* Cards */}
-          {loading ? (
-            <div className="row">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="col-12 col-md-4">
-                  <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 animate-pulse">
-                    <div className="h-52 bg-gray-200" />
-                    <div className="p-5 space-y-3">
-                      <div className="h-4 bg-gray-200 rounded w-3/4" />
-                      <div className="h-3 bg-gray-100 rounded w-1/2" />
-                      <div className="h-9 bg-gray-200 rounded-xl mt-4" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : view === 'map' ? (
-            <ToursMap slug={slug} tours={filteredTours} />
-          ) : filteredTours.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af' }}>
-              <i className="fa fa-compass" style={{ fontSize: 40, marginBottom: 12, display: 'block' }} />
-              <p>No tours found for {city.name} right now.</p>
-            </div>
-          ) : (
-            <div className="row">
-              {filteredTours.map((t, i) => (
-                <div key={t._id || i} className="col-12 col-md-4">
-                  <TourCard {...t} rank={i} />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* Hotels Section */}
       <section style={{ padding: '0 0 80px' }}>
@@ -427,7 +318,7 @@ export default function CityDestination() {
                     </button>
                   ))}
                 </div>
-                <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>Budget ≤₹7k · Mid ₹7k–15k · Luxury ₹15k+</p>
+                <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>Budget ₹7k · Mid ₹7k–15k · Luxury ₹15k+</p>
               </div>
 
               {/* Star Rating */}

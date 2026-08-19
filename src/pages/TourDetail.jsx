@@ -82,6 +82,7 @@ export default function TourDetail() {
         currency,
         name: 'Pacific Travel',
         description: tour.title,
+        image: import.meta.env.VITE_LOGO_URL || '',
         order_id: orderId,
         prefill: { name: form.name, email: form.email, contact: form.phone },
         theme: { color: '#f97316' },
