@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react';
 
 const SLIDES = [
-  'https://s3-us-west-2.amazonaws.com/s.cdpn.io/175711/winter.jpg',
-  'https://s3-us-west-2.amazonaws.com/s.cdpn.io/175711/spring.jpg',
-  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80',
-  'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80',
-  'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=80',
+  '/images/bg_1.jpg',
+  '/images/bg_2.jpg',
+  '/images/bg_3.jpg',
+  '/images/bg_4.jpg',
+  '/images/bg_5.jpg',
 ];
 
 function loadScript(src) {

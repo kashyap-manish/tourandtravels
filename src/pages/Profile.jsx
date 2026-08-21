@@ -38,6 +38,14 @@ function StatCard({ icon, label, value, color, bg }) {
   );
 }
 
+const LABELS = {
+  fullName: 'Full Name',
+  emailAddress: 'Email Address',
+  phoneNumber: 'Phone Number',
+  newPassword: 'New Password',
+  confirmPassword: 'Confirm Password',
+};
+
 export default function Profile() {
   const { user } = useSelector(s => s.auth);
   const dispatch = useDispatch();
@@ -103,6 +111,8 @@ export default function Profile() {
     } finally { setPwLoading(false); }
   };
 
+  const triggerFileInput = () => fileRef.current.click();
+
   const initials = user?.name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'U';
   const memberSince = user?.createdAt ? new Date(user.createdAt).getFullYear() : new Date().getFullYear();
 
@@ -136,7 +146,7 @@ export default function Profile() {
             <div className="relative shrink-0">
               <div
                 className="w-24 h-24 md:w-28 md:h-28 rounded-3xl overflow-hidden cursor-pointer group ring-4 ring-orange-100 shadow-xl"
-                onClick={() => fileRef.current.click()}
+                onClick={triggerFileInput}
               >
                 {preview
                   ? <img src={preview} alt="avatar" className="w-full h-full object-cover" />
@@ -151,7 +161,7 @@ export default function Profile() {
                 </div>
               </div>
               <button
-                onClick={() => fileRef.current.click()}
+                onClick={triggerFileInput}
                 className="absolute -bottom-2 -right-2 w-8 h-8 bg-orange-500 hover:bg-orange-600 rounded-xl flex items-center justify-center shadow-lg transition-colors"
               >
                 <i className="fa fa-pencil text-white text-xs" />
@@ -244,7 +254,7 @@ export default function Profile() {
 
                 <form onSubmit={handleProfile} className="space-y-5">
                   <div>
-                    <label htmlFor="p-name" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Full Name</label>
+                    <label htmlFor="p-name" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">{LABELS.fullName}</label>
                     <div className="relative">
                       <i className="fa fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
                       <input
@@ -256,7 +266,7 @@ export default function Profile() {
                   </div>
 
                   <div>
-                    <label htmlFor="p-email" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Email Address</label>
+                    <label htmlFor="p-email" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">{LABELS.emailAddress}</label>
                     <div className="relative">
                       <i className="fa fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
                       <input
@@ -268,7 +278,7 @@ export default function Profile() {
                   </div>
 
                   <div>
-                    <label htmlFor="p-phone" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Phone Number</label>
+                    <label htmlFor="p-phone" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">{LABELS.phoneNumber}</label>
                     <div className="relative">
                       <i className="fa fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
                       <input
@@ -318,7 +328,7 @@ export default function Profile() {
 
                 <form onSubmit={handlePassword} className="space-y-5">
                   <div>
-                    <label htmlFor="p-pw" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">New Password</label>
+                    <label htmlFor="p-pw" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">{LABELS.newPassword}</label>
                     <div className="relative">
                       <i className="fa fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
                       <input
@@ -334,7 +344,7 @@ export default function Profile() {
                   </div>
 
                   <div>
-                    <label htmlFor="p-confirm" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Confirm Password</label>
+                    <label htmlFor="p-confirm" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">{LABELS.confirmPassword}</label>
                     <div className="relative">
                       <i className="fa fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
                       <input

@@ -80,9 +80,14 @@ export async function fetchWeather(iata) {
   if (!coords) return null;
 
   try {
-    const res = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${coords[0]}&lon=${coords[1]}&units=metric&appid=${KEY}`
-    );
+    const [lat, lon] = coords;
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return fallbackWeather(key);
+    const url = new URL('https://api.openweathermap.org/data/2.5/weather');
+    url.searchParams.set('lat', lat);
+    url.searchParams.set('lon', lon);
+    url.searchParams.set('units', 'metric');
+    url.searchParams.set('appid', KEY);
+    const res = await fetch(url.toString());
     if (!res.ok) return fallbackWeather(key); // key not active yet → use fallback
     const d = await res.json();
     const result = {

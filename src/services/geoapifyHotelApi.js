@@ -1,10 +1,15 @@
-const API_KEY = '6779502357004b60a1743a290e2be9df';
+const API_KEY = import.meta.env.VITE_GEOAPIFY_KEY;
+const GEOAPIFY_BASE = 'https://api.geoapify.com';
+const SAFE_CITY = /^[a-zA-Z0-9 ,.'()-]{1,100}$/;
 
 export async function fetchHotels(city = 'Philippines') {
+  if (!SAFE_CITY.test(city)) throw new Error('Invalid city name');
+
   // Step 1: Geocode the city
-  const geoRes = await fetch(
-    `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(city)}&apiKey=${API_KEY}`
-  );
+  const geoUrl = new URL(`${GEOAPIFY_BASE}/v1/geocode/search`);
+  geoUrl.searchParams.set('text', city);
+  geoUrl.searchParams.set('apiKey', API_KEY);
+  const geoRes = await fetch(geoUrl.toString());
   const geoData = await geoRes.json();
   const place = geoData.features?.[0];
   if (!place) return [];
@@ -12,9 +17,12 @@ export async function fetchHotels(city = 'Philippines') {
   const [lon, lat] = place.geometry.coordinates;
 
   // Step 2: Fetch hotels near that location
-  const placesRes = await fetch(
-    `https://api.geoapify.com/v2/places?categories=accommodation.hotel&filter=circle:${lon},${lat},20000&limit=20&apiKey=${API_KEY}`
-  );
+  const placesUrl = new URL(`${GEOAPIFY_BASE}/v2/places`);
+  placesUrl.searchParams.set('categories', 'accommodation.hotel');
+  placesUrl.searchParams.set('filter', `circle:${lon},${lat},20000`);
+  placesUrl.searchParams.set('limit', '20');
+  placesUrl.searchParams.set('apiKey', API_KEY);
+  const placesRes = await fetch(placesUrl.toString());
   const placesData = await placesRes.json();
 
   return (placesData.features || []).map((f) => {

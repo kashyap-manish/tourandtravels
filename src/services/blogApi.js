@@ -1,4 +1,6 @@
-const API_KEY = 'test';
+const API_KEY = import.meta.env.VITE_GUARDIAN_KEY;
+const GUARDIAN_BASE = 'https://content.guardianapis.com';
+const ALLOWED_PARAMS = /^[a-zA-Z0-9 _-]{1,100}$/;
 
 const CATEGORY_QUERY = {
   'All': 'travel',
@@ -10,10 +12,15 @@ const CATEGORY_QUERY = {
 
 export async function fetchBlogs(category = 'All', search = '') {
   const base = CATEGORY_QUERY[category] || 'travel';
-  const query = encodeURIComponent(search.trim() || base);
-  const res = await fetch(
-    `https://content.guardianapis.com/search?q=${query}&show-fields=thumbnail,trailText,byline,wordcount&page-size=12&api-key=${API_KEY}`
-  );
+  const raw = (search.trim() || base).slice(0, 100);
+  if (!ALLOWED_PARAMS.test(raw)) throw new Error('Invalid search query');
+  const query = encodeURIComponent(raw);
+  const url = new URL(`${GUARDIAN_BASE}/search`);
+  url.searchParams.set('q', query);
+  url.searchParams.set('show-fields', 'thumbnail,trailText,byline,wordcount');
+  url.searchParams.set('page-size', '12');
+  url.searchParams.set('api-key', API_KEY);
+  const res = await fetch(url.toString());
   const data = await res.json();
   if (data.response?.status !== 'ok') throw new Error('Failed to fetch blogs');
 

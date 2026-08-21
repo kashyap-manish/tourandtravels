@@ -25,6 +25,13 @@ const contacts = [
   { icon: 'fa-whatsapp', label: 'WhatsApp Us', value: '+1 392 3929 210', sub: 'Chat with us instantly', href: 'https://wa.me/13923929210', accent: '#22c55e' },
 ];
 
+const FORM_LABELS = {
+  yourName: 'Your Name',
+  phoneNumber: 'Phone Number',
+  emailAddress: 'Email Address',
+  message: 'Message',
+};
+
 export default function CallUs() {
   return (
     <>
@@ -134,8 +141,8 @@ export default function CallUs() {
           <form onSubmit={e => e.preventDefault()} style={{ background: '#161616', borderRadius: 20, padding: '40px 36px', border: '1px solid #ffffff0d' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
               {[
-                { label: 'Your Name', type: 'text', placeholder: 'John Doe', span: 1 },
-                { label: 'Phone Number', type: 'tel', placeholder: '+1 234 567 890', span: 1 },
+                { label: FORM_LABELS.yourName, type: 'text', placeholder: 'John Doe', span: 1 },
+                { label: FORM_LABELS.phoneNumber, type: 'tel', placeholder: '+1 234 567 890', span: 1 },
               ].map(f => (
                 <div key={f.label}>
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>{f.label}</label>
@@ -146,13 +153,13 @@ export default function CallUs() {
               ))}
             </div>
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Email Address</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>{FORM_LABELS.emailAddress}</label>
               <input type="email" placeholder="john@example.com" style={{ width: '100%', background: '#0a0a0a', border: '1px solid #ffffff12', borderRadius: 10, padding: '12px 14px', fontSize: 13, color: '#fff', outline: 'none', boxSizing: 'border-box' }}
                 onFocus={e => e.target.style.borderColor = '#f97316'}
                 onBlur={e => e.target.style.borderColor = '#ffffff12'} />
             </div>
             <div style={{ marginBottom: 24 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Message</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>{FORM_LABELS.message}</label>
               <textarea rows={4} placeholder="What can we help you with?" style={{ width: '100%', background: '#0a0a0a', border: '1px solid #ffffff12', borderRadius: 10, padding: '12px 14px', fontSize: 13, color: '#fff', outline: 'none', resize: 'none', boxSizing: 'border-box' }}
                 onFocus={e => e.target.style.borderColor = '#f97316'}
                 onBlur={e => e.target.style.borderColor = '#ffffff12'} />

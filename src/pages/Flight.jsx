@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import PageHero from '../components/PageHero';
 import LiveTrackingMap from '../components/LiveTrackingMap';
 import { fetchWeather } from '../services/weatherApi';
 import { getFlightStatus, getFlightSchedules, getAirlines, getAirports } from '../services/flightApi';
@@ -521,8 +520,21 @@ export default function Flight() {
 
   return (
     <>
-      <PageHero title="Flight Search" breadcrumb="Flight Search"
-        bgImage="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1600&auto=format&fit=crop" />
+      <div className="relative h-[60vh] overflow-hidden flex items-center justify-center">
+        <video
+          src="/images/a flying plane on the runway.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-10 text-center">
+          <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight">Flight Search</h1>
+          <p className="text-slate-300 mt-3 text-sm uppercase tracking-[0.2em]">Home / Flight Search</p>
+        </div>
+      </div>
 
       <section className="bg-slate-950 min-h-screen py-12 px-4">
         <div className="max-w-6xl mx-auto">

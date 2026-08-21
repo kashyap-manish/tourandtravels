@@ -60,6 +60,14 @@ const SOCIALS = [
   { label: 'LinkedIn', icon: 'fa-linkedin', href: '#', color: '#0A66C2' },
 ];
 
+const FORM_LABELS = {
+  fullName: 'Full Name *',
+  emailAddress: 'Email Address *',
+  phoneNumber: 'Phone Number',
+  subject: 'Subject *',
+  yourMessage: 'Your Message *',
+};
+
 const FAQS = [
   { q: 'How far in advance should I book?', a: 'We recommend booking at least 2–4 weeks in advance, especially during peak season (Oct–Mar).' },
   { q: 'Can I customize a tour package?', a: 'Absolutely! All our packages are fully customizable. Contact us and we\'ll tailor an itinerary just for you.' },
@@ -257,7 +265,7 @@ export default function Contact() {
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="row">
                   <div className="col-12 col-sm-6">
-                    <label htmlFor="contact-name" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Full Name *</label>
+                    <label htmlFor="contact-name" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">{FORM_LABELS.fullName}</label>
                     <div className="relative">
                       <i className="fa fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
                       <input
@@ -269,7 +277,7 @@ export default function Contact() {
                     </div>
                   </div>
                   <div className="col-12 col-sm-6">
-                    <label htmlFor="contact-email" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Email Address *</label>
+                    <label htmlFor="contact-email" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">{FORM_LABELS.emailAddress}</label>
                     <div className="relative">
                       <i className="fa fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
                       <input
@@ -284,7 +292,7 @@ export default function Contact() {
 
                 <div className="row">
                   <div className="col-12 col-sm-6">
-                    <label htmlFor="contact-phone" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Phone Number</label>
+                    <label htmlFor="contact-phone" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">{FORM_LABELS.phoneNumber}</label>
                     <div className="relative">
                       <i className="fa fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
                       <input
@@ -296,7 +304,7 @@ export default function Contact() {
                     </div>
                   </div>
                   <div className="col-12 col-sm-6">
-                    <label htmlFor="contact-subject" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Subject *</label>
+                    <label htmlFor="contact-subject" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">{FORM_LABELS.subject}</label>
                     <div className="relative">
                       <i className="fa fa-tag absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
                       <select
@@ -313,7 +321,7 @@ export default function Contact() {
                 </div>
 
                 <div>
-                  <label htmlFor="contact-message" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Your Message *</label>
+                  <label htmlFor="contact-message" className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">{FORM_LABELS.yourMessage}</label>
                   <textarea
                     id="contact-message" required rows={5} placeholder="Tell us about your travel plans, preferred dates, group size..."
                     value={form.message}

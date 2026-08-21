@@ -318,7 +318,6 @@ export default function CityDestination() {
                     </button>
                   ))}
                 </div>
-                <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>Budget ₹7k · Mid ₹7k–15k · Luxury ₹15k+</p>
               </div>
 
               {/* Star Rating */}

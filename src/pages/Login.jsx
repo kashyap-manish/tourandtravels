@@ -3,6 +3,11 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { login, clearError } from '../store/authSlice';
 
+const LABELS = {
+  emailAddress: 'Email Address',
+  password: 'Password',
+};
+
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -51,7 +56,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1.5">Email Address</label>
+            <label className="block text-xs font-semibold text-gray-500 mb-1.5">{LABELS.emailAddress}</label>
             <input
               type="email" required placeholder="john@example.com"
               value={form.email}
@@ -60,7 +65,7 @@ export default function Login() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1.5">Password</label>
+            <label className="block text-xs font-semibold text-gray-500 mb-1.5">{LABELS.password}</label>
             <input
               type="password" required placeholder="••••••••"
               value={form.password}

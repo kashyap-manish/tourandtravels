@@ -5,6 +5,19 @@ import { createBooking, createPaymentOrder, verifyPayment } from '../services/ap
 import { useSelector } from 'react-redux';
 
 const TABS = ['Overview', 'Itinerary', 'Includes'];
+const LABELS = {
+  fullName: 'Full Name',
+  phone: 'Phone',
+  email: 'Email',
+  travelDate: 'Travel Date',
+  persons: 'Persons',
+  specialRequests: 'Special Requests',
+  optional: '(optional)',
+  stepBookingDetails: 'Booking Details',
+  stepPayment: 'Payment',
+};
+
+const BOOKING_STEPS = [LABELS.stepBookingDetails, LABELS.stepPayment];
 
 export default function TourDetail() {
   const { slug } = useParams();
@@ -404,15 +417,15 @@ export default function TourDetail() {
                 <>
                   {/* Step indicator */}
                   <div className="flex items-center gap-2 mb-5">
-                    {['Booking Details', 'Payment'].map((label, i) => (
-                      <div key={label} className="flex items-center gap-2 flex-1">
+                    {[{ label: LABELS.stepBookingDetails, idx: 1 }, { label: LABELS.stepPayment, idx: 2 }].map(({ label, idx }) => (
+                      <div key={idx} className="flex items-center gap-2 flex-1">
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                          step > i + 1 ? 'bg-green-500 text-white' : step === i + 1 ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-400'
+                          step > idx ? 'bg-green-500 text-white' : step === idx ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-400'
                         }`}>
-                          {step > i + 1 ? <i className="fa fa-check" /> : i + 1}
+                          {step > idx ? <i className="fa fa-check" /> : idx}
                         </div>
-                        <span className={`text-xs font-semibold ${step === i + 1 ? 'text-gray-800' : 'text-gray-400'}`}>{label}</span>
-                        {i === 0 && <div className={`flex-1 h-0.5 ${step > 1 ? 'bg-orange-400' : 'bg-gray-100'}`} />}
+                        <span className={`text-xs font-semibold ${step === idx ? 'text-gray-800' : 'text-gray-400'}`}>{label}</span>
+                        {idx === 1 && <div className={`flex-1 h-0.5 ${step > 1 ? 'bg-orange-400' : 'bg-gray-100'}`} />}
                       </div>
                     ))}
                   </div>
@@ -428,40 +441,40 @@ export default function TourDetail() {
                     <form onSubmit={handleDetailsSubmit} className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">Full Name</label>
+                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">{LABELS.fullName}</label>
                           <input required type="text" value={form.name}
                             onChange={e => setForm({ ...form, name: e.target.value })}
                             className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">Phone</label>
+                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">{LABELS.phone}</label>
                           <input required type="tel" value={form.phone} placeholder="+91 XXXXX XXXXX"
                             onChange={e => setForm({ ...form, phone: e.target.value })}
                             className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-gray-500 mb-1.5">Email</label>
+                        <label className="block text-xs font-semibold text-gray-500 mb-1.5">{LABELS.email}</label>
                         <input required type="email" value={form.email}
                           onChange={e => setForm({ ...form, email: e.target.value })}
                           className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">Travel Date</label>
+                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">{LABELS.travelDate}</label>
                           <input required type="date" value={form.travelDate} min={new Date().toISOString().split('T')[0]}
                             onChange={e => setForm({ ...form, travelDate: e.target.value })}
                             className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">Persons</label>
+                          <label className="block text-xs font-semibold text-gray-500 mb-1.5">{LABELS.persons}</label>
                           <input required type="number" min={1} max={15} value={form.persons}
                             onChange={e => setForm({ ...form, persons: Number(e.target.value) })}
                             className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors" />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-gray-500 mb-1.5">Special Requests <span className="text-gray-300">(optional)</span></label>
+                        <label className="block text-xs font-semibold text-gray-500 mb-1.5">{LABELS.specialRequests} <span className="text-gray-300">{LABELS.optional}</span></label>
                         <textarea rows={2} value={form.specialRequests}
                           onChange={e => setForm({ ...form, specialRequests: e.target.value })}
                           placeholder="Any dietary requirements, accessibility needs..."

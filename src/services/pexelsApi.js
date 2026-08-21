@@ -1,5 +1,6 @@
-const API_KEY = 'ebCr5UlASpj347ZCp34zxZv0BoGsT6iA17z4RpRhys0Fq5uJQfayt76k';
+const API_KEY = import.meta.env.VITE_PEXELS_KEY;
 const BASE = 'https://api.pexels.com/v1';
+const SAFE_QUERY = /^[a-zA-Z0-9 _+'-]{1,100}$/;
 
 const headers = { Authorization: API_KEY };
 
@@ -14,11 +15,13 @@ const CATEGORY_QUERIES = {
 };
 
 export async function fetchGalleryImages(category = 'All', page = 1, perPage = 12, searchQuery = '') {
-  const query = searchQuery.trim() || CATEGORY_QUERIES[category] || 'travel';
-  const res = await fetch(
-    `${BASE}/search?query=${encodeURIComponent(query)}&per_page=${perPage}&page=${page}`,
-    { headers }
-  );
+  const raw = searchQuery.trim() || CATEGORY_QUERIES[category] || 'travel';
+  if (!SAFE_QUERY.test(raw)) throw new Error('Invalid search query');
+  const url = new URL(`${BASE}/search`);
+  url.searchParams.set('query', raw);
+  url.searchParams.set('per_page', perPage);
+  url.searchParams.set('page', page);
+  const res = await fetch(url.toString(), { headers });
   if (!res.ok) throw new Error('Pexels API error');
   const data = await res.json();
   return {

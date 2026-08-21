@@ -1,11 +1,30 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { loginCustomer, registerCustomer } from '../services/api';
 
+const JWT_PATTERN = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
+
+const validateToken = (token) =>
+  typeof token === 'string' && JWT_PATTERN.test(token) ? token : null;
+
+const sanitizeUser = (u) => {
+  if (!u || typeof u !== 'object') return null;
+  return {
+    _id:   typeof u._id   === 'string' ? u._id   : undefined,
+    name:  typeof u.name  === 'string' ? u.name  : '',
+    email: typeof u.email === 'string' ? u.email : '',
+    role:  typeof u.role  === 'string' ? u.role  : 'customer',
+    phone: typeof u.phone === 'string' ? u.phone : '',
+    avatar:typeof u.avatar=== 'string' ? u.avatar: '',
+  };
+};
+
 export const login = createAsyncThunk('auth/login', async (data, { rejectWithValue }) => {
   try {
     const res = await loginCustomer(data);
-    localStorage.setItem('token', res.data.token);
-    return res.data;
+    const token = validateToken(res.data.token);
+    if (!token) return rejectWithValue('Invalid session token received.');
+    localStorage.setItem('token', token);
+    return { token, user: sanitizeUser(res.data.user) };
   } catch (e) {
     return rejectWithValue(e.response?.data?.message || 'Login failed');
   }
@@ -20,9 +39,14 @@ export const register = createAsyncThunk('auth/register', async (data, { rejectW
   }   
 });
 
-const token = localStorage.getItem('token');
+const token = validateToken(localStorage.getItem('token'));
+if (!token) localStorage.removeItem('token');
 let user = null;
-try { user = JSON.parse(localStorage.getItem('user')); } catch {}
+try {
+  const parsed = JSON.parse(localStorage.getItem('user'));
+  user = sanitizeUser(parsed);
+  if (!user) localStorage.removeItem('user');
+} catch { localStorage.removeItem('user'); }
 
 const authSlice = createSlice({
   name: 'auth',
