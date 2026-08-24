@@ -421,7 +421,7 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {places.map((p, i) => (
               <AnimSection key={p.name} anim="animate-scale-in" delay={`delay-${(i + 1) * 100}`}>
-                <Link to={`/destination?country=${p.slug}`} className="dest-card block" style={{ backgroundImage: `url('${p.img}')` }}>
+                <Link to={`/city/${p.slug}`} className="dest-card block" style={{ backgroundImage: `url('${p.img}')` }}>
                   <div className="dest-text">
                     <h3 className="font-bold text-lg">{p.name}</h3>
                     <span className="text-sm text-gray-200">{p.tours}</span>

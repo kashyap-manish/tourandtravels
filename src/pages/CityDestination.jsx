@@ -52,6 +52,39 @@ const cityHotels = {
     { name: 'Novotel Hyderabad Convention Centre', img: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&q=80', stars: 5, reviews: 1120, distance: '6.8 miles/10.94 km from central Hyderabad', tags: ['Sustainable Stays', 'Ideal for business travel'], badge: 'N', badgeBg: '#1d4ed8', price: '₹9,500' },
     { name: 'Radisson Blu Plaza Hotel Hyderabad', img: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=600&q=80', stars: 4, reviews: 980, distance: '2.4 miles/3.86 km from Hussain Sagar', tags: ['Central location', 'Sustainable Stays'], badge: 'BLU', badgeBg: '#1a56db', price: '₹7,800' },
   ],
+  philippines: [
+    { name: 'Shangri-La Boracay', img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&q=80', stars: 5, reviews: 3200, distance: '0.5 miles from White Beach', tags: ['Luxury', 'Near Beach'], badge: 'SL', badgeBg: '#92400e', price: '₱18,000' },
+    { name: 'Amanpulo, Palawan', img: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=600&q=80', stars: 5, reviews: 1450, distance: 'Private island, Palawan', tags: ['Luxury', 'Eco-friendly'], badge: 'AM', badgeBg: '#065f46', price: '₱45,000' },
+    { name: 'Crimson Resort & Spa Mactan', img: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&q=80', stars: 5, reviews: 2100, distance: '0.3 miles from Mactan Beach', tags: ['Near Beach', 'Family-friendly'], badge: 'CR', badgeBg: '#b45309', price: '₱9,500' },
+    { name: 'Sofitel Philippine Plaza Manila', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80', stars: 5, reviews: 2800, distance: '0.2 miles from Manila Bay', tags: ['Luxury', 'Central location'], badge: 'SF', badgeBg: '#1e3a5f', price: '₱12,000' },
+    { name: 'El Nido Resorts Miniloc Island', img: 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=600&q=80', stars: 4, reviews: 980, distance: 'Island resort, El Nido, Palawan', tags: ['Eco-friendly', 'Near Beach'], badge: 'EN', badgeBg: '#15803d', price: '₱22,000' },
+  ],
+  canada: [
+    { name: 'Fairmont Banff Springs', img: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=600&q=80', stars: 5, reviews: 4100, distance: '0.5 miles from Banff town centre', tags: ['Luxury', 'Mountain View'], badge: 'FM', badgeBg: '#1e3a5f', price: 'CA$650' },
+    { name: 'Fairmont Chateau Frontenac', img: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=600&q=80', stars: 5, reviews: 3600, distance: '0.1 miles from Old Quebec', tags: ['Luxury', 'Heritage'], badge: 'FC', badgeBg: '#92400e', price: 'CA$480' },
+    { name: 'The Rimrock Resort Hotel', img: 'https://images.unsplash.com/photo-1506059612708-99d6c258160e?w=600&q=80', stars: 4, reviews: 1820, distance: '2.5 miles from Banff', tags: ['Mountain View', 'Luxury'], badge: 'RR', badgeBg: '#374151', price: 'CA$380' },
+    { name: 'Hotel Le Germain Montreal', img: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=600&q=80', stars: 4, reviews: 1240, distance: '0.3 miles from Old Montreal', tags: ['Central location', 'Boutique'], badge: 'LG', badgeBg: '#1d4ed8', price: 'CA$290' },
+  ],
+  thailand: [
+    { name: 'Mandarin Oriental Bangkok', img: 'https://images.unsplash.com/photo-1563911302283-d2bc129e7570?w=600&q=80', stars: 5, reviews: 5200, distance: '0.2 miles from Chao Phraya River', tags: ['Luxury', 'Heritage'], badge: 'MO', badgeBg: '#92400e', price: '฿12,000' },
+    { name: 'Six Senses Yao Noi', img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&q=80', stars: 5, reviews: 1680, distance: 'Private island, Phang Nga Bay', tags: ['Luxury', 'Eco-friendly'], badge: 'SS', badgeBg: '#065f46', price: '฿28,000' },
+    { name: 'Anantara Riverside Bangkok', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80', stars: 5, reviews: 2340, distance: '1.2 miles from Asiatique', tags: ['Luxury', 'Near River'], badge: 'AN', badgeBg: '#b45309', price: '฿8,500' },
+    { name: 'Avani+ Koh Lanta Krabi Resort', img: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=600&q=80', stars: 4, reviews: 920, distance: '0.1 miles from Long Beach', tags: ['Near Beach', 'Family-friendly'], badge: 'AV', badgeBg: '#1d4ed8', price: '฿5,200' },
+    { name: 'Centara Grand Beach Resort Phuket', img: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&q=80', stars: 5, reviews: 3100, distance: '0.3 miles from Karon Beach', tags: ['Near Beach', 'Family-friendly'], badge: 'CG', badgeBg: '#1e3a5f', price: '฿7,800' },
+  ],
+  australia: [
+    { name: 'Park Hyatt Sydney', img: 'https://images.unsplash.com/photo-1506059612708-99d6c258160e?w=600&q=80', stars: 5, reviews: 3800, distance: '0.1 miles from Sydney Opera House', tags: ['Luxury', 'Central location'], badge: 'PH', badgeBg: '#1e3a5f', price: 'A$950' },
+    { name: 'Qualia Resort, Hamilton Island', img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&q=80', stars: 5, reviews: 1560, distance: 'Hamilton Island, Great Barrier Reef', tags: ['Luxury', 'Near Beach'], badge: 'QU', badgeBg: '#065f46', price: 'A$1,800' },
+    { name: 'Crown Towers Melbourne', img: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=600&q=80', stars: 5, reviews: 2900, distance: '0.5 miles from Southbank', tags: ['Luxury', 'Central location'], badge: 'CT', badgeBg: '#374151', price: 'A$620' },
+    { name: 'Longitude 131, Uluru', img: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=600&q=80', stars: 5, reviews: 890, distance: '3.7 miles from Uluru', tags: ['Luxury', 'Unique Experience'], badge: 'L1', badgeBg: '#92400e', price: 'A$2,200' },
+  ],
+  greece: [
+    { name: 'Canaves Oia Epitome, Santorini', img: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600&q=80', stars: 5, reviews: 2400, distance: '0.2 miles from Oia village', tags: ['Luxury', 'Caldera View'], badge: 'CO', badgeBg: '#1e3a5f', price: '€850' },
+    { name: 'Mystique, a Luxury Collection Hotel', img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&q=80', stars: 5, reviews: 1890, distance: '0.5 miles from Oia', tags: ['Luxury', 'Caldera View'], badge: 'MY', badgeBg: '#92400e', price: '€720' },
+    { name: 'Hotel Grande Bretagne, Athens', img: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=600&q=80', stars: 5, reviews: 3200, distance: '0.1 miles from Syntagma Square', tags: ['Luxury', 'Heritage'], badge: 'GB', badgeBg: '#374151', price: '€480' },
+    { name: 'Belvedere Hotel, Mykonos', img: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&q=80', stars: 5, reviews: 1650, distance: '0.8 miles from Mykonos Town', tags: ['Luxury', 'Sea View'], badge: 'BV', badgeBg: '#1d4ed8', price: '€560' },
+    { name: 'Amanzoe, Porto Heli', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80', stars: 5, reviews: 980, distance: '1.5 miles from Porto Heli', tags: ['Luxury', 'Sea View'], badge: 'AZ', badgeBg: '#065f46', price: '€1,200' },
+  ],
   bengaluru: [
     { name: 'The Leela Palace Bengaluru', img: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&q=80', stars: 5, reviews: 2450, distance: '1.8 miles/2.90 km from MG Road', tags: ['Luxury', 'Central location'], badge: 'LP', badgeBg: '#b45309', price: '₹20,000' },
     { name: 'ITC Windsor Bengaluru', img: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=600&q=80', stars: 5, reviews: 1680, distance: '2.2 miles/3.54 km from Cubbon Park', tags: ['Luxury', 'Heritage'], badge: 'ITC', badgeBg: '#065f46', price: '₹16,500' },
@@ -119,6 +152,36 @@ const cityData = {
     img: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80',
     desc: 'The Land of High Passes offers dramatic mountain landscapes, ancient Buddhist monasteries, and the surreal beauty of Pangong Lake under endless skies.',
     search: 'Ladakh',
+  },
+  philippines: {
+    name: 'Philippines',
+    img: 'https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=1200&q=80',
+    desc: 'An archipelago of over 7,000 islands, the Philippines dazzles with pristine beaches, crystal-clear waters, vibrant coral reefs, and warm Filipino hospitality.',
+    search: 'Philippines',
+  },
+  canada: {
+    name: 'Canada',
+    img: 'https://images.unsplash.com/photo-1517935706615-2717063c2225?w=1200&q=80',
+    desc: 'From the Rocky Mountains to Niagara Falls, Canada offers breathtaking natural wonders, cosmopolitan cities, and endless outdoor adventures across its vast landscapes.',
+    search: 'Canada',
+  },
+  thailand: {
+    name: 'Thailand',
+    img: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1200&q=80',
+    desc: 'The Land of Smiles enchants with ornate temples, turquoise beaches, bustling night markets, and world-renowned cuisine that delights every traveler.',
+    search: 'Thailand',
+  },
+  australia: {
+    name: 'Australia',
+    img: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80',
+    desc: 'From the Great Barrier Reef to the Outback, Australia offers iconic wildlife, stunning coastlines, vibrant cities, and adventures unlike anywhere else on Earth.',
+    search: 'Australia',
+  },
+  greece: {
+    name: 'Greece',
+    img: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1200&q=80',
+    desc: 'Birthplace of democracy and Western civilization, Greece captivates with whitewashed villages, ancient ruins, azure Aegean waters, and legendary Mediterranean cuisine.',
+    search: 'Greece',
   },
 };
 

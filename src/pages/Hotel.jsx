@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import HotelCard from '../components/HotelCard';
 import SearchForm from '../components/SearchForm';
 import CallToAction from '../components/CallToAction';
@@ -56,10 +56,16 @@ export default function Hotel() {
   const [sortBy, setSortBy] = useState('default');
   const [starFilter, setStarFilter] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [city, setCity] = useState('Philippines');
+  const [searchParams] = useSearchParams();
+  const [city, setCity] = useState(() => searchParams.get('city') || 'Philippines');
 
   const [gridRef, gridInView] = useInView();
   const gridSectionRef = useRef(null);
+
+  useEffect(() => {
+    const paramCity = searchParams.get('city');
+    if (paramCity) setCity(paramCity);
+  }, [searchParams]);
 
   useEffect(() => {
     setLoading(true);
@@ -129,7 +135,7 @@ export default function Hotel() {
       {/* Stats bar */}
       <div className="bg-gray-950">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/10">
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-white/10">
             {STATS.map((s, i) => (
               <div key={i} className="flex flex-col items-center py-5 px-3 text-white">
                 <i className={`fa ${s.icon} text-orange-400 text-lg mb-1`} />
@@ -187,9 +193,9 @@ export default function Hotel() {
 
           {/* Skeleton */}
           {loading && (
-            <div className="row">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="col-12 col-sm-6 col-lg-4 col-xl-3"><SkeletonCard /></div>
+                <SkeletonCard key={i} />
               ))}
             </div>
           )}
@@ -222,10 +228,10 @@ export default function Hotel() {
               ) : (
                 <div
                   ref={gridRef}
-                  className={`row ${gridInView ? 'animate-fade-up' : ''}`}
+                  className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${gridInView ? 'animate-fade-up' : ''}`}
                 >
                   {paginated.map((h, i) => (
-                    <div key={i} className="col-12 col-sm-6 col-lg-4 col-xl-3" style={{ animationDelay: `${(i % 8) * 0.07}s` }}>
+                    <div key={i} style={{ animationDelay: `${(i % 8) * 0.07}s` }}>
                       <HotelCard
                         name={h.name}
                         location={h.location}
@@ -290,14 +296,14 @@ export default function Hotel() {
             <span className="text-orange-500 text-xs font-bold uppercase tracking-widest">Why Book With Us</span>
             <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 mt-1">The Pacific Advantage</h2>
           </div>
-          <div className="row">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { icon: 'fa-ban', color: 'bg-blue-50 text-blue-500', title: 'Free Cancellation', desc: 'Cancel up to 48 hours before check-in at no charge.' },
               { icon: 'fa-tag', color: 'bg-green-50 text-green-500', title: 'Best Price Guarantee', desc: "Find a lower price? We'll match it, no questions asked." },
               { icon: 'fa-headphones', color: 'bg-orange-50 text-orange-500', title: '24/7 Support', desc: 'Our travel experts are available around the clock for you.' },
               { icon: 'fa-shield', color: 'bg-purple-50 text-purple-500', title: 'Verified Hotels', desc: 'Every property is personally vetted for quality and comfort.' },
             ].map((f, i) => (
-              <div key={i} className="col-12 col-sm-6 col-lg-3 bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col items-start gap-4">
+              <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col items-start gap-4">
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl ${f.color}`}>
                   <i className={`fa ${f.icon}`} />
                 </div>
@@ -381,13 +387,13 @@ export default function Hotel() {
             <span className="text-orange-400 text-xs font-bold uppercase tracking-widest">Guest Reviews</span>
             <h2 className="text-2xl md:text-3xl font-extrabold text-white mt-1">What Our Guests Say</h2>
           </div>
-          <div className="row">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { name: 'Sarah M.', location: 'Manila', avatar: 'https://i.pravatar.cc/80?img=47', rating: 5, text: 'Absolutely stunning hotel! The views were breathtaking and the staff went above and beyond. Will definitely book again through Pacific.' },
               { name: 'James R.', location: 'Cebu', avatar: 'https://i.pravatar.cc/80?img=12', rating: 5, text: "Best booking experience I've had. Found a 5-star resort at an unbeatable price. The free cancellation policy gave me total peace of mind." },
               { name: 'Anika L.', location: 'Boracay', avatar: 'https://i.pravatar.cc/80?img=32', rating: 4, text: "The beachfront hotel was exactly as described. Pacific's 24/7 support helped me sort a last-minute room change instantly. Highly recommend!" },
             ].map((r, i) => (
-              <div key={i} className="col-12 col-md-4 bg-white/5 border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-colors duration-300">
+              <div key={i} className="bg-white/5 border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-colors duration-300">
                 <div className="flex items-center gap-0.5 mb-4">
                   {[...Array(5)].map((_, j) => (
                     <i key={j} className={`fa fa-star text-xs ${j < r.rating ? 'text-yellow-400' : 'text-white/20'}`} />

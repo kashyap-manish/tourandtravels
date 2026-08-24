@@ -20,6 +20,7 @@
   max-width: 1280px;
   margin-inline: auto;
   padding-inline: 1.5rem;
+  overflow-x: hidden;
 }
 @media (min-width: 768px)  { .container { padding-inline: 2rem; } }
 @media (min-width: 1024px) { .container { padding-inline: 2.5rem; } }
@@ -29,6 +30,7 @@
   flex-wrap: wrap;
   margin-inline: -0.75rem;
   gap: 1.5rem 0;
+  max-width: calc(100% + 1.5rem);
 }
 
 [class*="col-"] {
@@ -132,6 +134,7 @@
 
 body {
   font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
 }
 
 .hero-bg {

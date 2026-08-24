@@ -69,7 +69,7 @@ export default function SearchForm({ onHotelSearch, hotelOnly, tourOnly, onTourS
 
       {/* Form */}
       <form
-        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 divide-y sm:divide-x sm:divide-y-0 md:divide-x divide-gray-100"
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 divide-y md:divide-x md:divide-y-0 divide-gray-100"
         onSubmit={handleSubmit}
       >
         <Field label="Destination" icon="fa-map-marker">

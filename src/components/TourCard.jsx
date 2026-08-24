@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleWishlistAsync } from '../store/wishlistSlice';
 
-export default function TourCard({ _id, id, slug, img, price, days, title, location, features, rating = 4.5, reviews = 24, rank = 99 }) {
+export default function TourCard({ _id, id, slug, img, price, days, title, location, features, rating = 4.5, reviews = 24, rank = 99, hotelLink }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const cardId = _id || id;
@@ -51,7 +51,7 @@ export default function TourCard({ _id, id, slug, img, price, days, title, locat
           ))}
         </div>
         <button
-          onClick={() => navigate(`/destination/${slug}`)}
+          onClick={() => navigate(hotelLink || `/destination/${slug}`)}
           className="w-full py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold rounded-xl transition-colors"
         >
           Book Now
