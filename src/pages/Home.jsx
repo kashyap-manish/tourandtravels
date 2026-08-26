@@ -452,8 +452,18 @@ export default function Home() {
       </section>
 
       {/* Video Banner */}
-      <section className="relative hero-bg py-40 flex items-center justify-center" style={{ backgroundImage: "url('/images/bg_4.jpg')" }}>
-        {/* <div className="overlay" /> */}
+      <section className="relative py-40 flex items-center justify-center overflow-hidden">
+        {/* Ocean background video */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/images/beach.mp4"
+        />
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-black/55" />
         <AnimSection anim="animate-scale-in" className="relative z-10 text-center text-white">
           <p className="text-orange-400 font-semibold tracking-widest uppercase text-sm mb-3">Watch Our Story</p>
           <h2 className="text-3xl md:text-5xl font-bold mb-8">Experience the World</h2>
