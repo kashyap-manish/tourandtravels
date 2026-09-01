@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import HotelCard from '../components/HotelCard';
 import SearchForm from '../components/SearchForm';
 import CallToAction from '../components/CallToAction';
+import RelatedSearches from '../components/RelatedSearch';
 import { fetchHotels } from '../services/geoapifyHotelApi';
 import useInView from '../hooks/useInView';
 
@@ -61,6 +62,31 @@ export default function Hotel() {
 
   const [gridRef, gridInView] = useInView();
   const gridSectionRef = useRef(null);
+  const searchRef = useRef(null);
+  const [liveQuery, setLiveQuery] = useState('');
+  const [liveResults, setLiveResults] = useState([]);
+  const [relatedSearches, setRelatedSearches] = useState([]);
+  const [liveLoading, setLiveLoading] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+    if (!liveQuery.trim()) { setLiveResults([]); setRelatedSearches([]); setShowDropdown(false); return; }
+    const timer = setTimeout(() => {
+      setLiveLoading(true);
+      fetch(`/api/search?q=${encodeURIComponent(liveQuery)}`)
+        .then(r => r.json())
+        .then(data => { setLiveResults(data.results || []); setRelatedSearches(data.relatedSearches || []); setShowDropdown(true); })
+        .catch(() => {})
+        .finally(() => setLiveLoading(false));
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [liveQuery]);
+
+  useEffect(() => {
+    const handler = (e) => { if (searchRef.current && !searchRef.current.contains(e.target)) setShowDropdown(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   useEffect(() => {
     const paramCity = searchParams.get('city');
@@ -150,6 +176,47 @@ export default function Hotel() {
       {/* ── Search ── */}
       <section className="max-w-7xl mx-auto px-6 py-8 relative z-20">
         <SearchForm hotelOnly onHotelSearch={handleSearch} />
+
+        {/* Live search */}
+        <div className="relative mt-4" ref={searchRef}>
+          <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 focus-within:border-orange-400 transition-colors">
+            <i className="fa fa-search text-gray-400 text-sm" />
+            <input
+              value={liveQuery}
+              onChange={e => setLiveQuery(e.target.value)}
+              onFocus={() => { if (liveResults.length > 0) setShowDropdown(true); }}
+              placeholder="Quick search hotels by name or location…"
+              className="flex-1 outline-none bg-transparent text-sm text-gray-700 placeholder-gray-400"
+            />
+            {liveLoading && <i className="fa fa-spinner fa-spin text-orange-400 text-sm" />}
+            {liveQuery && <button onClick={() => { setLiveQuery(''); setShowDropdown(false); }} className="text-gray-400 hover:text-gray-600"><i className="fa fa-times text-xs" /></button>}
+          </div>
+
+          {showDropdown && (
+            <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-xl shadow-xl mt-1 max-h-72 overflow-y-auto">
+              {liveResults.length === 0 ? (
+                <p className="text-sm text-gray-400 px-4 py-3">No results found for "{liveQuery}"</p>
+              ) : (
+                liveResults.map(r => (
+                  <div key={r._id} className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors border-b border-gray-50 last:border-0 cursor-pointer"
+                    onClick={() => { handleSearch(r.location); setShowDropdown(false); setLiveQuery(r.location); }}>
+                    <i className="fa fa-building text-orange-400 text-xs" />
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800">{r.title}</p>
+                      <p className="text-xs text-gray-400">{r.location} · {r.category}</p>
+                    </div>
+                    <span className="ml-auto text-xs font-bold text-orange-500">{r.price}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+
+        <RelatedSearches
+          items={relatedSearches}
+          onSelect={term => { setLiveQuery(term); handleSearch(term); }}
+        />
       </section>
 
             {/* ── Filters & Grid ── */}

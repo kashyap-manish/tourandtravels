@@ -40,6 +40,7 @@ import Sitemap from './pages/Sitemap';
 import Gallery from './pages/Gallery';
 import Wishlist from './pages/Wishlist';
 import CityDestination from './pages/CityDestination';
+import SearchPage from './pages/SearchPage';
 
 export default function App() {
   return (
@@ -85,6 +86,7 @@ export default function App() {
                 <Route path="/gallery" element={<Gallery />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/city/:slug" element={<CityDestination />} />
+                <Route path="/search" element={<SearchPage />} />
               </Routes>
             </main>
             <Footer />

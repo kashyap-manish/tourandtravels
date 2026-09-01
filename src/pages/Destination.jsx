@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCategory, setSortBy, setPage, loadDestinations } from '../store/toursSlice';
 import TourCard from '../components/TourCard';
 import SearchForm from '../components/SearchForm';
 import CallToAction from '../components/CallToAction';
+import RelatedSearches from '../components/RelatedSearch';
 import { Link, useSearchParams } from 'react-router-dom';
 
 const featured = [
@@ -121,6 +122,31 @@ export default function Destination() {
   const [searchParams] = useSearchParams();
   const country = searchParams.get('country');
   const [searchFilters, setSearchFilters] = useState({ destination: '', maxBudget: Infinity });
+  const [liveQuery, setLiveQuery] = useState('');
+  const [liveResults, setLiveResults] = useState([]);
+  const [relatedSearches, setRelatedSearches] = useState([]);
+  const [liveLoading, setLiveLoading] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const searchRef = useRef(null);
+
+  useEffect(() => {
+    if (!liveQuery.trim()) { setLiveResults([]); setRelatedSearches([]); setShowDropdown(false); return; }
+    const timer = setTimeout(() => {
+      setLiveLoading(true);
+      fetch(`/api/search?q=${encodeURIComponent(liveQuery)}`)
+        .then(r => r.json())
+        .then(data => { setLiveResults(data.results || []); setRelatedSearches(data.relatedSearches || []); setShowDropdown(true); })
+        .catch(() => {})
+        .finally(() => setLiveLoading(false));
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [liveQuery]);
+
+  useEffect(() => {
+    const handler = (e) => { if (searchRef.current && !searchRef.current.contains(e.target)) setShowDropdown(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   useEffect(() => { dispatch(loadDestinations(country || 'India')); }, [dispatch, country]);
 
@@ -198,6 +224,51 @@ export default function Destination() {
             setSearchFilters({ destination, maxBudget });
             dispatch(setPage(1));
           }} />
+
+          {/* Live search */}
+          <div className="relative mt-4" ref={searchRef}>
+            <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 focus-within:border-orange-400 transition-colors">
+              <i className="fa fa-search text-gray-400 text-sm" />
+              <input
+                value={liveQuery}
+                onChange={e => setLiveQuery(e.target.value)}
+                onFocus={() => { if (liveResults.length > 0) setShowDropdown(true); }}
+                placeholder="Quick search tours by name, location or category…"
+                className="flex-1 outline-none bg-transparent text-sm text-gray-700 placeholder-gray-400"
+              />
+              {liveLoading && <i className="fa fa-spinner fa-spin text-orange-400 text-sm" />}
+              {liveQuery && <button onClick={() => { setLiveQuery(''); setShowDropdown(false); }} className="text-gray-400 hover:text-gray-600"><i className="fa fa-times text-xs" /></button>}
+            </div>
+
+            {showDropdown && (
+              <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-xl shadow-xl mt-1 max-h-72 overflow-y-auto">
+                {liveResults.length === 0 ? (
+                  <p className="text-sm text-gray-400 px-4 py-3">No tours found for "{liveQuery}"</p>
+                ) : (
+                  liveResults.map(r => (
+                    <Link
+                      key={r._id}
+                      to={`/destination/${r.slug}`}
+                      onClick={() => setShowDropdown(false)}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors border-b border-gray-50 last:border-0"
+                    >
+                      <i className="fa fa-map-marker text-orange-400 text-xs" />
+                      <div>
+                        <p className="text-sm font-semibold text-gray-800">{r.title}</p>
+                        <p className="text-xs text-gray-400">{r.location} · {r.category}</p>
+                      </div>
+                      <span className="ml-auto text-xs font-bold text-orange-500">{r.price}</span>
+                    </Link>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+
+          <RelatedSearches
+            items={relatedSearches}
+            onSelect={term => { setLiveQuery(term); setSearchFilters({ destination: term, maxBudget: Infinity }); dispatch(setPage(1)); }}
+          />
         </div>
       </section>
 
