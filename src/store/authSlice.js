@@ -9,7 +9,7 @@ const validateToken = (token) =>
 const sanitizeUser = (u) => {
   if (!u || typeof u !== 'object') return null;
   return {
-    _id:   typeof u._id   === 'string' ? u._id   : undefined,
+    _id:   typeof u._id   === 'string' ? u._id   : typeof u.id === 'string' ? u.id : undefined,
     name:  typeof u.name  === 'string' ? u.name  : '',
     email: typeof u.email === 'string' ? u.email : '',
     role:  typeof u.role  === 'string' ? u.role  : 'customer',

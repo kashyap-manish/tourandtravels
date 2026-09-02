@@ -126,7 +126,7 @@ export default function Bookings() {
                       >
                         View Details
                       </button>
-                      {b.status !== 'cancelled' && (
+                      {b.status === 'pending' && (
                         <button
                           onClick={() => handleCancel(b._id)}
                           disabled={cancelling === b._id}
@@ -178,7 +178,7 @@ export default function Bookings() {
               )}
             </div>
 
-            {selected.status !== 'cancelled' && (
+            {selected.status === 'pending' && (
               <button
                 onClick={() => handleCancel(selected._id)}
                 disabled={cancelling === selected._id}
