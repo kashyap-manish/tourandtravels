@@ -86,11 +86,11 @@ export default function TourDetail() {
 
       // 3. Create Razorpay order
       const orderRes = await createPaymentOrder(totalNum);
-      const { orderId, amount, currency } = orderRes.data;
+      const { orderId, amount, currency, keyId } = orderRes.data;
 
       // 4. Open Razorpay checkout
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        key: keyId || import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount,
         currency,
         name: 'Pacific Travel',

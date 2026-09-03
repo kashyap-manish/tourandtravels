@@ -55,7 +55,7 @@ export default function Bookings() {
         </div>
       </section>
 
-      <section className="max-w-5xl mx-auto px-6 py-12">
+      <section className="max-w-5xl mx-auto px-3 sm:px-6 py-8 sm:py-12">
         {loading ? (
           <div className="flex justify-center py-20 text-gray-400">
             <i className="fa fa-spinner fa-spin text-3xl" />
@@ -72,57 +72,58 @@ export default function Bookings() {
           <div className="space-y-4">
             {bookings.map(b => (
               <div key={b._id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="flex flex-col sm:flex-row">
+                <div className="flex flex-row">
                   {/* Tour image */}
                   {b.tour?.img && (
                     <img
                       src={b.tour.img} alt={b.tour.title}
-                      className="w-full sm:w-40 h-36 sm:h-auto object-cover shrink-0"
+                      className="w-28 sm:w-40 h-auto object-cover shrink-0"
                     />
                   )}
-                  <div className="flex-1 p-5 flex flex-col justify-between gap-3">
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <div>
-                        <h3 className="font-bold text-gray-900 text-base">{b.tour?.title || 'Tour'}</h3>
-                        <p className="text-xs text-gray-400 mt-0.5">
-                          Booked on {new Date(b.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
-                        </p>
-                      </div>
-                      <div className="flex gap-2 flex-wrap">
-                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border capitalize ${STATUS_STYLES[b.status]}`}>
+                  <div className="flex-1 p-3 sm:p-5 flex flex-col justify-between gap-2 min-w-0">
+                    {/* Title + badges */}
+                    <div>
+                      <div className="flex flex-wrap gap-1.5 mb-1">
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border capitalize ${STATUS_STYLES[b.status]}`}>
                           {b.status}
                         </span>
-                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border capitalize ${PAYMENT_STYLES[b.paymentStatus]}`}>
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border capitalize ${PAYMENT_STYLES[b.paymentStatus]}`}>
                           {b.paymentStatus}
                         </span>
                       </div>
+                      <h3 className="font-bold text-gray-900 text-sm leading-tight">{b.tour?.title || 'Tour'}</h3>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {new Date(b.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </p>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                    {/* Stats */}
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
                       <div>
-                        <p className="text-xs text-gray-400 mb-0.5">Travel Date</p>
+                        <p className="text-gray-400">Travel Date</p>
                         <p className="font-semibold text-gray-800">
                           {new Date(b.travelDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-400 mb-0.5">Persons</p>
+                        <p className="text-gray-400">Persons</p>
                         <p className="font-semibold text-gray-800">{b.persons}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-400 mb-0.5">Total Price</p>
-                        <p className="font-semibold text-orange-500">{b.totalPrice}</p>
+                        <p className="text-gray-400">Total Price</p>
+                        <p className="font-semibold text-orange-500">₹{Number(b.totalPrice).toLocaleString('en-IN')}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-400 mb-0.5">Duration</p>
-                        <p className="font-semibold text-gray-800">{b.tour?.days || '—'} days</p>
+                        <p className="text-gray-400">Duration</p>
+                        <p className="font-semibold text-gray-800">{b.tour?.days || '—'}</p>
                       </div>
                     </div>
 
-                    <div className="flex gap-2 pt-1">
+                    {/* Actions */}
+                    <div className="flex gap-2">
                       <button
                         onClick={() => setSelected(b)}
-                        className="text-xs font-semibold px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 transition-colors"
                       >
                         View Details
                       </button>
@@ -130,7 +131,7 @@ export default function Bookings() {
                         <button
                           onClick={() => handleCancel(b._id)}
                           disabled={cancelling === b._id}
-                          className="text-xs font-semibold px-4 py-2 rounded-lg bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 transition-colors disabled:opacity-60"
+                          className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 transition-colors disabled:opacity-60"
                         >
                           {cancelling === b._id ? <i className="fa fa-spinner fa-spin" /> : 'Cancel'}
                         </button>
