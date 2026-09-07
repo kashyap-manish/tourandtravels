@@ -31,7 +31,7 @@ export default function Bookings() {
     setCancelling(id);
     try {
       const res = await cancelBooking(id);
-      setBookings(prev => prev.map(b => b._id === id ? res.data : b));
+      setBookings(prev => prev.map(b => b._id === id ? res.data : b)); 
       if (selected?._id === id) setSelected(res.data);
     } finally {
       setCancelling(null);

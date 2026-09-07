@@ -1,10 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { tours } from '../data/tours';
-import { createBooking, createPaymentOrder, verifyPayment } from '../services/api';
+import { createBooking, createPaymentOrder, verifyPayment, getReviews, addReview, getTourById } from '../services/api';
 import { useSelector } from 'react-redux';
 
-const TABS = ['Overview', 'Itinerary', 'Includes'];
+const TABS = ['Overview', 'Itinerary', 'Includes', 'Reviews'];
 const LABELS = {
   fullName: 'Full Name',
   phone: 'Phone',
@@ -23,13 +22,29 @@ export default function TourDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user } = useSelector(s => s.auth);
-  const tour = tours.find(t => t.slug === slug);
+  const [tour, setTour] = useState(null);
+  const [tourLoading, setTourLoading] = useState(true);
+
+  useEffect(() => {
+    setTourLoading(true);
+    getTourById(slug)
+      .then(r => setTour(r.data))
+      .catch(() => setTour(null))
+      .finally(() => setTourLoading(false));
+  }, [slug]);
+
   const fullStars = Math.floor(tour?.rating ?? 4.5);
   const hasHalf = (tour?.rating ?? 4.5) - fullStars >= 0.5;
 
   const [tab, setTab] = useState('Overview');
   const [showBooking, setShowBooking] = useState(false);
-  const [step, setStep] = useState(1); // 1=details, 2=payment
+  const [step, setStep] = useState(1);
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState('');
+  const [reviewSuccess, setReviewSuccess] = useState(false);
   const [form, setForm] = useState({
     name: user?.name || '', email: user?.email || '', phone: '',
     travelDate: '', persons: 1, specialRequests: '',
@@ -37,6 +52,37 @@ export default function TourDetail() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (tab !== 'Reviews' || !tour?._id) return;
+    setReviewsLoading(true);
+    getReviews(tour._id)
+      .then(r => setReviews(r.data || []))
+      .catch(() => {})
+      .finally(() => setReviewsLoading(false));
+  }, [tab, tour]);
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    setReviewSubmitting(true);
+    setReviewError('');
+    try {
+      const res = await addReview(tour._id, reviewForm);
+      setReviews(prev => [res.data, ...prev]);
+      setReviewSuccess(true);
+      setReviewForm({ rating: 5, comment: '' });
+    } catch (err) {
+      setReviewError(err.response?.data?.message || 'Failed to submit review.');
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
+
+  if (tourLoading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <i className="fa fa-spinner fa-spin text-orange-500 text-3xl" />
+    </div>
+  );
 
   if (!tour) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4">
@@ -314,6 +360,99 @@ export default function TourDetail() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Reviews Tab */}
+          {tab === 'Reviews' && (
+            <div className="space-y-8">
+              {/* Submit Review */}
+              <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Write a Review</h2>
+                {!user ? (
+                  <div className="text-center py-6">
+                    <i className="fa fa-lock text-3xl text-gray-300 mb-3" />
+                    <p className="text-gray-500 text-sm mb-3">You need to be logged in to write a review.</p>
+                    <Link to="/login" className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors inline-block">Login to Review</Link>
+                  </div>
+                ) : reviewSuccess ? (
+                  <div className="text-center py-6">
+                    <i className="fa fa-check-circle text-3xl text-green-500 mb-3" />
+                    <p className="text-gray-700 font-semibold">Review submitted successfully!</p>
+                    <button onClick={() => setReviewSuccess(false)} className="text-orange-500 text-sm mt-2 hover:underline">Write another</button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleReviewSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 mb-2">Your Rating</label>
+                      <div className="flex gap-1">
+                        {[1,2,3,4,5].map(star => (
+                          <button key={star} type="button" onClick={() => setReviewForm(f => ({ ...f, rating: star }))}>
+                            <i className={`fa fa-star text-xl ${star <= reviewForm.rating ? 'text-yellow-400' : 'text-gray-200'} transition-colors`} />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 mb-1.5">Your Comment</label>
+                      <textarea
+                        required rows={3} value={reviewForm.comment}
+                        onChange={e => setReviewForm(f => ({ ...f, comment: e.target.value }))}
+                        placeholder="Share your experience..."
+                        className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors resize-none"
+                      />
+                    </div>
+                    {reviewError && <p className="text-red-500 text-xs">{reviewError}</p>}
+                    <button type="submit" disabled={reviewSubmitting}
+                      className="bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors flex items-center gap-2 text-sm">
+                      {reviewSubmitting ? <i className="fa fa-spinner fa-spin" /> : <i className="fa fa-paper-plane" />}
+                      Submit Review
+                    </button>
+                  </form>
+                )}
+              </div>
+
+              {/* Reviews List */}
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Guest Reviews</h2>
+                {reviewsLoading ? (
+                  <div className="space-y-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="bg-white border border-gray-100 rounded-2xl p-5 animate-pulse">
+                        <div className="flex gap-3 mb-3"><div className="w-10 h-10 rounded-full bg-gray-200" /><div className="flex-1"><div className="h-3 bg-gray-200 rounded w-1/3 mb-2" /><div className="h-2 bg-gray-100 rounded w-1/4" /></div></div>
+                        <div className="h-3 bg-gray-100 rounded w-full" />
+                      </div>
+                    ))}
+                  </div>
+                ) : reviews.length === 0 ? (
+                  <div className="text-center py-12">
+                    <i className="fa fa-comment-o text-4xl text-gray-200 mb-3" />
+                    <p className="text-gray-400 text-sm">No reviews yet. Be the first to review!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {reviews.map((r, i) => (
+                      <div key={r._id || i} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+                        <div className="flex items-start gap-3 mb-2">
+                          <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
+                            <span className="text-orange-500 font-bold text-sm">{(r.user?.name || 'U')[0].toUpperCase()}</span>
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-gray-800 text-sm">{r.user?.name || 'Anonymous'}</p>
+                            <div className="flex gap-0.5 mt-0.5">
+                              {[1,2,3,4,5].map(s => (
+                                <i key={s} className={`fa fa-star text-xs ${s <= r.rating ? 'text-yellow-400' : 'text-gray-200'}`} />
+                              ))}
+                            </div>
+                          </div>
+                          <span className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        </div>
+                        <p className="text-sm text-gray-600 leading-relaxed">{r.comment}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}

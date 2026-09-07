@@ -122,6 +122,7 @@ export default function Destination() {
   const [searchParams] = useSearchParams();
   const country = searchParams.get('country');
   const [searchFilters, setSearchFilters] = useState({ destination: '', maxBudget: Infinity });
+  const [apiSearch, setApiSearch] = useState('');
   const [liveQuery, setLiveQuery] = useState('');
   const [liveResults, setLiveResults] = useState([]);
   const [relatedSearches, setRelatedSearches] = useState([]);
@@ -148,16 +149,14 @@ export default function Destination() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  useEffect(() => { dispatch(loadDestinations(country || 'India')); }, [dispatch, country]);
+  useEffect(() => {
+    dispatch(loadDestinations({ search: apiSearch || country || '', category: activeCategory }));
+    dispatch(setPage(1));
+  }, [dispatch, country, apiSearch, activeCategory]);
 
   const filtered = destinations.filter(t => {
-    const matchCategory = activeCategory === 'All' || t.category === activeCategory;
-    const matchDestination = !searchFilters.destination ||
-      t.title.toLowerCase().includes(searchFilters.destination.toLowerCase()) ||
-      t.location.toLowerCase().includes(searchFilters.destination.toLowerCase());
     const price = parseInt(t.price.replace(/[^0-9]/g, ''));
-    const matchBudget = price <= searchFilters.maxBudget;
-    return matchCategory && matchDestination && matchBudget;
+    return price <= searchFilters.maxBudget;
   });
   const sorted = [...filtered].sort((a, b) => {
     const pA = parseInt(a.price.replace(/\D/g, ''));
@@ -221,6 +220,7 @@ export default function Destination() {
       <section className="bg-white py-8 shadow-sm">
         <div className="container">
           <SearchForm tourOnly onTourSearch={({ destination, maxBudget }) => {
+            setApiSearch(destination);
             setSearchFilters({ destination, maxBudget });
             dispatch(setPage(1));
           }} />
@@ -267,7 +267,7 @@ export default function Destination() {
 
           <RelatedSearches
             items={relatedSearches}
-            onSelect={term => { setLiveQuery(term); setSearchFilters({ destination: term, maxBudget: Infinity }); dispatch(setPage(1)); }}
+            onSelect={term => { setLiveQuery(term); setApiSearch(term); setSearchFilters({ destination: term, maxBudget: Infinity }); dispatch(setPage(1)); }}
           />
         </div>
       </section>
@@ -280,9 +280,12 @@ export default function Destination() {
               <p className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-1">Top Picks</p>
               <h2 className="text-3xl font-extrabold text-gray-900">Featured <span className="text-orange-500">Destinations</span></h2>
             </div>
-            <Link to="#tours" className="hidden sm:flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-orange-500 transition-colors">
+            <button
+              onClick={() => document.getElementById('tours').scrollIntoView({ behavior: 'smooth' })}
+              className="hidden sm:flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-orange-500 transition-colors"
+            >
               View all <i className="fa fa-arrow-right text-xs" />
-            </Link>
+            </button>
           </div>
 
           {/* Bento grid — asymmetric 3-col layout */}
@@ -301,7 +304,7 @@ export default function Destination() {
       </section>
 
       {/* ── Travel Moods Strip ── */}
-      <section className="py-8 bg-gray-50 border-y border-gray-100" id="tours">
+      <section className="py-8 bg-gray-50 border-y border-gray-100">
         <div className="container">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Browse by Mood</p>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
@@ -319,7 +322,7 @@ export default function Destination() {
       </section>
 
       {/* ── Main Content ── */}
-      <section className="py-14 bg-gray-50">
+      <section className="py-14 bg-gray-50" id="tours">
         <div className="container">
 
           {/* Top bar */}
