@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { loginCustomer, registerCustomer } from '../services/api';
+import { loginCustomer, registerCustomer, verifyEmail, resendOtp, sendLoginOtp, verifyLoginOtp } from '../services/api';
 
 const JWT_PATTERN = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
 
@@ -27,6 +27,27 @@ export const login = createAsyncThunk('auth/login', async (data, { rejectWithVal
     return { token, user: sanitizeUser(res.data.user) };
   } catch (e) {
     return rejectWithValue(e.response?.data?.message || 'Login failed');
+  }
+});
+
+export const verifyOtp = createAsyncThunk('auth/verifyOtp', async ({ identifier, otp }, { rejectWithValue }) => {
+  try {
+    const res = await verifyLoginOtp({ identifier, otp });
+    const token = validateToken(res.data.token);
+    if (!token) return rejectWithValue('Invalid session token received.');
+    localStorage.setItem('token', token);
+    return { token, user: sanitizeUser(res.data.user) };
+  } catch (e) {
+    return rejectWithValue(e.response?.data?.message || 'OTP verification failed');
+  }
+});
+
+export const resendOtpThunk = createAsyncThunk('auth/resendOtp', async (data, { rejectWithValue }) => {
+  try {
+    const res = await resendOtp(data);
+    return res.data;
+  } catch (e) {
+    return rejectWithValue(e.response?.data?.message || 'Failed to resend OTP');
   }
 });
 
@@ -73,6 +94,17 @@ const authSlice = createSlice({
         localStorage.setItem('user', JSON.stringify(action.payload.user));
       })
       .addCase(login.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+      .addCase(verifyOtp.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(verifyOtp.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.token;
+        state.user = action.payload.user;
+        localStorage.setItem('user', JSON.stringify(action.payload.user));
+      })
+      .addCase(verifyOtp.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+      .addCase(resendOtpThunk.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(resendOtpThunk.fulfilled, (state) => { state.loading = false; })
+      .addCase(resendOtpThunk.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       .addCase(register.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(register.fulfilled, (state) => { state.loading = false; })
       .addCase(register.rejected, (state, action) => { state.loading = false; state.error = action.payload; });

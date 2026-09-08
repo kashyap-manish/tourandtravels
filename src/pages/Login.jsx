@@ -1,12 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { login, clearError } from '../store/authSlice';
-
-const LABELS = {
-  emailAddress: 'Email Address',
-  password: 'Password',
-};
+import { clearError } from '../store/authSlice';
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -14,17 +9,30 @@ export default function Login() {
   const location = useLocation();
   const from = location.state?.from?.pathname || '/';
   const verified = location.state?.verified;
-  const { loading, error, token } = useSelector(s => s.auth);
-  const [form, setForm] = useState({ email: '', password: '' });
+  const { error, token } = useSelector(s => s.auth);
+  const [form, setForm] = useState({ identifier: '', password: '' });
+  const [loading, setLoading] = useState(false);
+  const [localError, setLocalError] = useState('');
 
   useEffect(() => {
     if (token) navigate(from, { replace: true });
     return () => dispatch(clearError());
   }, [token]);
 
-  const handleSubmit = (e) => {
+  const isPhone = /^[0-9+\-\s]{7,15}$/.test(form.identifier);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(login(form));
+    setLocalError('');
+    setLoading(true);
+    try {
+      const { sendLoginOtp } = await import('../services/api');
+      await sendLoginOtp({ identifier: form.identifier, password: form.password });
+      navigate('/verify-otp', { state: { identifier: form.identifier, from } });
+    } catch (err) {
+      setLocalError(err.response?.data?.message || 'Failed to send OTP');
+    }
+    setLoading(false);
   };
 
   return (
@@ -48,24 +56,29 @@ export default function Login() {
             <i className="fa fa-check-circle" /> Email verified! You can now sign in.
           </div>
         )}
-        {error && (
+        {(localError || error) && (
           <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 mb-5 text-sm">
-            <i className="fa fa-exclamation-circle" /> {error}
+            <i className="fa fa-exclamation-circle" /> {localError || error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1.5">{LABELS.emailAddress}</label>
-            <input
-              type="email" required placeholder="john@example.com"
-              value={form.email}
-              onChange={e => setForm({ ...form, email: e.target.value })}
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors"
-            />
+            <label className="block text-xs font-semibold text-gray-500 mb-1.5">Email or Mobile Number</label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                <i className={`fa ${isPhone ? 'fa-phone' : 'fa-envelope'}`} />
+              </span>
+              <input
+                type="text" required placeholder="john@example.com or 9876543210"
+                value={form.identifier}
+                onChange={e => setForm({ ...form, identifier: e.target.value })}
+                className="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-2.5 text-sm outline-none focus:border-orange-400 transition-colors"
+              />
+            </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1.5">{LABELS.password}</label>
+            <label className="block text-xs font-semibold text-gray-500 mb-1.5">Password</label>
             <input
               type="password" required placeholder="••••••••"
               value={form.password}
@@ -77,7 +90,7 @@ export default function Login() {
             type="submit" disabled={loading}
             className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
           >
-            {loading ? <><i className="fa fa-spinner fa-spin" /> Signing in...</> : 'Sign In'}
+            {loading ? <><i className="fa fa-spinner fa-spin" /> Sending OTP...</> : 'Send OTP & Sign In'}
           </button>
         </form>
 
@@ -89,4 +102,3 @@ export default function Login() {
     </section>
   );
 }
-

@@ -11,6 +11,7 @@ const links = [
   { to: '/blog', label: 'Blog' },
   { to: '/gallery', label: 'Gallery' },
   { to: '/flight', label: 'Flight' },
+  { to: '/bus', label: 'Bus' },
   { to: '/contact', label: 'Contact' },
 ];
 

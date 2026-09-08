@@ -33,6 +33,7 @@ import Profile from './pages/Profile';
 import Bookings from './pages/Bookings';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import OtpVerify from './pages/OtpVerify';
 import PrivateRoute from './components/PrivateRoute';
 import AdminBookings from './pages/AdminBookings';
 import TermsOfService from './pages/TermsOfService';
@@ -41,6 +42,7 @@ import Gallery from './pages/Gallery';
 import Wishlist from './pages/Wishlist';
 import CityDestination from './pages/CityDestination';
 import SearchPage from './pages/SearchPage';
+import Bus from './pages/Bus';
 
 export default function App() {
   return (
@@ -50,6 +52,7 @@ export default function App() {
         {/* Auth routes — no Navbar/Footer */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-otp" element={<OtpVerify />} />
 
         {/* Main routes — protected */}
         <Route path="/*" element={
@@ -87,6 +90,7 @@ export default function App() {
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/city/:slug" element={<CityDestination />} />
                 <Route path="/search" element={<SearchPage />} />
+                <Route path="/bus" element={<Bus />} />
               </Routes>
             </main>
             <Footer />

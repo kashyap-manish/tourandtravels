@@ -21,6 +21,9 @@ const safeId = (id) => {
 // Auth
 export const loginCustomer = (data) => api.post('/auth/login/customer', data);
 export const registerCustomer = (data) => api.post('/auth/register/customer', data);
+export const sendLoginOtp = (data) => api.post('/auth/send-login-otp', data);
+export const verifyLoginOtp = (data) => api.post('/auth/verify-login-otp', data);
+export const resendLoginOtp = (data) => api.post('/auth/resend-login-otp', data);
 export const verifyEmail = (data) => api.post('/auth/verify-email', data);
 export const resendOtp = (data) => api.post('/auth/resend-otp', data);
 export const getMe = () => api.get('/auth/me');
