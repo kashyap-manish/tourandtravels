@@ -15,6 +15,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/aviationstack/, ''),
       },
+      '/railradar': {
+        target: 'https://api.railradar.in/v1',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/railradar/, ''),
+      },
     },
   },
 })

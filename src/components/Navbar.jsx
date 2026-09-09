@@ -12,6 +12,7 @@ const links = [
   { to: '/gallery', label: 'Gallery' },
   { to: '/flight', label: 'Flight' },
   { to: '/bus', label: 'Bus' },
+  { to: '/train', label: 'Train' },
   { to: '/contact', label: 'Contact' },
 ];
 

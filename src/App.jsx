@@ -43,6 +43,7 @@ import Wishlist from './pages/Wishlist';
 import CityDestination from './pages/CityDestination';
 import SearchPage from './pages/SearchPage';
 import Bus from './pages/Bus';
+import Train from './pages/Train';
 
 export default function App() {
   return (
@@ -91,6 +92,7 @@ export default function App() {
                 <Route path="/city/:slug" element={<CityDestination />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/bus" element={<Bus />} />
+                <Route path="/train" element={<Train />} />
               </Routes>
             </main>
             <Footer />
