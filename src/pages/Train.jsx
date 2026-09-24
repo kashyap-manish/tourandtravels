@@ -43,6 +43,8 @@ const POPULAR_ROUTES = [
   { from: 'Hyderabad',  to: 'Jaipur',    img: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?w=600&h=400&fit=crop', train: 'Duronto Express' },
   { from: 'Kolkata',    to: 'New Delhi', img: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=600&h=400&fit=crop', train: 'Rajdhani Express' },
   { from: 'Chennai',    to: 'Hyderabad', img: 'https://images.unsplash.com/photo-1588416936097-41850ab3d86d?w=600&h=400&fit=crop', train: 'Vande Bharat Exp.' },
+  { from: 'New Delhi', to: 'Chhapra', img: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=600&h=400&fit=crop', train: 'Bihar Sampark Kranti' },
+  { from: 'Anand Vihar Terminal', to: 'Chhapra', img: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=600&h=400&fit=crop', train: 'Lichchavi Express' }
 ];
 
 const STATS = [
