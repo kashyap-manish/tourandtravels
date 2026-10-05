@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { createBooking, createPaymentOrder, verifyPayment, getReviews, addReview, getTourById } from '../services/api';
 import { useSelector } from 'react-redux';
+import { geocodeCity, getRouteInfo, getBusStations } from '../services/busApi';
+import { resolveStation, getTrainsBetweenStations, CITY_STATION_MAP } from '../services/railRadarApi';
 
 const TABS = ['Overview', 'Itinerary', 'Includes', 'Reviews'];
 const LABELS = {
@@ -13,10 +15,242 @@ const LABELS = {
   specialRequests: 'Special Requests',
   optional: '(optional)',
   stepBookingDetails: 'Booking Details',
+  stepTransport: 'Transport',
   stepPayment: 'Payment',
 };
 
-const BOOKING_STEPS = [LABELS.stepBookingDetails, LABELS.stepPayment];
+const BOOKING_STEPS = [LABELS.stepBookingDetails, LABELS.stepTransport, LABELS.stepPayment];
+
+const TRANSPORT_OPTIONS = [
+  { type: 'bus',    icon: 'fa-bus',   label: 'Bus' },
+  { type: 'train',  icon: 'fa-train', label: 'Train' },
+  { type: 'flight', icon: 'fa-plane', label: 'Flight' },
+];
+
+// ── helpers reused from Bus.jsx / Train.jsx ──────────────────────────────────
+const BUS_OPERATORS = [
+  { name: 'FlixBus', color: '#00b849', abbr: 'FX' },
+  { name: 'National Express', color: '#e84118', abbr: 'NX' },
+  { name: 'Megabus', color: '#0057b8', abbr: 'MB' },
+  { name: 'BlaBlaBus', color: '#00aaff', abbr: 'BB' },
+  { name: 'Eurolines', color: '#f39c12', abbr: 'EL' },
+  { name: 'Greyhound', color: '#2c3e50', abbr: 'GH' },
+];
+const TRAIN_OPERATORS = [
+  { name: 'Indian Railways', color: '#1a56db', abbr: 'IR' },
+  { name: 'Rajdhani Exp.', color: '#e74c3c', abbr: 'RJ' },
+  { name: 'Shatabdi Exp.', color: '#27ae60', abbr: 'SB' },
+  { name: 'Vande Bharat', color: '#8e44ad', abbr: 'VB' },
+  { name: 'Duronto Exp.', color: '#f39c12', abbr: 'DU' },
+];
+const TRAIN_NAMES = ['Rajdhani Express','Shatabdi Express','Vande Bharat Exp.','Duronto Express','Garib Rath Exp.','Jan Shatabdi Exp.'];
+const TRAIN_NUMBERS = ['12301','12951','20501','12213','12209','14673'];
+const TRAIN_CLASSES = ['Sleeper','3AC','2AC','1AC','Chair Car'];
+
+function buildBusResult(distanceKm, durationMin, station, index) {
+  const p = station.properties;
+  const classMultiplier = [1, 1.35, 1.75][index % 3];
+  const fare = Math.round(Math.max(650, distanceKm * 6.5 * classMultiplier));
+  const totalMin = Math.round(durationMin * (1 + ((index % 5) - 2) * 0.05));
+  const depMin = 360 + index * Math.floor(960 / 11);
+  const hDep = String(Math.floor(depMin / 60) % 24).padStart(2, '0');
+  const mDep = String(depMin % 60).padStart(2, '0');
+  const arrMin = depMin + totalMin;
+  const hArr = String(Math.floor(arrMin / 60) % 24).padStart(2, '0');
+  const mArr = String(arrMin % 60).padStart(2, '0');
+  return {
+    op: BUS_OPERATORS[index % BUS_OPERATORS.length],
+    fare, distanceKm,
+    durH: Math.floor(totalMin / 60), durM: totalMin % 60,
+    hDep, mDep, hArr, mArr,
+    stationName: p.name || p.address_line1 || 'Bus Terminal',
+    busClass: ['Economy','Standard','Premium'][index % 3],
+    seats: Math.max(3, 28 - (index * 3) % 25),
+  };
+}
+
+function buildTrainResult(distanceKm, index) {
+  const cls = TRAIN_CLASSES[index % TRAIN_CLASSES.length];
+  const basePerKm = { Sleeper: 0.7, '3AC': 1.8, '2AC': 2.6, '1AC': 4.5, 'Chair Car': 1.2 };
+  const fare = Math.round(Math.max(250, distanceKm * (basePerKm[cls] || 1.2) + (index % 5) * 80));
+  const totalMin = Math.round((distanceKm / (65 + (index % 6) * 7)) * 60);
+  const depMin = 300 + index * Math.floor(1080 / 12);
+  const hDep = String(Math.floor(depMin / 60) % 24).padStart(2, '0');
+  const mDep = String(depMin % 60).padStart(2, '0');
+  const arrMin = depMin + totalMin;
+  const hArr = String(Math.floor(arrMin / 60) % 24).padStart(2, '0');
+  const mArr = String(arrMin % 60).padStart(2, '0');
+  return {
+    op: TRAIN_OPERATORS[index % TRAIN_OPERATORS.length],
+    trainName: TRAIN_NAMES[index % TRAIN_NAMES.length],
+    trainNo: TRAIN_NUMBERS[index % TRAIN_NUMBERS.length],
+    cls, fare, distanceKm,
+    durH: Math.floor(totalMin / 60), durM: totalMin % 60,
+    hDep, mDep, hArr, mArr,
+    seats: Math.max(2, 62 - (index * 7) % 58),
+  };
+}
+
+// ── Inline transport search component ────────────────────────────────────────
+function TransportSearch({ type, destination, onSelect, selected }) {
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [origin, setOrigin] = useState('');
+
+  const search = async () => {
+    if (!origin.trim()) return;
+    setLoading(true); setError(''); setResults([]);
+    try {
+      if (type === 'bus') {
+        const [from, to] = await Promise.all([geocodeCity(origin), geocodeCity(destination)]);
+        const route = await getRouteInfo(from.lat, from.lon, to.lat, to.lon);
+        if (!route.distanceKm) throw new Error('Could not calculate route.');
+        const stations = await getBusStations(from.lat, from.lon);
+        if (!stations.length) throw new Error('No bus stations found near your city.');
+        setResults(stations.slice(0, 5).map((s, i) => buildBusResult(route.distanceKm, route.durationMin, s, i)));
+      } else if (type === 'train') {
+        const fromStn = CITY_STATION_MAP[origin.trim().toLowerCase()] || await resolveStation(origin);
+        const toStn = CITY_STATION_MAP[destination.trim().toLowerCase()] || await resolveStation(destination);
+        if (!fromStn?.code || !toStn?.code) throw new Error('Could not resolve station codes.');
+        let trains = [];
+        try {
+          const data = await getTrainsBetweenStations(fromStn.code, toStn.code);
+          if (data?.trains?.length) {
+            trains = data.trains.slice(0, 5).map((item, i) => {
+              const t = item.train || {};
+              const f = item.from || {}; const to2 = item.to || {};
+              const distKm = Math.round(item.distance || 500);
+              const durMin = item.duration || 360;
+              const [hDep, mDep] = (f.departure || '10:00').split(':');
+              const [hArr, mArr] = (to2.arrival || '16:00').split(':');
+              const cls = TRAIN_CLASSES[i % TRAIN_CLASSES.length];
+              const basePerKm = { Sleeper: 0.7, '3AC': 1.8, '2AC': 2.6, '1AC': 4.5, 'Chair Car': 1.2 };
+              return {
+                op: TRAIN_OPERATORS[i % TRAIN_OPERATORS.length],
+                trainName: t.name || TRAIN_NAMES[i % TRAIN_NAMES.length],
+                trainNo: t.number || TRAIN_NUMBERS[i % TRAIN_NUMBERS.length],
+                cls, fare: Math.round(Math.max(250, distKm * (basePerKm[cls] || 1.2))),
+                distanceKm: distKm,
+                durH: Math.floor(durMin / 60), durM: durMin % 60,
+                hDep: hDep || '10', mDep: mDep || '00',
+                hArr: hArr || '16', mArr: mArr || '00',
+                seats: Math.max(4, 58 - (i * 9) % 50),
+              };
+            });
+          }
+        } catch { /* fallback below */ }
+        if (!trains.length) {
+          // haversine fallback
+          const R = 6371;
+          const c1 = CITY_STATION_MAP[origin.trim().toLowerCase()];
+          const c2 = CITY_STATION_MAP[destination.trim().toLowerCase()];
+          const distKm = (c1 && c2) ? 500 : 600; // rough fallback
+          trains = Array.from({ length: 5 }, (_, i) => buildTrainResult(distKm, i));
+        }
+        setResults(trains);
+      }
+    } catch (err) {
+      setError(err.message || 'Search failed. Try a different city.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (type === 'flight') {
+    return (
+      <div className="text-center py-6 space-y-3">
+        <i className="fa fa-plane text-4xl text-orange-400" />
+        <p className="text-sm text-gray-600">Search and book flights to <span className="font-bold text-gray-900">{destination}</span> on our Flight page.</p>
+        <a href="/flight" target="_blank" rel="noreferrer"
+          className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors">
+          <i className="fa fa-plane" /> Search Flights
+        </a>
+        <p className="text-xs text-gray-400">After booking, come back and proceed to payment.</p>
+        <button onClick={() => onSelect({ type: 'flight', label: 'Flight booked separately' })}
+          className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">
+          <i className="fa fa-check-circle mr-1" /> I've Booked My Flight — Continue
+        </button>
+      </div>
+    );
+  }
+
+  const icon = type === 'bus' ? 'fa-bus' : 'fa-train';
+  const color = type === 'bus' ? 'orange' : 'blue';
+  const colorCls = type === 'bus' ? 'bg-orange-500 hover:bg-orange-600 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white';
+  const borderSel = type === 'bus' ? 'border-orange-500 bg-orange-50' : 'border-blue-500 bg-blue-50';
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-gray-500">
+        Enter your <strong>departure city</strong> to find {type}s to <strong>{destination}</strong>:
+      </p>
+      <div className="flex gap-2">
+        <input
+          type="text" value={origin} placeholder={`Your city (e.g. ${type === 'train' ? 'Delhi' : 'Mumbai'})`}
+          onChange={e => setOrigin(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && search()}
+          className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-400 transition-colors"
+        />
+        <button onClick={search} disabled={loading || !origin.trim()}
+          className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors disabled:opacity-50 ${colorCls}`}>
+          {loading ? <i className="fa fa-spinner fa-spin" /> : <i className={`fa ${icon}`} />}
+        </button>
+      </div>
+
+      {error && <p className="text-xs text-red-500"><i className="fa fa-exclamation-circle mr-1" />{error}</p>}
+
+      {loading && (
+        <div className="space-y-2">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+          ))}
+        </div>
+      )}
+
+      {results.length > 0 && (
+        <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+          {results.map((r, i) => {
+            const isSel = selected?.index === i;
+            return (
+              <div key={i}
+                className={`border-2 rounded-xl p-3 cursor-pointer transition-all ${
+                  isSel ? borderSel : 'border-gray-100 hover:border-gray-300'
+                }`}
+                onClick={() => onSelect({ ...r, type, index: i, origin })}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-black flex-shrink-0"
+                      style={{ background: r.op.color }}>{r.op.abbr}</div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-900">
+                        {type === 'train' ? r.trainName : r.op.name}
+                      </p>
+                      <p className="text-[0.6rem] text-gray-400">
+                        {type === 'train' ? `#${r.trainNo} · ${r.cls}` : r.busClass}
+                        {' · '}{r.distanceKm} km
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-black text-gray-900">₹{r.fare}</p>
+                    <p className="text-[0.6rem] text-gray-400">{r.hDep}:{r.mDep} → {r.hArr}:{r.mArr}</p>
+                  </div>
+                </div>
+                {isSel && (
+                  <div className="mt-2 flex items-center gap-1 text-[0.65rem] font-semibold text-green-600">
+                    <i className="fa fa-check-circle" /> Selected
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function TourDetail() {
   const { slug } = useParams();
@@ -49,6 +283,8 @@ export default function TourDetail() {
     name: user?.name || '', email: user?.email || '', phone: '',
     travelDate: '', persons: 1, specialRequests: '',
   });
+  const [selectedTransport, setSelectedTransport] = useState(null);
+  const [transportType, setTransportType] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -95,7 +331,7 @@ export default function TourDetail() {
   const totalNum = priceNum * form.persons;
   const total = `₹${totalNum.toLocaleString('en-IN')}`;
 
-  const closeModal = () => { setShowBooking(false); setSuccess(false); setError(''); setStep(1); };
+  const closeModal = () => { setShowBooking(false); setSuccess(false); setError(''); setStep(1); setSelectedTransport(null); setTransportType(''); };
 
   const loadRazorpayScript = () => new Promise(resolve => {
     if (document.getElementById('razorpay-script')) return resolve(true);
@@ -112,6 +348,8 @@ export default function TourDetail() {
     setStep(2);
   };
 
+
+
   const handlePayment = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -123,6 +361,8 @@ export default function TourDetail() {
         ...form,
         totalPrice: totalNum,
         paymentMethod: 'razorpay',
+        transportType: selectedTransport?.type || '',
+        transportDetail: selectedTransport ? `${selectedTransport.trainName || selectedTransport.op?.name || ''} from ${selectedTransport.origin || ''}` : '',
       });
       const bookingId = bookingRes.data._id;
 
@@ -135,8 +375,11 @@ export default function TourDetail() {
       const { orderId, amount, currency, keyId } = orderRes.data;
 
       // 4. Open Razorpay checkout
+      const key = keyId || import.meta.env.VITE_RAZORPAY_KEY_ID;
+      if (!key) throw new Error('Razorpay key is not configured.');
+      if (!amount || amount <= 0) throw new Error('Invalid payment amount.');
       const options = {
-        key: keyId || import.meta.env.VITE_RAZORPAY_KEY_ID,
+        key,
         amount,
         currency,
         name: 'Pacific Travel',
@@ -162,6 +405,7 @@ export default function TourDetail() {
       };
       const rzp = new window.Razorpay(options);
       rzp.open();
+      setSubmitting(false);
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Payment failed. Please try again.');
       setSubmitting(false);
@@ -556,7 +800,11 @@ export default function TourDetail() {
                 <>
                   {/* Step indicator */}
                   <div className="flex items-center gap-2 mb-5">
-                    {[{ label: LABELS.stepBookingDetails, idx: 1 }, { label: LABELS.stepPayment, idx: 2 }].map(({ label, idx }) => (
+                    {[
+                      { label: LABELS.stepBookingDetails, idx: 1 },
+                      { label: LABELS.stepTransport, idx: 2 },
+                      { label: LABELS.stepPayment, idx: 3 },
+                    ].map(({ label, idx }) => (
                       <div key={idx} className="flex items-center gap-2 flex-1">
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
                           step > idx ? 'bg-green-500 text-white' : step === idx ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-400'
@@ -564,7 +812,7 @@ export default function TourDetail() {
                           {step > idx ? <i className="fa fa-check" /> : idx}
                         </div>
                         <span className={`text-xs font-semibold ${step === idx ? 'text-gray-800' : 'text-gray-400'}`}>{label}</span>
-                        {idx === 1 && <div className={`flex-1 h-0.5 ${step > 1 ? 'bg-orange-400' : 'bg-gray-100'}`} />}
+                        {idx < 3 && <div className={`flex-1 h-0.5 ${step > idx ? 'bg-orange-400' : 'bg-gray-100'}`} />}
                       </div>
                     ))}
                   </div>
@@ -631,8 +879,58 @@ export default function TourDetail() {
                     </form>
                   )}
 
-                  {/* Step 2: Payment */}
+                  {/* Step 2: Transport */}
                   {step === 2 && (
+                    <div className="space-y-4">
+                      {/* Mode selector */}
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-500 mb-2">How do you want to travel to <span className="text-gray-800">{tour.location.split(',')[0]}</span>?</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {TRANSPORT_OPTIONS.map(({ type, icon, label }) => (
+                            <button key={type} type="button"
+                              onClick={() => { setTransportType(type); setSelectedTransport(null); }}
+                              className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-colors text-sm font-semibold ${
+                                transportType === type
+                                  ? 'border-orange-500 bg-orange-50 text-orange-600'
+                                  : 'border-gray-200 text-gray-500 hover:border-orange-300'
+                              }`}>
+                              <i className={`fa ${icon} text-lg`} />{label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Inline search results */}
+                      {transportType && (
+                        <TransportSearch
+                          type={transportType}
+                          destination={tour.location.split(',')[0]}
+                          selected={selectedTransport}
+                          onSelect={setSelectedTransport}
+                        />
+                      )}
+
+                      {!transportType && (
+                        <p className="text-xs text-gray-400 text-center py-2">Select a mode above, or skip if transport is not needed.</p>
+                      )}
+
+                      <div className="flex gap-3 pt-1">
+                        <button type="button" onClick={() => setStep(1)}
+                          className="flex-1 border border-gray-200 text-gray-600 font-semibold py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm">
+                          <i className="fa fa-arrow-left mr-1" /> Back
+                        </button>
+                        <button type="button"
+                          onClick={() => setStep(3)}
+                          disabled={transportType && transportType !== 'flight' && !selectedTransport}
+                          className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-40 text-white font-bold py-2.5 rounded-xl transition-colors text-sm">
+                          {selectedTransport || !transportType ? 'Proceed to Payment' : 'Skip'} <i className="fa fa-arrow-right ml-1" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 3: Payment */}
+                  {step === 3 && (
                     <form onSubmit={handlePayment} className="space-y-4">
                       <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 flex justify-between items-center">
                         <div>
@@ -646,13 +944,26 @@ export default function TourDetail() {
                         </div>
                       </div>
 
+                      {selectedTransport && selectedTransport.type !== 'flight' && (
+                        <div className="flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-xl px-3 py-2.5 text-xs text-blue-700">
+                          <i className={`fa ${selectedTransport.type === 'bus' ? 'fa-bus' : 'fa-train'} text-blue-500`} />
+                          <span>
+                            <span className="font-bold capitalize">{selectedTransport.type}</span>:
+                            {' '}{selectedTransport.trainName || selectedTransport.op?.name}
+                            {' '}from <span className="font-bold">{selectedTransport.origin}</span>
+                            {' → '}{tour.location.split(',')[0]}
+                            {' · '}₹{selectedTransport.fare}
+                          </span>
+                        </div>
+                      )}
+
                       <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 text-sm text-orange-800">
                         <i className="fa fa-info-circle mr-2" />
                         You will be redirected to Razorpay's secure payment page. Supports UPI, Cards, Net Banking & Wallets.
                       </div>
 
                       <div className="flex gap-3 pt-1">
-                        <button type="button" onClick={() => setStep(1)}
+                        <button type="button" onClick={() => setStep(2)}
                           className="flex-1 border border-gray-200 text-gray-600 font-semibold py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm">
                           <i className="fa fa-arrow-left mr-1" /> Back
                         </button>

@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { geocodeCity, getRouteInfo, getBusStations } from '../services/busApi';
 import CallToAction from '../components/CallToAction';
 import {
@@ -14,7 +14,7 @@ import {
   NearbyStopsMap,
 } from '../components/BusExtras';
 
-// ─── Static reference data ───────────────────────────────────────────────────
+// ─── Static data ─────────────────────────────────────────────────────────────
 
 const OPERATORS = [
   { name: 'FlixBus',          color: '#00b849', abbr: 'FX' },
@@ -30,16 +30,15 @@ const AMENITY_ICONS = {
   Toilet: 'fa-tint', Snacks: 'fa-coffee', USB: 'fa-usb',
 };
 const ALL_AMENITIES = Object.keys(AMENITY_ICONS);
-
 const BUS_CLASSES = ['Economy', 'Standard', 'Premium'];
 
 const POPULAR_ROUTES = [
-  { from: 'London',   to: 'Manchester', img: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600&h=400&fit=crop' },
-  { from: 'Paris',    to: 'Lyon',       img: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&h=400&fit=crop' },
-  { from: 'New York', to: 'Boston',     img: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=600&h=400&fit=crop' },
-  { from: 'Berlin',   to: 'Hamburg',    img: 'https://images.unsplash.com/photo-1560969184-10fe8719e047?w=600&h=400&fit=crop' },
-  { from: 'Madrid',   to: 'Barcelona',  img: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&h=400&fit=crop' },
-  { from: 'Rome',     to: 'Naples',     img: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=600&h=400&fit=crop' },
+  { from: 'Delhi',     to: 'Agra',      img: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&h=400&fit=crop', duration: '3h', fare: '₹420' },
+  { from: 'Mumbai',    to: 'Pune',      img: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=600&h=400&fit=crop', duration: '3.5h', fare: '₹310' },
+  { from: 'Bangalore', to: 'Chennai',   img: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&h=400&fit=crop', duration: '6h', fare: '₹680' },
+  { from: 'Jaipur',    to: 'Jodhpur',   img: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=600&h=400&fit=crop', duration: '5h', fare: '₹580' },
+  { from: 'Hyderabad', to: 'Vijayawada',img: 'https://images.unsplash.com/photo-1561361058-c24e01238a46?w=600&h=400&fit=crop', duration: '5h', fare: '₹520' },
+  { from: 'Kolkata',   to: 'Bhubaneswar',img:'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600&h=400&fit=crop', duration: '7h', fare: '₹590' },
 ];
 
 const STATS = [
@@ -49,64 +48,58 @@ const STATS = [
   { icon: 'fa-star',       value: '4.7',    label: 'Avg. Rating' },
 ];
 
-const TESTIMONIALS = [
-  { name: 'Emma T.',   avatar: 'https://i.pravatar.cc/80?img=47', rating: 5, route: 'London → Manchester', text: 'Incredibly smooth booking. The bus was on time, spotless, and the WiFi actually worked the whole journey!' },
-  { name: 'Carlos M.', avatar: 'https://i.pravatar.cc/80?img=12', rating: 5, route: 'Madrid → Barcelona',  text: 'Best price I found anywhere. Comfortable seats, charging ports at every seat. Will always book through Pacific.' },
-  { name: 'Yuki S.',   avatar: 'https://i.pravatar.cc/80?img=32', rating: 4, route: 'Paris → Lyon',        text: 'Great value for money. The 24/7 support team helped me reschedule last minute without any hassle.' },
+const FEATURES = [
+  { icon: 'fa-tag',        color: 'text-green-500',  bg: 'bg-green-50',  title: 'Best Price Guarantee', desc: 'We compare all operators so you always get the lowest fare.' },
+  { icon: 'fa-shield',     color: 'text-blue-500',   bg: 'bg-blue-50',   title: 'Verified Operators',   desc: 'Every bus company is licensed, insured and safety-checked.' },
+  { icon: 'fa-ban',        color: 'text-orange-500', bg: 'bg-orange-50', title: 'Free Cancellation',    desc: 'Cancel up to 2 hours before departure with a full refund.' },
+  { icon: 'fa-headphones', color: 'text-purple-500', bg: 'bg-purple-50', title: '24/7 Support',         desc: 'Our team is available around the clock to help with any issue.' },
 ];
 
-// ─── Dynamic data builder from real route + station ─────────────────────────
-// Uses real distanceKm & durationMin from API; index only for schedule spread
+const TESTIMONIALS = [
+  { name: 'Priya S.',   avatar: 'https://i.pravatar.cc/80?img=47', rating: 5, route: 'Delhi → Agra',        text: 'Incredibly smooth booking. The bus was on time, spotless, and the WiFi actually worked the whole journey!' },
+  { name: 'Rahul M.',   avatar: 'https://i.pravatar.cc/80?img=12', rating: 5, route: 'Mumbai → Pune',       text: 'Best price I found anywhere. Comfortable seats, charging ports at every seat. Will always book through Pacific.' },
+  { name: 'Ananya K.',  avatar: 'https://i.pravatar.cc/80?img=32', rating: 4, route: 'Bangalore → Chennai', text: 'Great value for money. The 24/7 support team helped me reschedule last minute without any hassle.' },
+];
+
+// ─── Data builder ─────────────────────────────────────────────────────────────
 
 function buildBusData({ distanceKm, durationMin, station, index }) {
   const p = station.properties;
-
-  // Real fare: base $0.08/km, class multiplier, min $8
   const classMultiplier = [1, 1.35, 1.75][index % 3];
   const baseFare = Math.max(650, distanceKm * 6.5 * classMultiplier);
   const fare = Math.round(baseFare);
   const oldFare = Math.round(baseFare * 1.22);
   const discount = index % 4 === 0;
-
-  // Real duration with operator variance (±10%)
   const variance = 1 + ((index % 5) - 2) * 0.05;
   const totalMin = Math.round(durationMin * variance);
   const durH = Math.floor(totalMin / 60);
   const durM = totalMin % 60;
-
-  // Spread departures across the day (06:00 – 22:00)
   const depMinutes = 360 + index * Math.floor(960 / Math.max(1, 11));
   const hDep = String(Math.floor(depMinutes / 60) % 24).padStart(2, '0');
   const mDep = String(depMinutes % 60).padStart(2, '0');
   const arrMinutes = depMinutes + totalMin;
   const hArr = String(Math.floor(arrMinutes / 60) % 24).padStart(2, '0');
   const mArr = String(arrMinutes % 60).padStart(2, '0');
-
-  // Real station name & address from Geoapify
   const stationName = p.name || p.address_line1 || 'Bus Terminal';
   const stationCity = p.city || p.county || p.state || '';
   const stationAddr = p.address_line2 || p.formatted?.split(',').slice(0, 2).join(',') || '';
-
   const op = OPERATORS[index % OPERATORS.length];
   const busClass = BUS_CLASSES[index % 3];
   const seats = Math.max(3, 28 - (index * 3) % 25);
   const rating = parseFloat((3.8 + (index % 12) * 0.1).toFixed(1));
   const reviews = 40 + (index * 31) % 460;
   const amenities = ALL_AMENITIES.filter((_, i) => (index + i) % 2 === 0);
-
-  return {
-    op, fare, oldFare, discount,
-    durH, durM, hDep, mDep, hArr, mArr,
-    stationName, stationCity, stationAddr,
-    busClass, seats, rating, reviews, amenities,
-    distanceKm,
-  };
+  return { op, fare, oldFare, discount, durH, durM, hDep, mDep, hArr, mArr, stationName, stationCity, stationAddr, busClass, seats, rating, reviews, amenities, distanceKm };
 }
 
-// ─── Small UI helpers ────────────────────────────────────────────────────────
+// ─── Small UI helpers ─────────────────────────────────────────────────────────
 
 function ClassBadge({ cls }) {
-  const map = { Premium: 'bg-amber-50 text-amber-600 border-amber-200', Standard: 'bg-blue-50 text-blue-600 border-blue-200', Economy: 'bg-gray-50 text-gray-500 border-gray-200' };
+  const map = {
+    Premium: 'bg-amber-50 text-amber-600 border-amber-200',
+    Standard: 'bg-blue-50 text-blue-600 border-blue-200',
+    Economy: 'bg-gray-50 text-gray-500 border-gray-200',
+  };
   return <span className={`text-[0.6rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${map[cls] || map.Economy}`}>{cls}</span>;
 }
 
@@ -143,13 +136,13 @@ function SkeletonRow() {
   );
 }
 
-// ─── BusResultRow ────────────────────────────────────────────────────────────
+// ─── BusResultRow ─────────────────────────────────────────────────────────────
 
 function BusResultRow({ busData: d, origin, destination, onBook, view }) {
   if (view === 'grid') {
     return (
       <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-        <div className="h-1.5 w-full" style={{ background: d.op.color }} />
+        <div className="h-1 w-full" style={{ background: d.op.color }} />
         <div className="p-5 flex flex-col flex-1">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2.5">
@@ -214,81 +207,87 @@ function BusResultRow({ busData: d, origin, destination, onBook, view }) {
 
   // List view
   return (
-    <div className="bg-white border border-gray-100 rounded-2xl p-5 hover:shadow-lg hover:border-orange-200 transition-all duration-200 flex flex-col sm:flex-row gap-5">
-      <div className="flex-shrink-0 flex sm:flex-col items-center gap-3 sm:gap-2 sm:w-20">
-        <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-black text-sm" style={{ background: d.op.color }}>{d.op.abbr}</div>
-        <div className="text-center">
-          <p className="text-[0.65rem] font-bold text-gray-700 leading-tight">{d.op.name}</p>
-          <div className="mt-1"><ClassBadge cls={d.busClass} /></div>
-        </div>
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-3 mb-3">
+    <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-lg hover:border-orange-100 transition-all duration-200 flex flex-col sm:flex-row">
+      <div className="w-1 sm:w-auto sm:h-auto h-1 sm:min-h-full flex-shrink-0" style={{ background: d.op.color }} />
+      <div className="flex flex-col sm:flex-row gap-5 p-5 flex-1">
+        {/* Operator */}
+        <div className="flex-shrink-0 flex sm:flex-col items-center gap-3 sm:gap-2 sm:w-20">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-sm" style={{ background: d.op.color }}>{d.op.abbr}</div>
           <div className="text-center">
-            <p className="text-2xl font-black text-gray-900 leading-none">{d.hDep}:{d.mDep}</p>
-            <p className="text-xs text-gray-400 mt-0.5 truncate max-w-[80px]">{origin}</p>
+            <p className="text-[0.65rem] font-bold text-gray-700 leading-tight">{d.op.name}</p>
+            <div className="mt-1"><ClassBadge cls={d.busClass} /></div>
           </div>
-          <div className="flex-1 flex flex-col items-center gap-1 px-2">
-            <div className="w-full flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full border-2 border-orange-400 flex-shrink-0" />
-              <div className="flex-1 h-px bg-gradient-to-r from-orange-300 to-gray-200" />
-              <div className="bg-orange-50 border border-orange-200 rounded-full px-2 py-0.5 flex items-center gap-1 flex-shrink-0">
-                <i className="fa fa-bus text-orange-500 text-[0.6rem]" />
-                <span className="text-[0.6rem] font-bold text-orange-600">{d.durH}h {d.durM}m</span>
+        </div>
+
+        {/* Route */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="text-center">
+              <p className="text-2xl font-black text-gray-900 leading-none">{d.hDep}:{d.mDep}</p>
+              <p className="text-xs text-gray-400 mt-0.5 truncate max-w-[80px]">{origin}</p>
+            </div>
+            <div className="flex-1 flex flex-col items-center gap-1 px-2">
+              <div className="w-full flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full border-2 border-orange-400 flex-shrink-0" />
+                <div className="flex-1 h-px bg-gradient-to-r from-orange-300 to-gray-200" />
+                <div className="bg-orange-50 border border-orange-200 rounded-full px-2 py-0.5 flex items-center gap-1 flex-shrink-0">
+                  <i className="fa fa-bus text-orange-500 text-[0.6rem]" />
+                  <span className="text-[0.6rem] font-bold text-orange-600">{d.durH}h {d.durM}m</span>
+                </div>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-orange-300" />
+                <div className="w-2 h-2 rounded-full bg-gray-300 flex-shrink-0" />
               </div>
-              <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-orange-300" />
-              <div className="w-2 h-2 rounded-full bg-gray-300 flex-shrink-0" />
+              <p className="text-[0.6rem] text-gray-400">Direct · {d.distanceKm} km</p>
             </div>
-            <p className="text-[0.6rem] text-gray-400">Direct · {d.distanceKm} km</p>
+            <div className="text-center">
+              <p className="text-2xl font-black text-gray-900 leading-none">{d.hArr}:{d.mArr}</p>
+              <p className="text-xs text-gray-400 mt-0.5 truncate max-w-[80px]">{destination}</p>
+            </div>
           </div>
-          <div className="text-center">
-            <p className="text-2xl font-black text-gray-900 leading-none">{d.hArr}:{d.mArr}</p>
-            <p className="text-xs text-gray-400 mt-0.5 truncate max-w-[80px]">{destination}</p>
-          </div>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {d.amenities.map(a => (
-            <span key={a} className="flex items-center gap-1 text-[0.6rem] text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
-              <i className={`fa ${AMENITY_ICONS[a]} text-orange-400`} />{a}
+          <div className="flex flex-wrap items-center gap-2">
+            {d.amenities.map(a => (
+              <span key={a} className="flex items-center gap-1 text-[0.6rem] text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
+                <i className={`fa ${AMENITY_ICONS[a]} text-orange-400`} />{a}
+              </span>
+            ))}
+            <span className="ml-1 flex items-center gap-1">
+              <StarRating value={d.rating} />
+              <span className="text-[0.65rem] text-gray-400">{d.rating} ({d.reviews})</span>
             </span>
-          ))}
-          <span className="ml-1 flex items-center gap-1">
-            <StarRating value={d.rating} />
-            <span className="text-[0.65rem] text-gray-400">{d.rating} ({d.reviews} reviews)</span>
-          </span>
+          </div>
+
+          <p className="text-[0.65rem] text-gray-400 mt-2">
+            <i className="fa fa-map-marker text-orange-400 mr-1" />
+            {d.stationName}{d.stationCity ? `, ${d.stationCity}` : ''}
+            {d.stationAddr ? ` — ${d.stationAddr}` : ''}
+          </p>
         </div>
 
-        <p className="text-[0.65rem] text-gray-400 mt-2">
-          <i className="fa fa-map-marker text-orange-400 mr-1" />
-          {d.stationName}{d.stationCity ? `, ${d.stationCity}` : ''}
-          {d.stationAddr ? ` — ${d.stationAddr}` : ''}
-        </p>
-      </div>
-
-      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3 sm:w-36 flex-shrink-0 sm:border-l sm:border-gray-100 sm:pl-5">
-        <div className="text-right">
-          {d.discount && (
-            <div className="flex items-center gap-1 justify-end mb-0.5">
-              <span className="text-[0.6rem] text-gray-400 line-through">₹{d.oldFare}</span>
-              <span className="text-[0.6rem] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded">SALE</span>
-            </div>
-          )}
-          <p className="text-2xl font-black text-gray-900">₹{d.fare}</p>
-          <p className="text-[0.65rem] text-gray-400">per person</p>
-          <div className="mt-1"><SeatsBadge seats={d.seats} /></div>
+        {/* Price + CTA */}
+        <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3 sm:w-36 flex-shrink-0 sm:border-l sm:border-gray-100 sm:pl-5">
+          <div className="text-right">
+            {d.discount && (
+              <div className="flex items-center gap-1 justify-end mb-0.5">
+                <span className="text-[0.6rem] text-gray-400 line-through">₹{d.oldFare}</span>
+                <span className="text-[0.6rem] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded">SALE</span>
+              </div>
+            )}
+            <p className="text-2xl font-black text-gray-900">₹{d.fare}</p>
+            <p className="text-[0.65rem] text-gray-400">per person</p>
+            <div className="mt-1"><SeatsBadge seats={d.seats} /></div>
+          </div>
+          <button onClick={() => onBook({ ...d, origin, destination })}
+            className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all shadow-md shadow-orange-500/20 active:scale-95">
+            <i className="fa fa-ticket text-xs" /> Book Now
+          </button>
         </div>
-        <button onClick={() => onBook({ ...d, origin, destination })}
-          className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all shadow-md shadow-orange-500/20 active:scale-95">
-          <i className="fa fa-ticket text-xs" /> Book Now
-        </button>
       </div>
     </div>
   );
 }
 
-// ─── Seat Map ────────────────────────────────────────────────────────────────
+// ─── Seat Map ─────────────────────────────────────────────────────────────────
 
 function SeatMap({ totalSeats, selected, onToggle }) {
   const rows = Math.ceil(Math.min(totalSeats + 8, 24) / 4);
@@ -340,7 +339,7 @@ function SeatMap({ totalSeats, selected, onToggle }) {
   );
 }
 
-// ─── Booking Modal ───────────────────────────────────────────────────────────
+// ─── Booking Modal ────────────────────────────────────────────────────────────
 
 function loadRazorpay() {
   return new Promise(resolve => {
@@ -354,24 +353,54 @@ function loadRazorpay() {
   });
 }
 
+const BOOKING_STEPS = ['Trip Details', 'Choose Seat', 'Passenger Info'];
+
 function BookingModal({ data, onClose }) {
-  const [step, setStep]             = useState(1);
+  const [step, setStep]         = useState(1);
   const [passengers, setPassengers] = useState(1);
-  const [seat, setSeat]             = useState(null);
-  const [name, setName]             = useState('');
-  const [email, setEmail]           = useState('');
-  const [phone, setPhone]           = useState('');
-  const [booked, setBooked]         = useState(false);
-  const [paying, setPaying]         = useState(false);
-  const [payError, setPayError]     = useState('');
+  const [seat, setSeat]         = useState(null);
+  const [name, setName]         = useState('');
+  const [email, setEmail]       = useState('');
+  const [phone, setPhone]       = useState('');
+  const [booked, setBooked]     = useState(false);
+  const [paying, setPaying]     = useState(false);
+  const [payError, setPayError] = useState('');
 
   if (!data) return null;
 
   const total = Math.round(data.fare * passengers + 50);
-  const STEPS = ['Trip Details', 'Choose Seat', 'Passenger Info'];
+
+  const handlePay = async (e) => {
+    e.preventDefault();
+    setPaying(true);
+    setPayError('');
+    try {
+      const loaded = await loadRazorpay();
+      if (!loaded) throw new Error('Razorpay SDK failed to load. Check your connection.');
+      const key = import.meta.env.VITE_RAZORPAY_KEY_ID;
+      if (!key) throw new Error('Payment is not configured. Contact support.');
+      const rzp = new window.Razorpay({
+        key,
+        amount: total * 100,
+        currency: 'INR',
+        name: 'Pacific Travel',
+        description: `Bus: ${data.origin} → ${data.destination}`,
+        image: import.meta.env.VITE_LOGO_URL || '',
+        prefill: { name, email, contact: phone },
+        theme: { color: '#f97316' },
+        handler: () => { setBooked(true); },
+        modal: { ondismiss: () => setPaying(false) },
+      });
+      rzp.open();
+      setPaying(false);
+    } catch (err) {
+      setPayError(err.message || 'Payment failed. Please try again.');
+      setPaying(false);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
 
         {booked ? (
@@ -379,8 +408,8 @@ function BookingModal({ data, onClose }) {
             <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-5 border-4 border-green-100">
               <i className="fa fa-check text-green-500 text-3xl" />
             </div>
-            <h3 className="text-2xl font-black text-gray-900 mb-1">Payment Successful!</h3>
-            <p className="text-gray-400 text-sm mb-5">Confirmation sent to {email}</p>
+            <h3 className="text-2xl font-black text-gray-900 mb-1">Booking Confirmed!</h3>
+            <p className="text-gray-400 text-sm mb-6">Confirmation sent to <span className="font-semibold text-gray-700">{email}</span></p>
             <div className="bg-gray-50 rounded-2xl p-5 text-left space-y-2.5 mb-6 border border-gray-100 text-sm">
               {[
                 ['Route',      `${data.origin} → ${data.destination}`],
@@ -394,7 +423,7 @@ function BookingModal({ data, onClose }) {
                 ['Passengers', String(passengers)],
               ].map(([label, val]) => (
                 <div key={label} className="flex justify-between">
-                  <span className="text-gray-500">{label}</span>
+                  <span className="text-gray-400">{label}</span>
                   <span className="font-semibold text-gray-800">{val}</span>
                 </div>
               ))}
@@ -407,8 +436,9 @@ function BookingModal({ data, onClose }) {
           </div>
         ) : (
           <>
+            {/* Modal header */}
             <div className="bg-gradient-to-br from-orange-500 to-orange-600 px-6 py-5 text-white rounded-t-3xl">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-5">
                 <div>
                   <h3 className="font-black text-xl">Book Your Seat</h3>
                   <p className="text-orange-100 text-xs mt-0.5">{data.origin} → {data.destination} · {data.op.name}</p>
@@ -417,8 +447,9 @@ function BookingModal({ data, onClose }) {
                   <i className="fa fa-times" />
                 </button>
               </div>
+              {/* Step indicator */}
               <div className="flex items-center gap-0">
-                {STEPS.map((label, i) => (
+                {BOOKING_STEPS.map((label, i) => (
                   <div key={i} className="flex items-center flex-1 last:flex-none">
                     <div className="flex flex-col items-center gap-1">
                       <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black border-2 transition-all ${step > i+1 ? 'bg-white border-white text-orange-500' : step === i+1 ? 'bg-white border-white text-orange-500' : 'bg-transparent border-white/40 text-white/60'}`}>
@@ -426,13 +457,14 @@ function BookingModal({ data, onClose }) {
                       </div>
                       <span className={`text-[0.55rem] font-bold uppercase tracking-wider whitespace-nowrap ${step === i+1 ? 'text-white' : 'text-white/50'}`}>{label}</span>
                     </div>
-                    {i < STEPS.length-1 && <div className={`flex-1 h-px mx-2 mb-4 transition-all ${step > i+1 ? 'bg-white' : 'bg-white/30'}`} />}
+                    {i < BOOKING_STEPS.length-1 && <div className={`flex-1 h-px mx-2 mb-4 transition-all ${step > i+1 ? 'bg-white' : 'bg-white/30'}`} />}
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="p-6">
+              {/* Step 1: Trip Details */}
               {step === 1 && (
                 <div className="space-y-5">
                   <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4">
@@ -502,6 +534,7 @@ function BookingModal({ data, onClose }) {
                 </div>
               )}
 
+              {/* Step 2: Seat */}
               {step === 2 && (
                 <div className="space-y-5">
                   <SeatMap totalSeats={data.seats} selected={seat} onToggle={setSeat} />
@@ -520,37 +553,13 @@ function BookingModal({ data, onClose }) {
                 </div>
               )}
 
+              {/* Step 3: Passenger Info + Pay */}
               {step === 3 && (
-                <form onSubmit={async e => {
-                    e.preventDefault();
-                    setPaying(true);
-                    setPayError('');
-                    try {
-                      const loaded = await loadRazorpay();
-                      if (!loaded) throw new Error('Razorpay SDK failed to load. Check your connection.');
-                      const options = {
-                        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-                        amount: total * 100,
-                        currency: 'INR',
-                        name: 'Pacific Travel',
-                        description: `Bus: ${data.origin} → ${data.destination}`,
-                        image: import.meta.env.VITE_LOGO_URL || '',
-                        prefill: { name, email, contact: phone },
-                        theme: { color: '#f97316' },
-                        handler: () => { setBooked(true); },
-                        modal: { ondismiss: () => setPaying(false) },
-                      };
-                      const rzp = new window.Razorpay(options);
-                      rzp.open();
-                    } catch (err) {
-                      setPayError(err.message || 'Payment failed. Please try again.');
-                      setPaying(false);
-                    }
-                  }} className="space-y-4">
+                <form onSubmit={handlePay} className="space-y-4">
                   {[
                     { label: 'Full Name',     icon: 'fa-user',     value: name,  set: setName,  type: 'text',  placeholder: 'Your full name' },
                     { label: 'Email Address', icon: 'fa-envelope', value: email, set: setEmail, type: 'email', placeholder: 'your@email.com' },
-                    { label: 'Phone Number',  icon: 'fa-phone',    value: phone, set: setPhone, type: 'tel',   placeholder: '+1 234 567 8900' },
+                    { label: 'Phone Number',  icon: 'fa-phone',    value: phone, set: setPhone, type: 'tel',   placeholder: '+91 XXXXX XXXXX' },
                   ].map(({ label, icon, value, set, type, placeholder }) => (
                     <div key={label}>
                       <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1.5">{label}</label>
@@ -560,6 +569,7 @@ function BookingModal({ data, onClose }) {
                       </div>
                     </div>
                   ))}
+
                   <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 space-y-2 text-sm">
                     <div className="flex justify-between text-gray-500"><span>Fare × {passengers}</span><span>₹{data.fare * passengers}</span></div>
                     {data.discount && <div className="flex justify-between text-green-600"><span>Discount</span><span>-₹{data.oldFare - data.fare}</span></div>}
@@ -568,15 +578,18 @@ function BookingModal({ data, onClose }) {
                       <span>Total</span><span className="text-orange-500">₹{total}</span>
                     </div>
                   </div>
+
                   {payError && (
                     <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 text-sm">
                       <i className="fa fa-exclamation-circle flex-shrink-0" />{payError}
                     </div>
                   )}
-                  <div className="bg-orange-50 border border-orange-100 rounded-xl px-4 py-3 text-sm text-orange-800 flex items-center gap-2">
+
+                  <div className="flex items-center gap-2 bg-orange-50 border border-orange-100 rounded-xl px-4 py-3 text-sm text-orange-800">
                     <i className="fa fa-lock text-orange-500" />
-                    Secured by Razorpay · UPI, Cards, Net Banking & Wallets accepted
+                    Secured by Razorpay · UPI, Cards, Net Banking & Wallets
                   </div>
+
                   <div className="flex gap-3">
                     <button type="button" onClick={() => setStep(2)} className="flex-1 border border-gray-200 text-gray-600 font-bold py-3 rounded-2xl hover:border-gray-300 transition-all">Back</button>
                     <button type="submit" disabled={paying}
@@ -595,52 +608,41 @@ function BookingModal({ data, onClose }) {
   );
 }
 
-// ─── Main Page ───────────────────────────────────────────────────────────────
+// ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function Bus() {
+  const [searchParams] = useSearchParams();
   const [origin, setOrigin]           = useState('');
-  const [destination, setDestination] = useState('');
+  const [destination, setDestination] = useState(searchParams.get('to') || '');
   const [date, setDate]               = useState('');
   const [pax, setPax]                 = useState(1);
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState('');
-  const [results, setResults]         = useState(null); // { from, to, buses: [{busData, station}] }
+  const [results, setResults]         = useState(null);
   const [booking, setBooking]         = useState(null);
   const [view, setView]               = useState('list');
   const [sortBy, setSortBy]           = useState('price');
-  const [filterAmenity, setFilterAmenity] = useState('');
-  const [filterClass, setFilterClass]     = useState('');
-  const [filterMaxPrice, setFilterMaxPrice] = useState(200);
+  const [filterAmenity, setFilterAmenity]   = useState('');
+  const [filterClass, setFilterClass]       = useState('');
+  const [filterMaxPrice, setFilterMaxPrice] = useState(10000);
   const resultsRef = useRef(null);
 
   async function handleSearch(e) {
     e?.preventDefault();
     if (!origin.trim() || !destination.trim()) return;
-    setLoading(true);
-    setError('');
-    setResults(null);
+    setLoading(true); setError(''); setResults(null);
     try {
-      // 1. Geocode both cities
       const [from, to] = await Promise.all([geocodeCity(origin), geocodeCity(destination)]);
-
-      // 2. Get real route distance & duration
       const route = await getRouteInfo(from.lat, from.lon, to.lat, to.lon);
       if (!route.distanceKm) throw new Error('Could not calculate route between these cities.');
-
-      // 3. Get real bus stations near origin
       const stations = await getBusStations(from.lat, from.lon);
       if (!stations.length) throw new Error('No bus stations found near the departure city.');
-
-      // 4. Build one bus listing per station using real route data
       const buses = stations.map((station, index) => ({
         busData: buildBusData({ distanceKm: route.distanceKm, durationMin: route.durationMin, station, index }),
         station,
       }));
-
-      // Set max price filter ceiling based on real data
       const maxFare = Math.max(...buses.map(b => b.busData.fare));
       setFilterMaxPrice(Math.ceil(maxFare / 100) * 100);
-
       setResults({ from, to, route, buses });
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
     } catch (err) {
@@ -651,14 +653,12 @@ export default function Bus() {
   }
 
   const allBuses = results?.buses || [];
-
   const filtered = allBuses.filter(({ busData: d }) => {
     if (filterAmenity && !d.amenities.includes(filterAmenity)) return false;
     if (filterClass && d.busClass !== filterClass) return false;
     if (d.fare > filterMaxPrice) return false;
     return true;
   });
-
   const sorted = [...filtered].sort((a, b) => {
     const da = a.busData, db = b.busData;
     if (sortBy === 'price')    return da.fare - db.fare;
@@ -667,103 +667,116 @@ export default function Bus() {
     if (sortBy === 'departs')  return da.hDep.localeCompare(db.hDep);
     return 0;
   });
-
   const activeFilters = [filterAmenity, filterClass].filter(Boolean).length;
   const maxFareCeiling = results ? Math.ceil(Math.max(...allBuses.map(b => b.busData.fare)) / 100) * 100 : 10000;
 
   return (
     <>
-      {/* Hero */}
       <BusAlertsTicker />
-      <section className="relative flex items-center justify-center bg-cover bg-center overflow-hidden" style={{ backgroundImage: "url('/images/bg_4.jpg')", minHeight: '62vh' }}>
-        <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-black/55 to-orange-950/40" />
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px)', backgroundSize: '48px 48px' }} />
-        <div className="relative z-10 text-center text-white px-4 max-w-3xl mx-auto">
+
+      {/* ── Hero ── */}
+      <section className="relative overflow-hidden" style={{ minHeight: '72vh' }}>
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/bg_4.jpg')" }} />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/60 to-orange-950/50" />
+        {/* subtle grid overlay */}
+        <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px)', backgroundSize: '48px 48px' }} />
+
+        <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-4 pt-20 pb-40">
+          {/* Breadcrumb */}
+          <p className="text-sm mb-6 flex items-center justify-center gap-2 text-gray-400">
+            <Link to="/" className="hover:text-orange-400 transition-colors">Home</Link>
+            <i className="fa fa-chevron-right text-xs text-orange-500" />
+            <span className="text-white">Bus Booking</span>
+          </p>
+
           <div className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-400/30 text-orange-300 text-xs font-semibold px-4 py-1.5 rounded-full mb-5 backdrop-blur-sm">
             <i className="fa fa-bus" /> Intercity Bus Booking
           </div>
-          <p className="text-sm mb-4 flex items-center justify-center gap-2 text-gray-400">
-            <Link to="/" className="hover:text-orange-400 transition-colors">Home</Link>
-            <i className="fa fa-chevron-right text-xs text-orange-500" />
-            <span className="text-white">Bus</span>
-          </p>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight mb-4">
+
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight mb-4 max-w-3xl">
             Travel Smarter <span className="text-orange-400">by Bus</span>
           </h1>
-          <p className="text-gray-300 text-base md:text-lg max-w-xl mx-auto">
-            Real routes, real distances, real fares — book your seat in seconds.
+          <p className="text-gray-300 text-base md:text-lg max-w-xl">
+            Real routes · Real fares · Book your seat in seconds
           </p>
         </div>
+
       </section>
 
-      {/* Stats bar */}
+      {/* ── Search Card ── */}
+      <div className="bg-gray-950 px-4 py-8">
+        <div className="max-w-5xl mx-auto">
+          <form onSubmit={handleSearch} className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-5 md:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+              {[
+                { label: 'From',  icon: 'fa-map-marker text-orange-500', value: origin,      set: setOrigin,      type: 'text', placeholder: 'Departure city' },
+                { label: 'To',    icon: 'fa-map-marker text-gray-400',   value: destination, set: setDestination, type: 'text', placeholder: 'Arrival city' },
+                { label: 'Date',  icon: 'fa-calendar text-orange-400',   value: date,        set: setDate,        type: 'date', placeholder: '' },
+              ].map(({ label, icon, value, set, type, placeholder }) => (
+                <div key={label} className="flex flex-col gap-1.5 group">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">{label}</label>
+                  <div className="flex items-center gap-2.5 border border-gray-200 rounded-2xl px-4 py-3 group-focus-within:border-orange-400 group-focus-within:ring-2 group-focus-within:ring-orange-500/10 transition-all bg-gray-50/50">
+                    <i className={`fa ${icon} text-sm flex-shrink-0`} />
+                    <input type={type} value={value} onChange={e => set(e.target.value)} placeholder={placeholder}
+                      className="flex-1 outline-none text-sm text-gray-700 placeholder-gray-300 bg-transparent min-w-0" />
+                  </div>
+                </div>
+              ))}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Passengers</label>
+                <div className="flex items-center gap-2 border border-gray-200 rounded-2xl px-3 py-2.5 bg-gray-50/50">
+                  <button type="button" onClick={() => setPax(p => Math.max(1, p-1))} className="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:border-orange-400 hover:text-orange-500 transition-all flex-shrink-0"><i className="fa fa-minus text-[0.6rem]" /></button>
+                  <span className="flex-1 text-center text-sm font-bold text-gray-900">{pax}</span>
+                  <button type="button" onClick={() => setPax(p => Math.min(9, p+1))} className="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:border-orange-400 hover:text-orange-500 transition-all flex-shrink-0"><i className="fa fa-plus text-[0.6rem]" /></button>
+                </div>
+              </div>
+              <button type="submit" disabled={loading}
+                className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-bold px-6 py-3.5 rounded-2xl transition-all shadow-lg shadow-orange-500/30 active:scale-95 h-[50px]">
+                <i className={`fa ${loading ? 'fa-spinner fa-spin' : 'fa-search'}`} />
+                {loading ? 'Searching…' : 'Search Buses'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* ── Stats bar ── */}
       <div className="bg-gray-950">
         <div className="max-w-4xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-white/10">
             {STATS.map((s, i) => (
-              <div key={i} className="flex flex-col items-center py-5 px-3 text-white">
-                <i className={`fa ${s.icon} text-orange-400 text-lg mb-1`} />
-                <span className="text-xl font-extrabold">{s.value}</span>
-                <span className="text-[10px] text-gray-400 uppercase tracking-widest">{s.label}</span>
+              <div key={i} className="flex flex-col items-center py-6 px-3 text-white">
+                <i className={`fa ${s.icon} text-orange-400 text-lg mb-1.5`} />
+                <span className="text-2xl font-extrabold">{s.value}</span>
+                <span className="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">{s.label}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Search form */}
-      <section className="max-w-6xl mx-auto px-6 py-10">
-        <form onSubmit={handleSearch} className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-            {[
-              { label: 'From',  icon: 'fa-map-marker', value: origin,      set: setOrigin,      type: 'text', placeholder: 'Departure city' },
-              { label: 'To',    icon: 'fa-map-marker', value: destination, set: setDestination, type: 'text', placeholder: 'Arrival city' },
-              { label: 'Date',  icon: 'fa-calendar',   value: date,        set: setDate,        type: 'date', placeholder: '' },
-            ].map(({ label, icon, value, set, type, placeholder }) => (
-              <div key={label} className="flex flex-col gap-1.5 group">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">{label}</label>
-                <div className="flex items-center gap-2.5 border border-gray-200 rounded-2xl px-4 py-3 group-focus-within:border-orange-400 group-focus-within:ring-2 group-focus-within:ring-orange-500/10 transition-all bg-gray-50/50">
-                  <i className={`fa ${icon} text-orange-400 text-sm flex-shrink-0`} />
-                  <input type={type} value={value} onChange={e => set(e.target.value)} placeholder={placeholder}
-                    className="flex-1 outline-none text-sm text-gray-700 placeholder-gray-300 bg-transparent min-w-0" />
-                </div>
-              </div>
-            ))}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Passengers</label>
-              <div className="flex items-center gap-2 border border-gray-200 rounded-2xl px-3 py-2.5 bg-gray-50/50">
-                <button type="button" onClick={() => setPax(p => Math.max(1, p-1))} className="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:border-orange-400 hover:text-orange-500 transition-all flex-shrink-0"><i className="fa fa-minus text-[0.6rem]" /></button>
-                <span className="flex-1 text-center text-sm font-bold text-gray-900">{pax}</span>
-                <button type="button" onClick={() => setPax(p => Math.min(9, p+1))} className="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:border-orange-400 hover:text-orange-500 transition-all flex-shrink-0"><i className="fa fa-plus text-[0.6rem]" /></button>
-              </div>
-            </div>
-            <button type="submit" disabled={loading}
-              className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-bold px-6 py-3.5 rounded-2xl transition-all shadow-lg shadow-orange-500/25 active:scale-95 h-[50px]">
-              <i className={`fa ${loading ? 'fa-spinner fa-spin' : 'fa-search'}`} />
-              {loading ? 'Searching…' : 'Search Buses'}
-            </button>
-          </div>
-        </form>
-        {error && (
-          <div className="flex items-center gap-3 bg-red-50 border border-red-200 text-red-600 rounded-2xl px-5 py-4 text-sm mt-4">
+      {/* ── Error ── */}
+      {error && (
+        <div className="max-w-5xl mx-auto px-6 pt-8">
+          <div className="flex items-center gap-3 bg-red-50 border border-red-200 text-red-600 rounded-2xl px-5 py-4 text-sm">
             <i className="fa fa-exclamation-circle text-lg flex-shrink-0" />{error}
           </div>
-        )}
-      </section>
+        </div>
+      )}
 
-      {/* Loading skeletons */}
+      {/* ── Loading skeletons ── */}
       {loading && (
-        <section className="max-w-6xl mx-auto px-6 pb-16">
+        <section className="max-w-6xl mx-auto px-6 py-12">
           <div className="space-y-4">{[...Array(5)].map((_, i) => <SkeletonRow key={i} />)}</div>
         </section>
       )}
 
-      {/* Results */}
+      {/* ── Results ── */}
       {results && !loading && (
-        <section className="max-w-6xl mx-auto px-6 pb-16" ref={resultsRef}>
+        <section className="max-w-6xl mx-auto px-6 py-12" ref={resultsRef}>
 
           {/* Route summary banner */}
-          <div className="bg-white border border-gray-100 rounded-2xl p-4 mb-6 flex flex-wrap items-center gap-4 shadow-sm">
+          <div className="bg-white border border-gray-100 rounded-2xl p-4 mb-8 flex flex-wrap items-center gap-4 shadow-sm">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <i className="fa fa-bus text-orange-500" />
@@ -797,7 +810,6 @@ export default function Bus() {
                   )}
                 </div>
                 <div className="p-5 space-y-6">
-                  {/* Max price */}
                   <div>
                     <div className="flex items-center justify-between mb-3">
                       <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Max Price</p>
@@ -808,7 +820,6 @@ export default function Bus() {
                       className="w-full accent-orange-500 cursor-pointer" />
                     <div className="flex justify-between text-[0.6rem] text-gray-400 mt-1"><span>₹0</span><span>₹{maxFareCeiling}</span></div>
                   </div>
-                  {/* Bus class */}
                   <div>
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Bus Class</p>
                     <div className="space-y-2">
@@ -821,7 +832,6 @@ export default function Bus() {
                       ))}
                     </div>
                   </div>
-                  {/* Amenities */}
                   <div>
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Amenities</p>
                     <div className="space-y-2">
@@ -842,7 +852,7 @@ export default function Bus() {
             {/* Results list */}
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-                <p className="text-sm text-gray-500">{sorted.length} service{sorted.length !== 1 ? 's' : ''} found</p>
+                <p className="text-sm text-gray-500"><span className="font-bold text-gray-900">{sorted.length}</span> service{sorted.length !== 1 ? 's' : ''} found</p>
                 <div className="flex items-center gap-2 flex-wrap">
                   <select value={sortBy} onChange={e => setSortBy(e.target.value)}
                     className="border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold text-gray-600 outline-none focus:border-orange-400 bg-white cursor-pointer">
@@ -873,7 +883,7 @@ export default function Bus() {
                 </div>
               ) : (
                 <div className={view === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 gap-4' : 'space-y-4'}>
-                  {sorted.map(({ busData, station }, i) => (
+                  {sorted.map(({ busData }, i) => (
                     <BusResultRow key={i} busData={busData} origin={origin} destination={destination} onBook={setBooking} view={view} />
                   ))}
                 </div>
@@ -883,10 +893,11 @@ export default function Bus() {
         </section>
       )}
 
-      {/* Popular routes (shown before search) */}
+      {/* ── Pre-search sections ── */}
       {!results && !loading && (
         <>
-          <section className="max-w-6xl mx-auto px-6 pb-16">
+          {/* Popular Routes */}
+          <section className="max-w-6xl mx-auto px-6 py-20">
             <div className="flex items-end justify-between mb-8">
               <div>
                 <span className="text-orange-500 text-xs font-bold uppercase tracking-widest">Quick Pick</span>
@@ -897,35 +908,37 @@ export default function Bus() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {POPULAR_ROUTES.map((r, i) => (
                 <button key={i} onClick={() => { setOrigin(r.from); setDestination(r.to); }}
-                  className="group relative h-48 rounded-3xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 text-left">
+                  className="group relative h-52 rounded-3xl overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 text-left">
                   <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: `url('${r.img}')` }} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
                   <div className="absolute inset-0 p-5 flex flex-col justify-end">
                     <p className="text-white font-extrabold text-lg leading-tight">{r.from} → {r.to}</p>
-                    <p className="text-gray-300 text-xs mt-1 flex items-center gap-1">
-                      <i className="fa fa-bus text-orange-400" /> Click to search this route
-                    </p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-gray-300 text-xs flex items-center gap-1.5">
+                        <i className="fa fa-clock-o text-orange-400" />{r.duration}
+                      </span>
+                      <span className="text-orange-400 font-black text-sm">{r.fare}</span>
+                    </div>
+                  </div>
+                  <div className="absolute top-4 right-4 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <i className="fa fa-arrow-right text-white text-xs" />
                   </div>
                 </button>
               ))}
             </div>
           </section>
 
-          <section className="py-14 bg-gray-50">
+          {/* Why Book With Us */}
+          <section className="py-16 bg-gray-50">
             <div className="max-w-6xl mx-auto px-6">
               <div className="text-center mb-10">
                 <span className="text-orange-500 text-xs font-bold uppercase tracking-widest">Why Book With Us</span>
                 <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 mt-1">The Pacific Bus Advantage</h2>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                  { icon: 'fa-tag',        color: 'bg-green-50 text-green-500',   title: 'Best Price Guarantee', desc: 'We compare all operators so you always get the lowest fare.' },
-                  { icon: 'fa-shield',     color: 'bg-blue-50 text-blue-500',     title: 'Verified Operators',   desc: 'Every bus company is licensed, insured and safety-checked.' },
-                  { icon: 'fa-ban',        color: 'bg-orange-50 text-orange-500', title: 'Free Cancellation',    desc: 'Cancel up to 2 hours before departure with a full refund.' },
-                  { icon: 'fa-headphones', color: 'bg-purple-50 text-purple-500', title: '24/7 Support',         desc: 'Our team is available around the clock to help with any issue.' },
-                ].map((f, i) => (
+                {FEATURES.map((f, i) => (
                   <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col items-start gap-4">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl ${f.color}`}><i className={`fa ${f.icon}`} /></div>
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl ${f.bg} ${f.color}`}><i className={`fa ${f.icon}`} /></div>
                     <div>
                       <h4 className="font-bold text-gray-900 text-sm mb-1">{f.title}</h4>
                       <p className="text-xs text-gray-400 leading-relaxed">{f.desc}</p>
@@ -936,7 +949,8 @@ export default function Bus() {
             </div>
           </section>
 
-          <section className="py-14 bg-gray-950">
+          {/* Testimonials */}
+          <section className="py-16 bg-gray-950">
             <div className="max-w-6xl mx-auto px-6">
               <div className="text-center mb-10">
                 <span className="text-orange-400 text-xs font-bold uppercase tracking-widest">Passenger Reviews</span>
@@ -966,17 +980,8 @@ export default function Bus() {
         </>
       )}
 
-      {/* ── Bus Extras (always visible) ── */}
-      <NearbyStopsMap results={results?.stations ? { stations: results.stations, from: results.from } : null} />
-      <JourneyPlanner />
-      <PriceTrendChart />
-      <CompareTable />
-      <OperatorProfiles />
-      <TerminalFinder />
-      <PopularDestinations onSelect={city => { setDestination(city); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
-      <TravelTips />
-      {/* ── Bus Extra Sections ── */}
-      {results && <NearbyStopsMap results={{ stations: results.stations, from: results.from }} />}
+      {/* ── Bus Extras ── */}
+      {results && <NearbyStopsMap results={results.stations ? { stations: results.stations, from: results.from } : null} />}
       <JourneyPlanner />
       <PriceTrendChart />
       <CompareTable />

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
 import {
   searchStations,
@@ -1040,11 +1040,12 @@ function PnrStatusChecker() {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function Train() {
-  const [activeTab, setActiveTab]     = useState('search'); // 'search' | 'live' | 'pnr'
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab]     = useState('search');
   const [origin, setOrigin]           = useState('New Delhi (NDLS)');
   const [originCode, setOriginCode]   = useState('NDLS');
-  const [destination, setDestination] = useState('Howrah Jn (HWH)');
-  const [destCode, setDestCode]       = useState('HWH');
+  const [destination, setDestination] = useState(searchParams.get('to') || 'Howrah Jn (HWH)');
+  const [destCode, setDestCode]       = useState(searchParams.get('to') ? '' : 'HWH');
   const [date, setDate]               = useState('');
   const [pax, setPax]                 = useState(1);
   const [travelClass, setTravelClass] = useState('');
