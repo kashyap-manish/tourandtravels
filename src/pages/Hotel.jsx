@@ -65,17 +65,15 @@ export default function Hotel() {
   const searchRef = useRef(null);
   const [liveQuery, setLiveQuery] = useState('');
   const [liveResults, setLiveResults] = useState([]);
-  const [relatedSearches, setRelatedSearches] = useState([]);
   const [liveLoading, setLiveLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
-    if (!liveQuery.trim()) { setLiveResults([]); setRelatedSearches([]); setShowDropdown(false); return; }
+    if (!liveQuery.trim()) { setLiveResults([]); setShowDropdown(false); return; }
     const timer = setTimeout(() => {
       setLiveLoading(true);
-      fetch(`/api/search?q=${encodeURIComponent(liveQuery)}`)
-        .then(r => r.json())
-        .then(data => { setLiveResults(data.results || []); setRelatedSearches(data.relatedSearches || []); setShowDropdown(true); })
+      fetchHotels(liveQuery)
+        .then(data => { setLiveResults(data); setShowDropdown(true); })
         .catch(() => {})
         .finally(() => setLiveLoading(false));
     }, 350);
@@ -197,15 +195,17 @@ export default function Hotel() {
               {liveResults.length === 0 ? (
                 <p className="text-sm text-gray-400 px-4 py-3">No results found for "{liveQuery}"</p>
               ) : (
-                liveResults.map(r => (
-                  <div key={r._id} className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors border-b border-gray-50 last:border-0 cursor-pointer"
-                    onClick={() => { handleSearch(r.location); setShowDropdown(false); setLiveQuery(r.location); }}>
+                liveResults.map((h, i) => (
+                  <div key={i} className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors border-b border-gray-50 last:border-0 cursor-pointer"
+                    onClick={() => { handleSearch(liveQuery); setShowDropdown(false); setLiveQuery(''); }}>
                     <i className="fa fa-building text-orange-400 text-xs" />
                     <div>
-                      <p className="text-sm font-semibold text-gray-800">{r.title}</p>
-                      <p className="text-xs text-gray-400">{r.location} · {r.category}</p>
+                      <p className="text-sm font-semibold text-gray-800">{h.name}</p>
+                      <p className="text-xs text-gray-400">{h.location}</p>
                     </div>
-                    <span className="ml-auto text-xs font-bold text-orange-500">{r.price}</span>
+                    {'★'.repeat(Math.min(h.stars || 3, 5)) && (
+                      <span className="ml-auto text-xs text-yellow-500">{'★'.repeat(Math.min(h.stars || 3, 5))}</span>
+                    )}
                   </div>
                 ))
               )}
@@ -213,10 +213,7 @@ export default function Hotel() {
           )}
         </div>
 
-        <RelatedSearches
-          items={relatedSearches}
-          onSelect={term => { setLiveQuery(term); handleSearch(term); }}
-        />
+
       </section>
 
             {/* ── Filters & Grid ── */}

@@ -5,7 +5,6 @@ const SAFE_CITY = /^[a-zA-Z0-9 ,.'()-]{1,100}$/;
 export async function fetchHotels(city = 'Philippines') {
   if (!SAFE_CITY.test(city)) throw new Error('Invalid city name');
 
-  // Step 1: Geocode the city
   const geoUrl = new URL(`${GEOAPIFY_BASE}/v1/geocode/search`);
   geoUrl.searchParams.set('text', city);
   geoUrl.searchParams.set('apiKey', API_KEY);
@@ -16,7 +15,6 @@ export async function fetchHotels(city = 'Philippines') {
 
   const [lon, lat] = place.geometry.coordinates;
 
-  // Step 2: Fetch hotels near that location
   const placesUrl = new URL(`${GEOAPIFY_BASE}/v2/places`);
   placesUrl.searchParams.set('categories', 'accommodation.hotel');
   placesUrl.searchParams.set('filter', `circle:${lon},${lat},20000`);
@@ -39,4 +37,3 @@ export async function fetchHotels(city = 'Philippines') {
     };
   });
 }
-

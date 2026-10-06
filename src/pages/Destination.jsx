@@ -7,20 +7,12 @@ import CallToAction from '../components/CallToAction';
 import RelatedSearches from '../components/RelatedSearch';
 import { Link, useSearchParams } from 'react-router-dom';
 
-const featured = [
-  { img: '/images/destination-1.jpg', name: 'Goa',       country: 'India', tours: 14, tag: 'Trending',  slug: 'goa-beach-getaway',        desc: 'Sun-soaked beaches, vibrant nightlife and Portuguese heritage.' },
-  { img: '/images/destination-2.jpg', name: 'Manali',    country: 'India', tours: 9,  tag: 'Adventure', slug: 'manali-snow-escape',        desc: 'Snow-capped peaks, river rafting and mountain serenity.' },
-  { img: '/images/destination-3.jpg', name: 'Kerala',    country: 'India', tours: 11, tag: 'Nature',    slug: 'kerala-backwaters',         desc: 'Backwaters, spice gardens and tranquil houseboat stays.' },
-  { img: '/images/destination-4.jpg', name: 'Rajasthan', country: 'India', tours: 16, tag: 'Culture',   slug: 'rajasthan-desert-safari',   desc: 'Royal palaces, desert safaris and timeless Rajput heritage.' },
-  { img: '/images/destination-5.jpg', name: 'Andaman',   country: 'India', tours: 7,  tag: 'Beach',     slug: 'andaman-islands',           desc: 'Crystal-clear waters, coral reefs and untouched island life.' },
-];
-
 const tagColors = {
-  Trending:  'bg-orange-500',
   Adventure: 'bg-red-500',
   Nature:    'bg-green-600',
   Culture:   'bg-purple-600',
   Beach:     'bg-sky-500',
+  Trending:  'bg-orange-500',
 };
 
 const moods = [
@@ -147,6 +139,26 @@ export default function Destination() {
     const handler = (e) => { if (searchRef.current && !searchRef.current.contains(e.target)) setShowDropdown(false); };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const [featured, setFeatured] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/tours?limit=5')
+      .then(r => r.json())
+      .then(data => {
+        const tours = Array.isArray(data) ? data : data.tours || data.data || [];
+        setFeatured(tours.slice(0, 5).map(t => ({
+          img: t.img,
+          name: t.title,
+          country: t.location,
+          tours: t.reviewCount || 0,
+          tag: t.category || 'Trending',
+          slug: t.slug || t._id,
+          desc: t.description || '',
+        })));
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {

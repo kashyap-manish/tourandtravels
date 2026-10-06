@@ -10,10 +10,20 @@ export default defineConfig({
         target: 'http://localhost:5001',
         changeOrigin: true,
       },
-      '/aviationstack': {
-        target: 'http://api.aviationstack.com/v1',
+      '/airlabs': {
+        target: 'https://airlabs.co/api/v9',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/aviationstack/, ''),
+        rewrite: (path) => path.replace(/^\/airlabs/, ''),
+      },
+      '/pixabay': {
+        target: 'https://pixabay.com/api',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/pixabay/, ''),
+      },
+      '/newsdata': {
+        target: 'https://newsdata.io',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/newsdata/, ''),
       },
       '/railradar': {
         target: 'https://api.railradar.in/v1',
