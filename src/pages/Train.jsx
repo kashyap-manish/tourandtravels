@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
+import { createBooking } from '../services/api';
 import {
   searchStations,
   resolveStation,
@@ -528,7 +529,32 @@ function BookingModal({ data, origin, destination, pax, onClose }) {
                   image: import.meta.env.VITE_LOGO_URL || '',
                   prefill: { name, email, contact: phone },
                   theme: { color: '#3b82f6' },
-                  handler: () => { setBooked(true); },
+                  handler: async () => {
+                    try {
+                      await createBooking({
+                        type: 'train',
+                        name,
+                        email,
+                        phone,
+                        origin,
+                        destination,
+                        trainName: data.trainName,
+                        trainNo: data.trainNo,
+                        trainClass: data.cls,
+                        departure: `${data.hDep}:${data.mDep}`,
+                        arrival: `${data.hArr}:${data.mArr}`,
+                        duration: `${data.durH}h ${data.durM}m`,
+                        distanceKm: data.distanceKm,
+                        seat: seat || null,
+                        passengers,
+                        totalPrice: total,
+                        amenities: data.amenities,
+                      });
+                    } catch {
+                      // booking saved best-effort; don't block confirmation
+                    }
+                    setBooked(true);
+                  },
                   modal: { ondismiss: () => setPaying(false) },
                 };
                 const rzp = new window.Razorpay(options);

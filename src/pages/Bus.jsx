@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react';
+﻿import { useState, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { geocodeCity, getRouteInfo, getBusStations } from '../services/busApi';
+import { createBooking } from '../services/api';
 import CallToAction from '../components/CallToAction';
 import {
   BusAlertsTicker,
@@ -14,7 +15,7 @@ import {
   NearbyStopsMap,
 } from '../components/BusExtras';
 
-// ─── Static data ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Static data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const OPERATORS = [
   { name: 'FlixBus',          color: '#00b849', abbr: 'FX' },
@@ -33,12 +34,12 @@ const ALL_AMENITIES = Object.keys(AMENITY_ICONS);
 const BUS_CLASSES = ['Economy', 'Standard', 'Premium'];
 
 const POPULAR_ROUTES = [
-  { from: 'Delhi',     to: 'Agra',      img: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&h=400&fit=crop', duration: '3h', fare: '₹420' },
-  { from: 'Mumbai',    to: 'Pune',      img: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=600&h=400&fit=crop', duration: '3.5h', fare: '₹310' },
-  { from: 'Bangalore', to: 'Chennai',   img: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&h=400&fit=crop', duration: '6h', fare: '₹680' },
-  { from: 'Jaipur',    to: 'Jodhpur',   img: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=600&h=400&fit=crop', duration: '5h', fare: '₹580' },
-  { from: 'Hyderabad', to: 'Vijayawada',img: 'https://images.unsplash.com/photo-1561361058-c24e01238a46?w=600&h=400&fit=crop', duration: '5h', fare: '₹520' },
-  { from: 'Kolkata',   to: 'Bhubaneswar',img:'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600&h=400&fit=crop', duration: '7h', fare: '₹590' },
+  { from: 'Delhi',     to: 'Agra',      img: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&h=400&fit=crop', duration: '3h', fare: 'â‚¹420' },
+  { from: 'Mumbai',    to: 'Pune',      img: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=600&h=400&fit=crop', duration: '3.5h', fare: 'â‚¹310' },
+  { from: 'Bangalore', to: 'Chennai',   img: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&h=400&fit=crop', duration: '6h', fare: 'â‚¹680' },
+  { from: 'Jaipur',    to: 'Jodhpur',   img: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=600&h=400&fit=crop', duration: '5h', fare: 'â‚¹580' },
+  { from: 'Hyderabad', to: 'Vijayawada',img: 'https://images.unsplash.com/photo-1561361058-c24e01238a46?w=600&h=400&fit=crop', duration: '5h', fare: 'â‚¹520' },
+  { from: 'Kolkata',   to: 'Bhubaneswar',img:'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600&h=400&fit=crop', duration: '7h', fare: 'â‚¹590' },
 ];
 
 const STATS = [
@@ -56,12 +57,12 @@ const FEATURES = [
 ];
 
 const TESTIMONIALS = [
-  { name: 'Priya S.',   avatar: 'https://i.pravatar.cc/80?img=47', rating: 5, route: 'Delhi → Agra',        text: 'Incredibly smooth booking. The bus was on time, spotless, and the WiFi actually worked the whole journey!' },
-  { name: 'Rahul M.',   avatar: 'https://i.pravatar.cc/80?img=12', rating: 5, route: 'Mumbai → Pune',       text: 'Best price I found anywhere. Comfortable seats, charging ports at every seat. Will always book through Pacific.' },
-  { name: 'Ananya K.',  avatar: 'https://i.pravatar.cc/80?img=32', rating: 4, route: 'Bangalore → Chennai', text: 'Great value for money. The 24/7 support team helped me reschedule last minute without any hassle.' },
+  { name: 'Priya S.',   avatar: 'https://i.pravatar.cc/80?img=47', rating: 5, route: 'Delhi â†’ Agra',        text: 'Incredibly smooth booking. The bus was on time, spotless, and the WiFi actually worked the whole journey!' },
+  { name: 'Rahul M.',   avatar: 'https://i.pravatar.cc/80?img=12', rating: 5, route: 'Mumbai â†’ Pune',       text: 'Best price I found anywhere. Comfortable seats, charging ports at every seat. Will always book through Pacific.' },
+  { name: 'Ananya K.',  avatar: 'https://i.pravatar.cc/80?img=32', rating: 4, route: 'Bangalore â†’ Chennai', text: 'Great value for money. The 24/7 support team helped me reschedule last minute without any hassle.' },
 ];
 
-// ─── Data builder ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Data builder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function buildBusData({ distanceKm, durationMin, station, index }) {
   const p = station.properties;
@@ -92,7 +93,7 @@ function buildBusData({ distanceKm, durationMin, station, index }) {
   return { op, fare, oldFare, discount, durH, durM, hDep, mDep, hArr, mArr, stationName, stationCity, stationAddr, busClass, seats, rating, reviews, amenities, distanceKm };
 }
 
-// ─── Small UI helpers ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Small UI helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function ClassBadge({ cls }) {
   const map = {
@@ -136,7 +137,7 @@ function SkeletonRow() {
   );
 }
 
-// ─── BusResultRow ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ BusResultRow â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function BusResultRow({ busData: d, origin, destination, onBook, view }) {
   if (view === 'grid') {
@@ -168,7 +169,7 @@ function BusResultRow({ busData: d, origin, destination, onBook, view }) {
                 <div className="flex-1 border-t-2 border-dashed border-orange-200" />
                 <div className="w-1.5 h-1.5 rounded-full bg-gray-300 flex-shrink-0" />
               </div>
-              <p className="text-[0.6rem] text-gray-400">{d.durH}h {d.durM}m · {d.distanceKm} km</p>
+              <p className="text-[0.6rem] text-gray-400">{d.durH}h {d.durM}m Â· {d.distanceKm} km</p>
             </div>
             <div className="text-center">
               <p className="text-xl font-black text-gray-900">{d.hArr}:{d.mArr}</p>
@@ -192,8 +193,8 @@ function BusResultRow({ busData: d, origin, destination, onBook, view }) {
 
           <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
             <div>
-              {d.discount && <p className="text-[0.6rem] text-gray-400 line-through">₹{d.oldFare}</p>}
-              <p className="text-xl font-black text-gray-900">₹{d.fare}<span className="text-xs font-normal text-gray-400 ml-1">/person</span></p>
+              {d.discount && <p className="text-[0.6rem] text-gray-400 line-through">â‚¹{d.oldFare}</p>}
+              <p className="text-xl font-black text-gray-900">â‚¹{d.fare}<span className="text-xs font-normal text-gray-400 ml-1">/person</span></p>
             </div>
             <button onClick={() => onBook({ ...d, origin, destination })}
               className="flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-orange-500/20 active:scale-95">
@@ -237,7 +238,7 @@ function BusResultRow({ busData: d, origin, destination, onBook, view }) {
                 <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-orange-300" />
                 <div className="w-2 h-2 rounded-full bg-gray-300 flex-shrink-0" />
               </div>
-              <p className="text-[0.6rem] text-gray-400">Direct · {d.distanceKm} km</p>
+              <p className="text-[0.6rem] text-gray-400">Direct Â· {d.distanceKm} km</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-black text-gray-900 leading-none">{d.hArr}:{d.mArr}</p>
@@ -260,7 +261,7 @@ function BusResultRow({ busData: d, origin, destination, onBook, view }) {
           <p className="text-[0.65rem] text-gray-400 mt-2">
             <i className="fa fa-map-marker text-orange-400 mr-1" />
             {d.stationName}{d.stationCity ? `, ${d.stationCity}` : ''}
-            {d.stationAddr ? ` — ${d.stationAddr}` : ''}
+            {d.stationAddr ? ` â€” ${d.stationAddr}` : ''}
           </p>
         </div>
 
@@ -269,11 +270,11 @@ function BusResultRow({ busData: d, origin, destination, onBook, view }) {
           <div className="text-right">
             {d.discount && (
               <div className="flex items-center gap-1 justify-end mb-0.5">
-                <span className="text-[0.6rem] text-gray-400 line-through">₹{d.oldFare}</span>
+                <span className="text-[0.6rem] text-gray-400 line-through">â‚¹{d.oldFare}</span>
                 <span className="text-[0.6rem] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded">SALE</span>
               </div>
             )}
-            <p className="text-2xl font-black text-gray-900">₹{d.fare}</p>
+            <p className="text-2xl font-black text-gray-900">â‚¹{d.fare}</p>
             <p className="text-[0.65rem] text-gray-400">per person</p>
             <div className="mt-1"><SeatsBadge seats={d.seats} /></div>
           </div>
@@ -287,7 +288,7 @@ function BusResultRow({ busData: d, origin, destination, onBook, view }) {
   );
 }
 
-// ─── Seat Map ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Seat Map â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function SeatMap({ totalSeats, selected, onToggle }) {
   const rows = Math.ceil(Math.min(totalSeats + 8, 24) / 4);
@@ -339,7 +340,7 @@ function SeatMap({ totalSeats, selected, onToggle }) {
   );
 }
 
-// ─── Booking Modal ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Booking Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function loadRazorpay() {
   return new Promise(resolve => {
@@ -384,11 +385,36 @@ function BookingModal({ data, onClose }) {
         amount: total * 100,
         currency: 'INR',
         name: 'Pacific Travel',
-        description: `Bus: ${data.origin} → ${data.destination}`,
+        description: `Bus: ${data.origin} â†’ ${data.destination}`,
         image: import.meta.env.VITE_LOGO_URL || '',
         prefill: { name, email, contact: phone },
         theme: { color: '#f97316' },
-        handler: () => { setBooked(true); },
+        handler: async () => {
+          try {
+            await createBooking({
+              type: 'bus',
+              name,
+              email,
+              phone,
+              origin: data.origin,
+              destination: data.destination,
+              operator: data.op.name,
+              busClass: data.busClass,
+              departure: `${data.hDep}:${data.mDep}`,
+              arrival: `${data.hArr}:${data.mArr}`,
+              duration: `${data.durH}h ${data.durM}m`,
+              distanceKm: data.distanceKm,
+              station: data.stationName,
+              seat: seat || null,
+              passengers,
+              totalPrice: total,
+              amenities: data.amenities,
+            });
+          } catch {
+            // booking saved best-effort; don't block confirmation
+          }
+          setBooked(true);
+        },
         modal: { ondismiss: () => setPaying(false) },
       });
       rzp.open();
@@ -412,12 +438,12 @@ function BookingModal({ data, onClose }) {
             <p className="text-gray-400 text-sm mb-6">Confirmation sent to <span className="font-semibold text-gray-700">{email}</span></p>
             <div className="bg-gray-50 rounded-2xl p-5 text-left space-y-2.5 mb-6 border border-gray-100 text-sm">
               {[
-                ['Route',      `${data.origin} → ${data.destination}`],
+                ['Route',      `${data.origin} â†’ ${data.destination}`],
                 ['Operator',   data.op.name],
                 ['Station',    data.stationName],
                 ['Departure',  `${data.hDep}:${data.mDep}`],
                 ['Arrival',    `${data.hArr}:${data.mArr}`],
-                ['Duration',   `${data.durH}h ${data.durM}m · ${data.distanceKm} km`],
+                ['Duration',   `${data.durH}h ${data.durM}m Â· ${data.distanceKm} km`],
                 ['Class',      data.busClass],
                 ...(seat ? [['Seat', `#${seat}`]] : []),
                 ['Passengers', String(passengers)],
@@ -429,7 +455,7 @@ function BookingModal({ data, onClose }) {
               ))}
               <div className="flex justify-between font-black text-base border-t border-gray-200 pt-2.5 mt-1">
                 <span className="text-gray-900">Total Paid</span>
-                <span className="text-orange-500">₹{total}</span>
+                <span className="text-orange-500">â‚¹{total}</span>
               </div>
             </div>
             <button onClick={onClose} className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 rounded-2xl transition-all">Done</button>
@@ -441,7 +467,7 @@ function BookingModal({ data, onClose }) {
               <div className="flex items-center justify-between mb-5">
                 <div>
                   <h3 className="font-black text-xl">Book Your Seat</h3>
-                  <p className="text-orange-100 text-xs mt-0.5">{data.origin} → {data.destination} · {data.op.name}</p>
+                  <p className="text-orange-100 text-xs mt-0.5">{data.origin} â†’ {data.destination} Â· {data.op.name}</p>
                 </div>
                 <button onClick={onClose} className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all">
                   <i className="fa fa-times" />
@@ -489,7 +515,7 @@ function BookingModal({ data, onClose }) {
                           <i className="fa fa-bus text-orange-400 text-xs" />
                           <div className="flex-1 border-t-2 border-dashed border-orange-300" />
                         </div>
-                        <p className="text-[0.6rem] text-gray-400">{data.durH}h {data.durM}m · {data.distanceKm} km</p>
+                        <p className="text-[0.6rem] text-gray-400">{data.durH}h {data.durM}m Â· {data.distanceKm} km</p>
                       </div>
                       <div className="text-center">
                         <p className="text-xl font-black text-gray-900">{data.hArr}:{data.mArr}</p>
@@ -525,7 +551,7 @@ function BookingModal({ data, onClose }) {
                   <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                     <div>
                       <p className="text-xs text-gray-400">Estimated total</p>
-                      <p className="text-2xl font-black text-gray-900">₹{total}</p>
+                      <p className="text-2xl font-black text-gray-900">â‚¹{total}</p>
                     </div>
                     <button onClick={() => setStep(2)} className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-2xl transition-all shadow-md shadow-orange-500/20">
                       Next <i className="fa fa-arrow-right text-xs" />
@@ -571,11 +597,11 @@ function BookingModal({ data, onClose }) {
                   ))}
 
                   <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 space-y-2 text-sm">
-                    <div className="flex justify-between text-gray-500"><span>Fare × {passengers}</span><span>₹{data.fare * passengers}</span></div>
-                    {data.discount && <div className="flex justify-between text-green-600"><span>Discount</span><span>-₹{data.oldFare - data.fare}</span></div>}
-                    <div className="flex justify-between text-gray-500"><span>Service fee</span><span>₹50</span></div>
+                    <div className="flex justify-between text-gray-500"><span>Fare Ã— {passengers}</span><span>â‚¹{data.fare * passengers}</span></div>
+                    {data.discount && <div className="flex justify-between text-green-600"><span>Discount</span><span>-â‚¹{data.oldFare - data.fare}</span></div>}
+                    <div className="flex justify-between text-gray-500"><span>Service fee</span><span>â‚¹50</span></div>
                     <div className="flex justify-between font-black text-gray-900 text-base border-t border-gray-200 pt-2 mt-1">
-                      <span>Total</span><span className="text-orange-500">₹{total}</span>
+                      <span>Total</span><span className="text-orange-500">â‚¹{total}</span>
                     </div>
                   </div>
 
@@ -587,7 +613,7 @@ function BookingModal({ data, onClose }) {
 
                   <div className="flex items-center gap-2 bg-orange-50 border border-orange-100 rounded-xl px-4 py-3 text-sm text-orange-800">
                     <i className="fa fa-lock text-orange-500" />
-                    Secured by Razorpay · UPI, Cards, Net Banking & Wallets
+                    Secured by Razorpay Â· UPI, Cards, Net Banking & Wallets
                   </div>
 
                   <div className="flex gap-3">
@@ -595,7 +621,7 @@ function BookingModal({ data, onClose }) {
                     <button type="submit" disabled={paying}
                       className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-bold py-3 rounded-2xl transition-all shadow-md shadow-orange-500/20 flex items-center justify-center gap-2">
                       {paying ? <i className="fa fa-spinner fa-spin" /> : <i className="fa fa-lock text-xs" />}
-                      {paying ? 'Opening Razorpay…' : `Pay ₹${total}`}
+                      {paying ? 'Opening Razorpayâ€¦' : `Pay â‚¹${total}`}
                     </button>
                   </div>
                 </form>
@@ -608,7 +634,7 @@ function BookingModal({ data, onClose }) {
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Main Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function Bus() {
   const [searchParams] = useSearchParams();
@@ -674,7 +700,7 @@ export default function Bus() {
     <>
       <BusAlertsTicker />
 
-      {/* ── Hero ── */}
+      {/* â”€â”€ Hero â”€â”€ */}
       <section className="relative overflow-hidden" style={{ minHeight: '72vh' }}>
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/bg_4.jpg')" }} />
         <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/60 to-orange-950/50" />
@@ -696,14 +722,12 @@ export default function Bus() {
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight mb-4 max-w-3xl">
             Travel Smarter <span className="text-orange-400">by Bus</span>
           </h1>
-          <p className="text-gray-300 text-base md:text-lg max-w-xl">
-            Real routes · Real fares · Book your seat in seconds
-          </p>
+          <p className="text-gray-300 text-base md:text-lg max-w-xl">Real routes · Real fares · Book your seat in seconds</p>
         </div>
 
       </section>
 
-      {/* ── Search Card ── */}
+      {/* â”€â”€ Search Card â”€â”€ */}
       <div className="bg-gray-950 px-4 py-8">
         <div className="max-w-5xl mx-auto">
           <form onSubmit={handleSearch} className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-5 md:p-6">
@@ -723,7 +747,7 @@ export default function Bus() {
                 </div>
               ))}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Passengers</label>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Passengers</p>
                 <div className="flex items-center gap-2 border border-gray-200 rounded-2xl px-3 py-2.5 bg-gray-50/50">
                   <button type="button" onClick={() => setPax(p => Math.max(1, p-1))} className="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:border-orange-400 hover:text-orange-500 transition-all flex-shrink-0"><i className="fa fa-minus text-[0.6rem]" /></button>
                   <span className="flex-1 text-center text-sm font-bold text-gray-900">{pax}</span>
@@ -733,14 +757,14 @@ export default function Bus() {
               <button type="submit" disabled={loading}
                 className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-bold px-6 py-3.5 rounded-2xl transition-all shadow-lg shadow-orange-500/30 active:scale-95 h-[50px]">
                 <i className={`fa ${loading ? 'fa-spinner fa-spin' : 'fa-search'}`} />
-                {loading ? 'Searching…' : 'Search Buses'}
+                {loading ? 'Searchingâ€¦' : 'Search Buses'}
               </button>
             </div>
           </form>
         </div>
       </div>
 
-      {/* ── Stats bar ── */}
+      {/* â”€â”€ Stats bar â”€â”€ */}
       <div className="bg-gray-950">
         <div className="max-w-4xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-white/10">
@@ -755,7 +779,7 @@ export default function Bus() {
         </div>
       </div>
 
-      {/* ── Error ── */}
+      {/* â”€â”€ Error â”€â”€ */}
       {error && (
         <div className="max-w-5xl mx-auto px-6 pt-8">
           <div className="flex items-center gap-3 bg-red-50 border border-red-200 text-red-600 rounded-2xl px-5 py-4 text-sm">
@@ -764,14 +788,14 @@ export default function Bus() {
         </div>
       )}
 
-      {/* ── Loading skeletons ── */}
+      {/* â”€â”€ Loading skeletons â”€â”€ */}
       {loading && (
         <section className="max-w-6xl mx-auto px-6 py-12">
           <div className="space-y-4">{[...Array(5)].map((_, i) => <SkeletonRow key={i} />)}</div>
         </section>
       )}
 
-      {/* ── Results ── */}
+      {/* â”€â”€ Results â”€â”€ */}
       {results && !loading && (
         <section className="max-w-6xl mx-auto px-6 py-12" ref={resultsRef}>
 
@@ -782,8 +806,8 @@ export default function Bus() {
                 <i className="fa fa-bus text-orange-500" />
               </div>
               <div className="min-w-0">
-                <p className="font-extrabold text-gray-900 text-lg truncate">{results.from.name} → {results.to.name}</p>
-                <p className="text-xs text-gray-400">{results.from.country} → {results.to.country}</p>
+                <p className="font-extrabold text-gray-900 text-lg truncate">{results.from.name} â†’ {results.to.name}</p>
+                <p className="text-xs text-gray-400">{results.from.country} â†’ {results.to.country}</p>
               </div>
             </div>
             <div className="flex items-center gap-6 flex-wrap text-center">
@@ -813,12 +837,12 @@ export default function Bus() {
                   <div>
                     <div className="flex items-center justify-between mb-3">
                       <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Max Price</p>
-                      <span className="text-sm font-black text-orange-500">₹{filterMaxPrice}</span>
+                      <span className="text-sm font-black text-orange-500">â‚¹{filterMaxPrice}</span>
                     </div>
                     <input type="range" min={0} max={maxFareCeiling} step={50} value={filterMaxPrice}
                       onChange={e => setFilterMaxPrice(Number(e.target.value))}
                       className="w-full accent-orange-500 cursor-pointer" />
-                    <div className="flex justify-between text-[0.6rem] text-gray-400 mt-1"><span>₹0</span><span>₹{maxFareCeiling}</span></div>
+                    <div className="flex justify-between text-[0.6rem] text-gray-400 mt-1"><span>â‚¹0</span><span>â‚¹{maxFareCeiling}</span></div>
                   </div>
                   <div>
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Bus Class</p>
@@ -893,7 +917,7 @@ export default function Bus() {
         </section>
       )}
 
-      {/* ── Pre-search sections ── */}
+      {/* â”€â”€ Pre-search sections â”€â”€ */}
       {!results && !loading && (
         <>
           {/* Popular Routes */}
@@ -903,7 +927,7 @@ export default function Bus() {
                 <span className="text-orange-500 text-xs font-bold uppercase tracking-widest">Quick Pick</span>
                 <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 mt-1">Popular Routes</h2>
               </div>
-              <span className="text-xs text-gray-400 hidden sm:block">Click to auto-fill →</span>
+              <span className="text-xs text-gray-400 hidden sm:block">Click to auto-fill â†’</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {POPULAR_ROUTES.map((r, i) => (
@@ -912,7 +936,7 @@ export default function Bus() {
                   <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: `url('${r.img}')` }} />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
                   <div className="absolute inset-0 p-5 flex flex-col justify-end">
-                    <p className="text-white font-extrabold text-lg leading-tight">{r.from} → {r.to}</p>
+                    <p className="text-white font-extrabold text-lg leading-tight">{r.from} â†’ {r.to}</p>
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-gray-300 text-xs flex items-center gap-1.5">
                         <i className="fa fa-clock-o text-orange-400" />{r.duration}
@@ -980,7 +1004,7 @@ export default function Bus() {
         </>
       )}
 
-      {/* ── Bus Extras ── */}
+      {/* â”€â”€ Bus Extras â”€â”€ */}
       {results && <NearbyStopsMap results={results.stations ? { stations: results.stations, from: results.from } : null} />}
       <JourneyPlanner />
       <PriceTrendChart />
